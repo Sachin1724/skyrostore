@@ -1,16 +1,20 @@
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
-import { OrderList } from "@/components/account/order-list";
+import { OrderDashboard } from "@/components/account/order-dashboard";
 
-export const metadata = { title: "My Orders" };
+export const metadata = {
+  title: "My Orders — Skyrostore",
+  description: "Track your orders, view details, download invoices and manage returns.",
+};
 
 export default function OrdersPage() {
   return (
     <>
       <Header />
-      <main className="mx-auto max-w-[960px] px-8 py-8 md:px-10">
-        <h1 className="text-[28px] font-bold tracking-[-0.025em] text-graphite">My Orders</h1>
-        <OrderList />
+      <main className="min-h-screen bg-surface-soft py-10">
+        <div className="mx-auto max-w-[1280px] px-8 md:px-10">
+          <OrderDashboard />
+        </div>
       </main>
       <Footer />
     </>

@@ -3,50 +3,49 @@ import Image from "next/image";
 
 export function Hero() {
   return (
-    <section className="bg-surface-soft">
-      <div className="mx-auto flex flex-col md:flex-row max-w-[1280px] items-center justify-between px-8 py-12 md:px-10 md:py-20">
-        <div className="w-full max-w-lg md:w-[50%] lg:w-[48%]">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-success">
-            BUILT FOR PROFESSIONAL APPLICATIONS
-          </p>
-          <h1 className="mt-4 text-[42px] font-bold leading-[0.98] tracking-[-0.025em] text-graphite md:text-[52px]">
+    <section className="bg-white" style={{ borderBottom: "1px solid var(--color-border)" }}>
+      <div className="mx-auto flex flex-col md:flex-row max-w-[1280px] items-center justify-between px-8 py-10 md:px-10 md:py-16">
+        <div className="w-full max-w-xl md:w-[52%]">
+          <div className="inline-block">
+            <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-success">
+              BUILT FOR PROFESSIONAL APPLICATIONS
+            </span>
+            <div className="mt-1 h-0.5 w-12 bg-accent" />
+          </div>
+          <h1 className="mt-4 text-[44px] font-extrabold leading-[1.04] tracking-[-0.03em] text-graphite md:text-[54px]">
             Professional UAVs
             <br />
             and Components
           </h1>
-          <p className="mt-5 max-w-md text-[15px] leading-relaxed text-text-secondary">
+          <p className="mt-4 max-w-lg text-[15px] leading-relaxed text-text-secondary">
             Engineering-grade drones, flight hardware, and components for mapping,
             inspection, agriculture, and custom aerial systems.
           </p>
-          <div className="mt-8 flex flex-wrap gap-3">
+          <div className="mt-8 flex flex-wrap items-center gap-3">
             <Link
               href="/uavs"
-              className="inline-flex items-center bg-graphite px-6 py-3 text-[13px] font-semibold text-white transition-colors hover:bg-graphite-soft"
-              style={{ borderRadius: "var(--radius-sm)" }}
+              className="inline-flex items-center gap-2 rounded-md bg-graphite px-6 py-3 text-[13px] font-bold text-white transition-all hover:bg-black"
             >
-              Shop UAVs
+              Shop UAVs &rarr;
             </Link>
             <Link
               href="/parts"
-              className="inline-flex items-center bg-surface px-6 py-3 text-[13px] font-semibold text-graphite transition-colors hover:bg-surface-muted"
-              style={{ borderRadius: "var(--radius-sm)", border: "1px solid var(--color-border-strong)" }}
+              className="inline-flex items-center rounded-md border border-border bg-white px-6 py-3 text-[13px] font-semibold text-graphite transition-all hover:bg-surface-soft hover:border-border-strong"
             >
               Shop Components
             </Link>
           </div>
         </div>
-        <div className="mt-8 w-full md:mt-0 md:w-[46%] lg:w-[45%]">
-          <div
-            className="relative aspect-[4/3] w-full overflow-hidden bg-surface-muted sm:aspect-[16/11] md:aspect-square"
-            style={{ borderRadius: "var(--radius-md)", border: "1px solid var(--color-border)" }}
-          >
+
+        <div className="mt-8 w-full md:mt-0 md:w-[48%] flex items-center justify-center">
+          <div className="relative aspect-[16/10] w-full max-w-[540px]">
             <Image
-              src="/images/hero/uav-hero.png"
-              alt="Professional Autonomous UAV Platform"
+              src="/images/hero/storefront-hero-drone.png"
+              alt="Professional Multi-Rotor UAV Platform"
               fill
               priority
-              className="object-cover transition-transform duration-500 hover:scale-[1.02]"
-              sizes="(min-width: 1024px) 45vw, (min-width: 768px) 48vw, 100vw"
+              className="object-contain"
+              sizes="(min-width: 1024px) 50vw, 100vw"
             />
           </div>
         </div>

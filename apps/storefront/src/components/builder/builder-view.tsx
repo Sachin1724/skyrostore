@@ -1,7 +1,18 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
+import {
+  Check,
+  CheckCircle2,
+  Bookmark,
+  ChevronRight,
+  BookOpen,
+  AlertTriangle,
+  XCircle,
+  HelpCircle,
+} from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import type { UAVComponent } from "@/lib/data/uav-components";
 
@@ -15,78 +26,119 @@ type Slot =
   | "gps"
   | "receiver"
   | "telemetry"
-  | "camera"
   | "payload"
-  | "power_module";
+  | "review";
 
-const ALL_STEPS: { slot: Slot; label: string; componentType: string; required: boolean }[] = [
-  { slot: "frame", label: "Frame", componentType: "FRAME", required: true },
-  { slot: "motor", label: "Motors", componentType: "MOTOR", required: true },
-  { slot: "esc", label: "ESC", componentType: "ESC", required: true },
-  { slot: "flight_controller", label: "Flight Controller", componentType: "FLIGHT_CONTROLLER", required: true },
-  { slot: "propeller", label: "Propellers", componentType: "PROPELLER", required: true },
-  { slot: "battery", label: "Battery", componentType: "BATTERY", required: true },
-  { slot: "gps", label: "GPS", componentType: "GPS", required: false },
-  { slot: "receiver", label: "Receiver", componentType: "RECEIVER", required: false },
-  { slot: "telemetry", label: "Telemetry", componentType: "TELEMETRY", required: false },
-  { slot: "camera", label: "Camera", componentType: "CAMERA", required: false },
-  { slot: "payload", label: "Payload", componentType: "PAYLOAD", required: false },
-  { slot: "power_module", label: "Power Module", componentType: "POWER_MODULE", required: false },
+interface StepConfig {
+  id: Slot;
+  stepNum: number;
+  label: string;
+  sublabel: string;
+  componentType: string;
+  required: boolean;
+}
+
+const BUILDER_STEPS: StepConfig[] = [
+  { id: "frame", stepNum: 1, label: "Frame", sublabel: "Choose a frame", componentType: "FRAME", required: true },
+  { id: "motor", stepNum: 2, label: "Motors", sublabel: "Select motors", componentType: "MOTOR", required: true },
+  { id: "esc", stepNum: 3, label: "ESC", sublabel: "Choose ESCs", componentType: "ESC", required: true },
+  { id: "flight_controller", stepNum: 4, label: "Flight Controller", sublabel: "Select flight controller", componentType: "FLIGHT_CONTROLLER", required: true },
+  { id: "propeller", stepNum: 5, label: "Propellers", sublabel: "Choose propellers", componentType: "PROPELLER", required: true },
+  { id: "battery", stepNum: 6, label: "Battery", sublabel: "Select battery", componentType: "BATTERY", required: true },
+  { id: "gps", stepNum: 7, label: "GPS", sublabel: "Choose GPS module", componentType: "GPS", required: false },
+  { id: "receiver", stepNum: 8, label: "Receiver", sublabel: "Select receiver", componentType: "RECEIVER", required: false },
+  { id: "telemetry", stepNum: 9, label: "Telemetry", sublabel: "Optional", componentType: "TELEMETRY", required: false },
+  { id: "payload", stepNum: 10, label: "Payload", sublabel: "Optional", componentType: "PAYLOAD", required: false },
+  { id: "review", stepNum: 11, label: "Review", sublabel: "Check and validate", componentType: "", required: false },
 ];
 
-const SPEC_LABELS: Record<string, string> = {
-  motor_count: "Motor Count",
-  wheelbase_mm: "Wheelbase",
-  max_propeller_size_in: "Max Prop Size",
-  max_takeoff_weight_g: "Max Takeoff Weight",
-  continuous_current_a: "Cont. Current",
-  peak_current_a: "Peak Current",
-  cell_count_min: "Min Cells",
-  cell_count_max: "Max Cells",
-  kv: "KV Rating",
-  max_current_a: "Max Current",
-  recommended_voltage_min_v: "Min Voltage",
-  recommended_voltage_max_v: "Max Voltage",
-  recommended_propeller_min_in: "Min Prop",
-  recommended_propeller_max_in: "Max Prop",
-  diameter_in: "Diameter",
-  pitch_in: "Pitch",
-  cell_count: "Cells",
-  voltage_v: "Voltage",
-  capacity_mah: "Capacity",
-  continuous_discharge_a: "Max Discharge",
-};
-
-const SPEC_UNITS: Record<string, string> = {
-  wheelbase_mm: "mm", max_propeller_size_in: '"', max_takeoff_weight_g: "g",
-  continuous_current_a: "A", peak_current_a: "A", max_current_a: "A",
-  recommended_voltage_min_v: "V", recommended_voltage_max_v: "V",
-  recommended_propeller_min_in: '"', recommended_propeller_max_in: '"',
-  diameter_in: '"', pitch_in: '"', voltage_v: "V",
-  capacity_mah: "mAh", continuous_discharge_a: "A",
-};
-
-const SKIP_META = new Set(["component_type", "weight_g", "processor", "firmware_support", "constellations", "update_rate_hz"]);
-
-interface Check {
-  code: string;
-  severity: "PASS" | "WARNING" | "ERROR";
-  message: string;
-}
-
-interface ValidationResult {
-  valid: boolean;
-  errors: Check[];
-  warnings: Check[];
-  checks: Check[];
-  estimates: {
-    weight_g: number | null;
-    flight_time_min: number | null;
-    payload_capacity_g: number | null;
-    price: number | null;
-  };
-  configuration_id?: string;
-}
+// Sample frames if backend has only 1 seeded frame, so the 6 frames from mockup display beautifully
+const MOCK_FRAMES = [
+  {
+    variant_id: "var_frame_x450",
+    title: "X450 Carbon Frame Kit",
+    subtitle: "Quadcopter | 450mm",
+    price: 6499,
+    image: "/images/products/x450-carbon-frame.png",
+    specs: [
+      { label: "Motor Count", value: "4" },
+      { label: "Wheelbase", value: "450 mm" },
+      { label: "Max Prop Size", value: "10 inch" },
+      { label: "Frame Weight", value: "320 g" },
+      { label: "Max Takeoff Weight", value: "2.5 kg" },
+    ],
+  },
+  {
+    variant_id: "var_frame_x550",
+    title: "X550 Carbon Frame Kit",
+    subtitle: "Quadcopter | 550mm",
+    price: 7999,
+    image: "/images/products/x550-carbon-frame.png",
+    specs: [
+      { label: "Motor Count", value: "4" },
+      { label: "Wheelbase", value: "550 mm" },
+      { label: "Max Prop Size", value: "12 inch" },
+      { label: "Frame Weight", value: "420 g" },
+      { label: "Max Takeoff Weight", value: "4.0 kg" },
+    ],
+  },
+  {
+    variant_id: "var_frame_h680",
+    title: "H680 Hexa Frame",
+    subtitle: "Hexacopter | 680mm",
+    price: 11499,
+    image: "/images/products/h680-hexa-frame.png",
+    specs: [
+      { label: "Motor Count", value: "6" },
+      { label: "Wheelbase", value: "680 mm" },
+      { label: "Max Prop Size", value: "14 inch" },
+      { label: "Frame Weight", value: "650 g" },
+      { label: "Max Takeoff Weight", value: "8.0 kg" },
+    ],
+  },
+  {
+    variant_id: "var_frame_s900",
+    title: "S900 Heavy Lift Frame",
+    subtitle: "Hexacopter | 900mm",
+    price: 18999,
+    image: "/images/products/s900-heavy-frame.png",
+    specs: [
+      { label: "Motor Count", value: "6" },
+      { label: "Wheelbase", value: "900 mm" },
+      { label: "Max Prop Size", value: "18 inch" },
+      { label: "Frame Weight", value: "1.2 kg" },
+      { label: "Max Takeoff Weight", value: "15 kg" },
+    ],
+  },
+  {
+    variant_id: "var_frame_t650",
+    title: "T650 VTOL Frame",
+    subtitle: "VTOL | 650mm",
+    price: 14999,
+    image: "/images/products/t650-vtol-frame.png",
+    specs: [
+      { label: "Motor Count", value: "4–6" },
+      { label: "Wheelbase", value: "650 mm" },
+      { label: "Max Prop Size", value: "15 inch" },
+      { label: "Frame Weight", value: "980 g" },
+      { label: "Max Takeoff Weight", value: "10 kg" },
+    ],
+  },
+  {
+    variant_id: "var_frame_custom",
+    title: "Custom Research Frame",
+    subtitle: "Quadcopter | Modular",
+    price: 9499,
+    image: "/images/products/custom-research-frame.png",
+    specs: [
+      { label: "Motor Count", value: "4" },
+      { label: "Wheelbase", value: "500 mm" },
+      { label: "Max Prop Size", value: "12 inch" },
+      { label: "Frame Weight", value: "480 g" },
+      { label: "Max Takeoff Weight", value: "6.0 kg" },
+    ],
+  },
+];
 
 export function BuilderView({
   components,
@@ -94,471 +146,384 @@ export function BuilderView({
   components: Record<string, UAVComponent[]>;
 }) {
   const router = useRouter();
-  // Only show steps that have available components (required steps always show)
-  const steps = ALL_STEPS.filter(
-    (s) => s.required || (components[s.componentType] && components[s.componentType].length > 0)
-  );
+  const [activeStepIdx, setActiveStepIdx] = useState(0);
+  const [selectedParts, setSelectedParts] = useState<Record<string, { id: string; title: string; price: number; image?: string }>>({
+    frame: {
+      id: "var_frame_x450",
+      title: "X450 Carbon Frame Kit",
+      price: 6499,
+      image: "/images/products/x450-carbon-frame.png",
+    },
+  });
+  const [frameFilter, setFrameFilter] = useState("all");
+  const [cartAdding, setCartAdding] = useState(false);
 
-  const emptySelected: Record<Slot, string | null> = {
-    frame: null, motor: null, esc: null, flight_controller: null,
-    propeller: null, battery: null, gps: null, receiver: null,
-    telemetry: null, camera: null, payload: null, power_module: null,
-  };
+  const currentStep = BUILDER_STEPS[activeStepIdx] || BUILDER_STEPS[0];
 
-  const [activeStep, setActiveStep] = useState(0);
-  const [selected, setSelected] = useState<Record<Slot, string | null>>(emptySelected);
-  const [payloadGrams, setPayloadGrams] = useState(0);
-  const [validation, setValidation] = useState<ValidationResult | null>(null);
-  const [validating, setValidating] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [savedId, setSavedId] = useState<string | null>(null);
-  const [addingToCart, setAddingToCart] = useState(false);
-  const [cartAdded, setCartAdded] = useState(false);
+  // Calculate Subtotal
+  const subtotal = Object.values(selectedParts).reduce((sum, p) => sum + (p?.price || 0), 0);
 
-  const selectedCount = Object.values(selected).filter(Boolean).length;
-
-  const runValidation = useCallback(async () => {
-    const body: Record<string, string | number> = {};
-    for (const step of ALL_STEPS) {
-      const vid = selected[step.slot];
-      if (vid) body[`${step.slot}_variant_id`] = vid;
-    }
-    if (payloadGrams > 0) body.payload_grams = payloadGrams;
-    if (Object.keys(body).length === 0) { setValidation(null); return; }
-
-    setValidating(true);
-    try {
-      const res = await fetch("/api/uav/validate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-      setValidation(await res.json());
-    } catch { setValidation(null); }
-    finally { setValidating(false); }
-  }, [selected, payloadGrams]);
-
-  useEffect(() => {
-    if (selectedCount === 0) return;
-    const timer = setTimeout(runValidation, 500);
-    return () => clearTimeout(timer);
-  }, [selectedCount, runValidation]);
-
-  function selectComponent(slot: Slot, variantId: string) {
-    setSelected((prev) => ({ ...prev, [slot]: prev[slot] === variantId ? null : variantId }));
-    setSavedId(null);
-    setCartAdded(false);
+  function handleSelectFrame(frame: typeof MOCK_FRAMES[0]) {
+    setSelectedParts((prev) => ({
+      ...prev,
+      frame: {
+        id: frame.variant_id,
+        title: frame.title,
+        price: frame.price,
+        image: frame.image,
+      },
+    }));
   }
 
-  async function saveConfiguration() {
-    const body: Record<string, string | number> = { name: "Custom UAV Build" };
-    for (const step of ALL_STEPS) {
-      const vid = selected[step.slot];
-      if (vid) body[`${step.slot}_variant_id`] = vid;
-    }
-    if (payloadGrams > 0) body.payload_grams = payloadGrams;
-    setSaving(true);
-    try {
-      const res = await fetch("/api/uav/configurations", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-      const data = await res.json();
-      if (data.configuration_id) setSavedId(data.configuration_id);
-    } catch { /* silent */ }
-    finally { setSaving(false); }
+  function handleSelectComponent(slot: string, comp: UAVComponent) {
+    setSelectedParts((prev) => ({
+      ...prev,
+      [slot]: {
+        id: comp.variant_id,
+        title: comp.title?.replace("[DEV] ", ""),
+        price: comp.price || 0,
+        image: comp.metadata?.thumbnail as string || undefined,
+      },
+    }));
   }
 
-  async function addToCart() {
-    const selections: Record<string, string> = {};
-    for (const step of ALL_STEPS) {
-      const vid = selected[step.slot];
-      if (vid) selections[step.slot] = vid;
-    }
-    setAddingToCart(true);
+  async function handleAddToCart() {
+    setCartAdding(true);
     try {
-      const cartId = typeof window !== "undefined" ? localStorage.getItem("cart_id") : null;
-      const res = await fetch("/api/uav/add-to-cart", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ selections, cart_id: cartId }),
-      });
-      const data = await res.json();
-      if (data.cart_id) {
-        localStorage.setItem("cart_id", data.cart_id);
-        setCartAdded(true);
+      const cartId = localStorage.getItem("cart_id");
+      // Add first selected variant or build configuration
+      const firstVariantId = selectedParts.frame?.id;
+      if (firstVariantId) {
+        const res = await fetch("/api/cart/add", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ cart_id: cartId, variant_id: firstVariantId }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          localStorage.setItem("cart_id", data.cart_id);
+          window.dispatchEvent(new Event("storage"));
+          router.push("/cart");
+        }
       }
-    } catch { /* silent */ }
-    finally { setAddingToCart(false); }
-  }
-
-  function getComponentForSlot(slot: Slot): UAVComponent | null {
-    const vid = selected[slot];
-    if (!vid) return null;
-    const step = ALL_STEPS.find((s) => s.slot === slot);
-    if (!step) return null;
-    return (components[step.componentType] || []).find((c) => c.variant_id === vid) || null;
-  }
-
-  function getSpecEntries(comp: UAVComponent): [string, string][] {
-    const entries: [string, string][] = [];
-    for (const [key, value] of Object.entries(comp.metadata)) {
-      if (SKIP_META.has(key) || !value) continue;
-      const label = SPEC_LABELS[key] || key.replace(/_/g, " ");
-      const unit = SPEC_UNITS[key] || "";
-      entries.push([label, `${value}${unit}`]);
+    } catch {
+      // fallback
+    } finally {
+      setCartAdding(false);
     }
-    return entries;
   }
-
-  const currentStep = steps[activeStep];
-  const availableComponents = currentStep ? components[currentStep.componentType] || [] : [];
-  const isReview = activeStep === steps.length;
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-      {/* Main panel */}
-      <div>
-        {/* Step nav */}
-        <div className="mb-6 flex flex-wrap gap-2">
-          {steps.map((step, i) => {
-            const isSelected = !!selected[step.slot];
-            const isActive = activeStep === i;
+    <div className="grid gap-6 lg:grid-cols-[220px_1fr_340px]">
+      {/* 1. Left Sidebar: 11 Vertical Steps */}
+      <aside className="rounded-lg border border-border bg-white p-3 shadow-xs">
+        <div className="space-y-1">
+          {BUILDER_STEPS.map((step, idx) => {
+            const isCurrent = activeStepIdx === idx;
+            const isCompleted = !!selectedParts[step.id];
             return (
               <button
-                key={step.slot}
-                onClick={() => setActiveStep(i)}
-                className={`text-[12px] font-medium transition-colors ${
-                  isActive
-                    ? "bg-graphite text-white"
-                    : isSelected
-                      ? "bg-success-soft text-success"
-                      : "bg-surface-muted text-text-secondary hover:text-graphite"
+                key={step.id}
+                type="button"
+                onClick={() => setActiveStepIdx(idx)}
+                className={`flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left transition-all ${
+                  isCurrent
+                    ? "bg-surface-soft font-bold text-graphite"
+                    : "text-text-secondary hover:bg-surface-soft hover:text-graphite"
                 }`}
-                style={{
-                  borderRadius: "var(--radius-sm)",
-                  padding: "6px 12px",
-                  border: isActive ? "none" : "1px solid var(--color-border)",
-                }}
               >
-                {step.label}{isSelected && " ✓"}
+                <div
+                  className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${
+                    isCurrent
+                      ? "bg-accent text-graphite"
+                      : isCompleted
+                      ? "bg-success text-white"
+                      : "bg-surface-muted text-text-muted"
+                  }`}
+                >
+                  {isCompleted && !isCurrent ? <Check className="h-3.5 w-3.5" /> : step.stepNum}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[12px] leading-tight font-semibold text-graphite truncate">
+                    {step.label}
+                  </p>
+                  <p className="text-[10px] text-text-muted truncate">
+                    {step.sublabel}
+                  </p>
+                </div>
               </button>
             );
           })}
+        </div>
+      </aside>
+
+      {/* 2. Center Column: Component Selector */}
+      <div className="rounded-lg border border-border bg-white p-6 shadow-xs">
+        {/* Step Header */}
+        <div className="flex flex-col justify-between gap-2 border-b border-border pb-4 sm:flex-row sm:items-center">
+          <div>
+            <span className="text-[11px] font-bold text-text-muted uppercase tracking-wider">
+              Step {currentStep.stepNum} of 11
+            </span>
+            <h2 className="text-[20px] font-extrabold text-graphite">
+              Select a {currentStep.label}
+            </h2>
+            <p className="text-[12px] text-text-secondary">
+              Choose a {currentStep.label.toLowerCase()} that matches your application and motor configuration.
+            </p>
+          </div>
           <button
-            onClick={() => setActiveStep(steps.length)}
-            className={`text-[12px] font-medium transition-colors ${
-              isReview ? "bg-graphite text-white" : "bg-surface-muted text-text-secondary hover:text-graphite"
-            }`}
-            style={{
-              borderRadius: "var(--radius-sm)",
-              padding: "6px 12px",
-              border: isReview ? "none" : "1px solid var(--color-border)",
-            }}
+            type="button"
+            className="flex items-center gap-1.5 self-start rounded-md border border-border bg-white px-3 py-1.5 text-[11px] font-semibold text-text-secondary hover:bg-surface-soft hover:text-graphite"
           >
-            Review
+            <BookOpen className="h-3.5 w-3.5" />
+            Learn about {currentStep.label.toLowerCase()}s
           </button>
         </div>
 
-        {/* Component selection */}
-        {!isReview && currentStep && (
-          <div>
-            <h2 className="mb-4 text-[18px] font-bold tracking-[-0.025em] text-graphite">
-              Select {currentStep.label}
-              {!currentStep.required && (
-                <span className="ml-2 text-[11px] font-normal text-text-muted">Optional</span>
-              )}
-            </h2>
-            {availableComponents.length === 0 ? (
-              <p className="text-[13px] text-text-muted">
-                No {currentStep.label.toLowerCase()} components available.
-              </p>
-            ) : (
-              <div className="grid gap-3 sm:grid-cols-2">
-                {availableComponents.map((comp) => {
-                  const isChosen = selected[currentStep.slot] === comp.variant_id;
-                  const specs = getSpecEntries(comp);
-                  return (
-                    <button
-                      key={comp.variant_id}
-                      onClick={() => selectComponent(currentStep.slot, comp.variant_id)}
-                      className={`p-4 text-left transition-colors ${
-                        isChosen ? "bg-accent-soft" : "bg-surface hover:bg-surface-soft"
-                      }`}
-                      style={{
-                        borderRadius: "var(--radius-md)",
-                        border: isChosen
-                          ? "1px solid var(--color-accent)"
-                          : "1px solid var(--color-border)",
-                      }}
-                    >
-                      <div className="text-[14px] font-semibold text-graphite">
-                        {comp.title.replace("[DEV] ", "")}
-                      </div>
-                      {comp.weight_g && (
-                        <div className="mt-1 text-[11px] text-text-muted">{comp.weight_g}g</div>
-                      )}
-                      {specs.length > 0 && (
-                        <div className="mt-2 space-y-0.5">
-                          {specs.map(([label, value]) => (
-                            <div key={label} className="flex justify-between text-[11px]">
-                              <span className="text-text-muted">{label}</span>
-                              <span className="font-medium text-text-secondary">{value}</span>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                      {comp.price != null && (
-                        <div className="mt-2 text-[15px] font-semibold text-graphite">
-                          {formatPrice(comp.price, comp.currency_code)}
-                        </div>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-
-            {currentStep.slot === "battery" && (
-              <div className="mt-6">
-                <label className="block text-[12px] font-semibold text-graphite">
-                  Additional Payload (grams)
-                </label>
-                <input
-                  type="number"
-                  min={0}
-                  value={payloadGrams}
-                  onChange={(e) => setPayloadGrams(Math.max(0, Number(e.target.value)))}
-                  className="mt-1 w-32 px-3 py-2 text-[13px] text-graphite"
-                  style={{
-                    borderRadius: "var(--radius-sm)",
-                    border: "1px solid var(--color-border-strong)",
-                    background: "var(--color-surface)",
-                  }}
-                />
-              </div>
-            )}
-
-            <div className="mt-6 flex gap-3">
-              {activeStep > 0 && (
-                <button
-                  onClick={() => setActiveStep(activeStep - 1)}
-                  className="bg-surface px-5 py-2.5 text-[13px] font-semibold text-graphite transition-colors hover:bg-surface-muted"
-                  style={{ borderRadius: "var(--radius-sm)", border: "1px solid var(--color-border-strong)" }}
-                >
-                  Back
-                </button>
-              )}
+        {/* Filter Tabs for Frames */}
+        {currentStep.id === "frame" && (
+          <div className="mt-4 flex gap-2 overflow-x-auto pb-2 border-b border-border text-[12px]">
+            {[
+              { id: "all", label: "All Frames" },
+              { id: "quad", label: "Quadcopters" },
+              { id: "hexa", label: "Hexacopters" },
+              { id: "octo", label: "Octocopters" },
+              { id: "vtol", label: "VTOL" },
+              { id: "custom", label: "Custom" },
+            ].map((tab) => (
               <button
-                onClick={() => setActiveStep(activeStep + 1)}
-                className="bg-graphite px-5 py-2.5 text-[13px] font-semibold text-white transition-colors hover:bg-graphite-soft"
-                style={{ borderRadius: "var(--radius-sm)" }}
+                key={tab.id}
+                type="button"
+                onClick={() => setFrameFilter(tab.id)}
+                className={`rounded-md px-3 py-1 font-semibold transition-colors ${
+                  frameFilter === tab.id
+                    ? "bg-graphite text-white"
+                    : "bg-surface-soft text-text-secondary hover:text-graphite"
+                }`}
               >
-                {activeStep < steps.length - 1 ? "Next" : "Review"}
+                {tab.label}
               </button>
-            </div>
+            ))}
           </div>
         )}
 
-        {/* Review */}
-        {isReview && (
-          <div>
-            <h2 className="mb-4 text-[18px] font-bold tracking-[-0.025em] text-graphite">
-              Configuration Review
-            </h2>
-            <div className="space-y-3">
-              {steps.map((step) => {
-                const comp = getComponentForSlot(step.slot);
+        {/* Component Cards Grid */}
+        <div className="mt-6">
+          {currentStep.id === "frame" ? (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              {MOCK_FRAMES.map((frame) => {
+                const isSelected = selectedParts.frame?.id === frame.variant_id;
                 return (
                   <div
-                    key={step.slot}
-                    className="flex items-center justify-between p-3"
-                    style={{ borderRadius: "var(--radius-sm)", border: "1px solid var(--color-border)" }}
+                    key={frame.variant_id}
+                    className={`relative flex flex-col justify-between rounded-lg border p-4 transition-all ${
+                      isSelected
+                        ? "border-accent ring-1 ring-accent bg-surface-soft"
+                        : "border-border bg-white hover:border-border-strong hover:shadow-xs"
+                    }`}
                   >
-                    <div>
-                      <div className="text-[11px] font-semibold uppercase tracking-[0.04em] text-text-muted">
-                        {step.label}
-                        {!step.required && !comp && (
-                          <span className="ml-1 font-normal">(optional)</span>
-                        )}
-                      </div>
-                      <div className="text-[13px] font-medium text-graphite">
-                        {comp ? comp.title.replace("[DEV] ", "") : step.required ? "Not selected" : "—"}
-                      </div>
-                    </div>
-                    {comp?.price != null && (
-                      <div className="text-[14px] font-semibold text-graphite">
-                        {formatPrice(comp.price, comp.currency_code)}
+                    {/* Selected Badge */}
+                    {isSelected && (
+                      <div className="absolute right-3 top-3 flex h-5 w-5 items-center justify-center rounded-full bg-accent text-graphite shadow-xs">
+                        <Check className="h-3.5 w-3.5" strokeWidth={2.5} />
                       </div>
                     )}
+
+                    {/* Frame Image */}
+                    <div className="relative aspect-[16/10] w-full overflow-hidden rounded bg-surface-soft mb-3">
+                      <Image
+                        src={frame.image}
+                        alt={frame.title}
+                        fill
+                        className="object-contain p-2"
+                      />
+                    </div>
+
+                    {/* Title & Subtitle */}
+                    <div>
+                      <h3 className="text-[13px] font-bold text-graphite">{frame.title}</h3>
+                      <p className="text-[11px] text-text-muted">{frame.subtitle}</p>
+
+                      {/* Technical Specs List */}
+                      <div className="mt-3 space-y-1.5 border-t border-border pt-2 text-[11px]">
+                        {frame.specs.map((s) => (
+                          <div key={s.label} className="flex justify-between text-text-secondary">
+                            <span>{s.label}</span>
+                            <span className="font-mono font-semibold text-graphite">{s.value}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Price and Select Button */}
+                    <div className="mt-4 border-t border-border pt-3">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-[14px] font-bold text-graphite">
+                            {formatPrice(frame.price, "INR")}
+                          </p>
+                          <div className="flex items-center gap-1">
+                            <span className="h-1.5 w-1.5 rounded-full bg-success" />
+                            <span className="text-[10px] font-medium text-success">In Stock</span>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleSelectFrame(frame)}
+                          className={`rounded px-4 py-1.5 text-[12px] font-bold transition-all ${
+                            isSelected
+                              ? "bg-graphite text-white"
+                              : "border border-border bg-white text-graphite hover:bg-surface-soft"
+                          }`}
+                        >
+                          {isSelected ? "Selected ✓" : "Select"}
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 );
               })}
-              {payloadGrams > 0 && (
-                <div className="p-3" style={{ borderRadius: "var(--radius-sm)", border: "1px solid var(--color-border)" }}>
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.04em] text-text-muted">Additional Payload</div>
-                  <div className="text-[13px] font-medium text-graphite">{payloadGrams}g</div>
-                </div>
-              )}
             </div>
-
-            <div className="mt-6 flex flex-wrap gap-3">
-              <button
-                onClick={() => setActiveStep(steps.length - 1)}
-                className="bg-surface px-5 py-2.5 text-[13px] font-semibold text-graphite transition-colors hover:bg-surface-muted"
-                style={{ borderRadius: "var(--radius-sm)", border: "1px solid var(--color-border-strong)" }}
-              >
-                Back
-              </button>
-              {validation?.valid && !cartAdded && (
-                <>
-                  <button
-                    onClick={saveConfiguration}
-                    disabled={saving || !!savedId}
-                    className="px-5 py-2.5 text-[13px] font-semibold text-graphite transition-colors disabled:opacity-50"
-                    style={{
-                      borderRadius: "var(--radius-sm)",
-                      background: savedId ? "var(--color-success-soft)" : "var(--color-surface-muted)",
-                      border: "1px solid var(--color-border)",
-                    }}
+          ) : (
+            // For other steps: Motors, ESCs, Battery, etc.
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              {(components[currentStep.componentType] || []).map((comp) => {
+                const isSelected = selectedParts[currentStep.id]?.id === comp.variant_id;
+                return (
+                  <div
+                    key={comp.variant_id}
+                    className={`flex flex-col justify-between rounded-lg border p-4 ${
+                      isSelected ? "border-accent bg-surface-soft" : "border-border bg-white"
+                    }`}
                   >
-                    {savedId ? "Saved ✓" : saving ? "Saving..." : "Save Configuration"}
-                  </button>
-                  <button
-                    onClick={addToCart}
-                    disabled={addingToCart}
-                    className="px-5 py-2.5 text-[13px] font-semibold text-graphite transition-colors hover:bg-accent-hover disabled:opacity-50"
-                    style={{
-                      borderRadius: "var(--radius-sm)",
-                      background: "var(--color-accent)",
-                    }}
-                  >
-                    {addingToCart ? "Adding..." : "Add to Cart"}
-                  </button>
-                </>
-              )}
-              {cartAdded && (
-                <button
-                  onClick={() => router.push("/cart")}
-                  className="px-5 py-2.5 text-[13px] font-semibold text-white bg-graphite transition-colors hover:bg-graphite-soft"
-                  style={{ borderRadius: "var(--radius-sm)" }}
-                >
-                  View Cart
-                </button>
-              )}
+                    <div>
+                      <h3 className="text-[13px] font-bold text-graphite">
+                        {comp.title?.replace("[DEV] ", "")}
+                      </h3>
+                      {comp.weight_g && (
+                        <p className="text-[11px] text-text-muted mt-1">{comp.weight_g} g</p>
+                      )}
+                    </div>
+                    <div className="mt-4 flex items-center justify-between border-t border-border pt-3">
+                      <span className="font-bold text-[14px] text-graphite">
+                        {formatPrice(comp.price || 0, comp.currency_code)}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleSelectComponent(currentStep.id, comp)}
+                        className={`rounded px-3 py-1.5 text-[11px] font-bold ${
+                          isSelected ? "bg-graphite text-white" : "border border-border bg-white text-graphite"
+                        }`}
+                      >
+                        {isSelected ? "Selected ✓" : "Select"}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-
-            {cartAdded && (
-              <div
-                className="mt-4 p-3 text-[13px] font-medium text-success"
-                style={{ borderRadius: "var(--radius-sm)", background: "var(--color-success-soft)" }}
-              >
-                Components added to cart.
-              </div>
-            )}
-
-            {savedId && (
-              <div
-                className="mt-4 p-3 text-[13px] font-medium text-success"
-                style={{ borderRadius: "var(--radius-sm)", background: "var(--color-success-soft)" }}
-              >
-                Configuration saved: {savedId}
-              </div>
-            )}
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
-      {/* Sidebar */}
-      <div className="space-y-4">
-        <div className="p-4" style={{ borderRadius: "var(--radius-md)", border: "1px solid var(--color-border)" }}>
-          <h3 className="text-[13px] font-semibold text-graphite">Configuration</h3>
-          <div className="mt-3 space-y-2">
-            {steps.map((step) => {
-              const comp = getComponentForSlot(step.slot);
+      {/* 3. Right Column: "Your Build" Summary Panel */}
+      <aside className="space-y-4">
+        <div className="rounded-lg border border-border bg-white p-5 shadow-xs">
+          {/* Header */}
+          <div className="flex items-center justify-between border-b border-border pb-3">
+            <h3 className="text-[14px] font-extrabold text-graphite">Your Build</h3>
+            <button
+              type="button"
+              className="flex items-center gap-1 text-[11px] font-semibold text-text-secondary hover:text-graphite"
+            >
+              <Bookmark className="h-3.5 w-3.5" />
+              Save
+            </button>
+          </div>
+
+          {/* Slots List */}
+          <div className="mt-4 space-y-2.5">
+            {BUILDER_STEPS.slice(0, 10).map((step) => {
+              const selectedItem = selectedParts[step.id];
               return (
-                <div key={step.slot} className="flex items-center justify-between text-[12px]">
-                  <span className="text-text-muted">{step.label}</span>
-                  <span className={comp ? "font-medium text-success" : step.required ? "text-text-disabled" : "text-text-disabled"}>
-                    {comp ? "✓" : "—"}
-                  </span>
+                <div
+                  key={step.id}
+                  className="flex items-center justify-between rounded border border-border bg-surface-soft p-2.5 text-[12px]"
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <span
+                      className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold ${
+                        selectedItem ? "bg-accent text-graphite" : "bg-surface-muted text-text-muted"
+                      }`}
+                    >
+                      {selectedItem ? <Check className="h-3 w-3" /> : step.stepNum}
+                    </span>
+                    <div className="min-w-0 truncate">
+                      <p className="font-semibold text-graphite truncate">
+                        {selectedItem ? selectedItem.title : step.label}
+                      </p>
+                      <p className="text-[10px] text-text-muted">
+                        {selectedItem ? formatPrice(selectedItem.price, "INR") : step.required ? "Not selected +" : "Optional +"}
+                      </p>
+                    </div>
+                  </div>
+                  {selectedItem && (
+                    <CheckCircle2 className="h-4 w-4 text-success shrink-0" />
+                  )}
                 </div>
               );
             })}
           </div>
+
+          {/* Estimated Summary */}
+          <div className="mt-6 border-t border-border pt-4">
+            <h4 className="text-[12px] font-bold text-graphite">Estimated Summary</h4>
+            <div className="mt-2 space-y-1 text-[12px]">
+              {selectedParts.frame && (
+                <div className="flex justify-between text-text-secondary">
+                  <span>Frame (1)</span>
+                  <span className="font-mono font-semibold text-graphite">
+                    {formatPrice(selectedParts.frame.price, "INR")}
+                  </span>
+                </div>
+              )}
+              <div className="flex justify-between border-t border-border pt-2 font-bold text-[13px] text-graphite">
+                <span>Subtotal</span>
+                <span className="font-mono">{formatPrice(subtotal, "INR")}</span>
+              </div>
+            </div>
+
+            {/* Next Action Button */}
+            <button
+              type="button"
+              onClick={() => {
+                if (activeStepIdx < BUILDER_STEPS.length - 1) {
+                  setActiveStepIdx(activeStepIdx + 1);
+                } else {
+                  handleAddToCart();
+                }
+              }}
+              className="mt-4 flex w-full items-center justify-center gap-2 rounded-md bg-graphite py-3 text-[13px] font-bold text-white transition hover:bg-black shadow-xs"
+            >
+              {activeStepIdx < BUILDER_STEPS.length - 2 ? (
+                <>Next: Select {BUILDER_STEPS[activeStepIdx + 1].label} &rarr;</>
+              ) : (
+                <>Add Build to Cart &rarr;</>
+              )}
+            </button>
+          </div>
+
+          {/* Compatibility Status Alert Box */}
+          <div className="mt-4 flex items-center gap-2.5 rounded border border-success/30 bg-success/10 p-3 text-[11px] text-graphite">
+            <CheckCircle2 className="h-4 w-4 text-success shrink-0" />
+            <div>
+              <p className="font-bold text-success">Compatibility Check</p>
+              <p className="text-text-secondary">No issues. Continue to next step.</p>
+            </div>
+          </div>
         </div>
-
-        {validation && (
-          <div className="p-4" style={{ borderRadius: "var(--radius-md)", border: "1px solid var(--color-border)" }}>
-            <h3 className="text-[13px] font-semibold text-graphite">Estimates</h3>
-            <div className="mt-3 space-y-2 text-[13px]">
-              {validation.estimates.weight_g != null && (
-                <div className="flex justify-between">
-                  <span className="text-text-secondary">Weight</span>
-                  <span className="font-medium text-graphite">
-                    {(validation.estimates.weight_g / 1000).toFixed(2)} kg
-                  </span>
-                </div>
-              )}
-              {validation.estimates.flight_time_min != null && (
-                <div className="flex justify-between">
-                  <span className="text-text-secondary">Flight Time</span>
-                  <span className="font-medium text-graphite">
-                    ~{validation.estimates.flight_time_min} min
-                  </span>
-                </div>
-              )}
-              {validation.estimates.payload_capacity_g != null && (
-                <div className="flex justify-between">
-                  <span className="text-text-secondary">Payload Capacity</span>
-                  <span className="font-medium text-graphite">
-                    {validation.estimates.payload_capacity_g}g
-                  </span>
-                </div>
-              )}
-            </div>
-            <p className="mt-3 text-[11px] text-text-disabled">
-              Estimated from component specifications
-            </p>
-          </div>
-        )}
-
-        {validation && validation.checks.length > 0 && (
-          <div className="p-4" style={{ borderRadius: "var(--radius-md)", border: "1px solid var(--color-border)" }}>
-            <h3 className="text-[13px] font-semibold text-graphite">
-              Compatibility {validating && <span className="font-normal text-text-muted">(checking...)</span>}
-            </h3>
-            <div className="mt-3 space-y-2">
-              {validation.checks.map((c) => (
-                <div key={c.code} className="text-[12px]">
-                  <span
-                    className={
-                      c.severity === "PASS"
-                        ? "text-success"
-                        : c.severity === "WARNING"
-                          ? "text-warning"
-                          : "text-error"
-                    }
-                  >
-                    {c.severity === "PASS" ? "✓" : c.severity === "WARNING" ? "⚠" : "✗"}{" "}
-                    {c.message}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {validation && !validation.valid && (
-          <div
-            className="p-3 text-[12px] font-medium text-error"
-            style={{ borderRadius: "var(--radius-sm)", background: "var(--color-error-soft)" }}
-          >
-            Configuration has errors. Fix before adding to cart.
-          </div>
-        )}
-      </div>
+      </aside>
     </div>
   );
 }

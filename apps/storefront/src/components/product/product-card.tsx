@@ -96,41 +96,36 @@ export function ProductCard({ product }: { product: any }) {
 
         {/* Real Technical Highlights */}
         {technicalHighlights.length > 0 && (
-          <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-            {technicalHighlights.map((highlight, idx) => (
-              <span
-                key={idx}
-                className="inline-flex items-center rounded-xs bg-surface-muted px-1.5 py-0.5 font-mono text-[10px] text-text-secondary"
-                style={{ border: "1px solid var(--color-border)" }}
-              >
-                {highlight}
-              </span>
-            ))}
-          </div>
-        )}
-
-        {price?.calculated_amount != null && (
-          <p className="mt-2 text-[15px] font-semibold text-graphite">
-            {formatPrice(price.calculated_amount, price.currency_code)}
+          <p className="mt-1 text-[11px] font-medium text-text-muted line-clamp-1">
+            {technicalHighlights.join("  |  ")}
           </p>
         )}
-        <div className="mt-2 flex items-center justify-between">
-          {inStock ? (
-            <span className="text-[11px] font-medium text-success">&bull; In Stock</span>
-          ) : (
-            <span className="text-[11px] font-medium text-text-disabled">&bull; Out of Stock</span>
-          )}
+
+        <div className="mt-3 flex items-end justify-between pt-1">
+          <div>
+            {price?.calculated_amount != null && (
+              <p className="text-[15px] font-bold text-graphite">
+                {formatPrice(price.calculated_amount, price.currency_code)}
+              </p>
+            )}
+            <div className="mt-0.5 flex items-center gap-1.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-success" />
+              <span className="text-[11px] font-medium text-success">
+                {inStock ? "In Stock" : "Out of Stock"}
+              </span>
+            </div>
+          </div>
           <button
             type="button"
             onClick={handleQuickAdd}
             disabled={!inStock || cartState === "adding"}
             aria-label="Add to cart"
-            className="ml-auto p-1 text-text-muted transition-colors hover:text-graphite disabled:cursor-not-allowed disabled:opacity-40"
+            className="flex h-8 w-8 items-center justify-center rounded bg-graphite text-white transition-all hover:bg-black active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
           >
             {cartState === "added" ? (
-              <Check className="h-4 w-4 text-success" strokeWidth={2} />
+              <Check className="h-4 w-4 text-accent" strokeWidth={2.5} />
             ) : (
-              <ShoppingCart className="h-4 w-4" strokeWidth={1.6} />
+              <ShoppingCart className="h-4 w-4" strokeWidth={1.8} />
             )}
           </button>
         </div>

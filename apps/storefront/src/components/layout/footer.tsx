@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Linkedin, Youtube, Instagram, Twitter } from "lucide-react";
 
 const FOOTER_SECTIONS = [
   {
@@ -7,8 +8,7 @@ const FOOTER_SECTIONS = [
       { href: "/uavs", label: "UAVs" },
       { href: "/parts", label: "Components" },
       { href: "/build", label: "Build Your UAV" },
-      { href: "/bulk-orders", label: "Bulk & Custom Orders" },
-      { href: "/accessories", label: "Accessories" },
+      { href: "/parts?category=accessories", label: "Accessories" },
     ],
   },
   {
@@ -37,10 +37,24 @@ export function Footer() {
       <div className="mx-auto max-w-[1280px] px-8 py-12 md:px-10">
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
           <div>
-            <p className="text-[13px] font-bold tracking-[-0.01em] text-white">SKYROSTORE</p>
+            <p className="text-[14px] font-extrabold tracking-[-0.02em] text-white">SKYROSTORE</p>
             <p className="mt-3 text-[12px] leading-relaxed text-text-disabled">
               Professional UAVs and components for mapping, inspection, agriculture, and custom aerial systems.
             </p>
+            <div className="mt-4 flex items-center gap-3 text-text-disabled">
+              <a href="https://linkedin.com" target="_blank" rel="noreferrer" aria-label="LinkedIn" className="hover:text-white transition-colors">
+                <Linkedin className="h-4 w-4" />
+              </a>
+              <a href="https://youtube.com" target="_blank" rel="noreferrer" aria-label="YouTube" className="hover:text-white transition-colors">
+                <Youtube className="h-4 w-4" />
+              </a>
+              <a href="https://instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram" className="hover:text-white transition-colors">
+                <Instagram className="h-4 w-4" />
+              </a>
+              <a href="https://twitter.com" target="_blank" rel="noreferrer" aria-label="X" className="hover:text-white transition-colors">
+                <Twitter className="h-4 w-4" />
+              </a>
+            </div>
           </div>
           {FOOTER_SECTIONS.map((section) => (
             <div key={section.title}>
@@ -59,8 +73,9 @@ export function Footer() {
             </div>
           ))}
         </div>
-        <div className="mt-10 pt-6 text-[11px] text-text-muted" style={{ borderTop: "1px solid rgba(255,255,255,0.1)" }}>
-          &copy; {new Date().getFullYear()} Skyrostore. All rights reserved.
+        <div className="mt-12 flex flex-col items-center justify-between gap-2 pt-6 text-[11px] text-text-muted md:flex-row" style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+          <p>&copy; 2026 Skyrostore. All rights reserved.</p>
+          <p className="text-text-disabled">Built for a higher tomorrow.</p>
         </div>
       </div>
     </footer>

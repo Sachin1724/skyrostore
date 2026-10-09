@@ -1,42 +1,94 @@
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { BulkOrderRequestForm } from "./bulk-order-request-form";
-import Link from "next/link";
+import Image from "next/image";
+import { ShieldCheck, Wrench, Users, Headphones } from "lucide-react";
 import { Suspense } from "react";
 
 export const metadata = {
-  title: "Request Bulk Quote & Custom UAV Build | Skyrostore",
-  description: "Submit institutional specifications for bulk components or custom UAV engineering.",
+  title: "Bulk Orders & Custom UAV Builds — Skyrostore",
+  description: "Get tailored solutions for your projects. Request multiple units, custom configurations, or specialized UAVs.",
 };
 
 export default function BulkOrderRequestPage() {
   return (
     <>
       <Header />
-      <main className="mx-auto max-w-[900px] px-8 py-10 md:px-10">
-        {/* Breadcrumb */}
-        <nav className="text-[11px] font-mono uppercase tracking-[0.08em] text-text-muted">
-          <Link href="/" className="hover:text-text-secondary">Home</Link>
-          <span className="mx-2 text-text-disabled">/</span>
-          <Link href="/bulk-orders" className="hover:text-text-secondary">Bulk Orders</Link>
-          <span className="mx-2 text-text-disabled">/</span>
-          <span className="text-graphite">Request Specification</span>
-        </nav>
+      <main className="min-h-screen bg-surface-soft">
+        {/* Hero Top Banner */}
+        <section className="relative overflow-hidden border-b border-border bg-white">
+          <div className="mx-auto flex max-w-[1280px] flex-col justify-between px-8 py-8 md:flex-row md:items-center md:px-10">
+            <div className="relative z-10 max-w-xl">
+              <span className="text-[11px] font-bold uppercase tracking-widest text-success">
+                BUSINESS SOLUTIONS
+              </span>
+              <h1 className="mt-2 text-[32px] font-extrabold tracking-tight text-graphite md:text-[40px]">
+                Bulk Orders &amp; Custom UAV Builds
+              </h1>
+              <p className="mt-2 text-[14px] leading-relaxed text-text-secondary">
+                Get tailored solutions for your projects. Request multiple units, custom configurations, or specialized UAVs for agriculture, mapping, inspection and industrial applications.
+              </p>
+            </div>
+            {/* Banner Industrial Drone Asset */}
+            <div className="pointer-events-none relative mt-4 h-28 w-full max-w-[500px] md:mt-0 md:h-32">
+              <Image
+                src="/images/hero/bulk-hero-drone.png"
+                alt="Industrial Inspection Hexacopter"
+                fill
+                className="object-contain object-right"
+              />
+            </div>
+          </div>
+        </section>
 
-        <div className="mt-6 border-b border-color-border pb-6">
-          <h1 className="text-[28px] font-bold tracking-tight text-graphite sm:text-[32px]">
-            Bulk Supply & Custom UAV Build Request
-          </h1>
-          <p className="mt-2 text-[14px] leading-relaxed text-text-secondary">
-            Provide your component quantities or custom airframe requirements. Our engineering team validates propulsion curves, thermal envelopes, and prepares an official itemized quotation.
-          </p>
-        </div>
+        {/* 4 Trust Badges Strip */}
+        <section className="border-b border-border bg-white">
+          <div className="mx-auto grid max-w-[1280px] grid-cols-2 gap-4 px-8 py-4 lg:grid-cols-4 md:px-10">
+            <div className="flex items-center gap-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent/20 text-graphite">
+                <ShieldCheck className="h-4 w-4 text-graphite" />
+              </div>
+              <div>
+                <p className="text-[12px] font-bold text-graphite">Volume Pricing</p>
+                <p className="text-[11px] text-text-muted">Competitive rates for bulk quantities</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent/20 text-graphite">
+                <Wrench className="h-4 w-4 text-graphite" />
+              </div>
+              <div>
+                <p className="text-[12px] font-bold text-graphite">Custom Builds</p>
+                <p className="text-[11px] text-text-muted">Tailored to your requirements</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent/20 text-graphite">
+                <Users className="h-4 w-4 text-graphite" />
+              </div>
+              <div>
+                <p className="text-[12px] font-bold text-graphite">Expert Consultation</p>
+                <p className="text-[11px] text-text-muted">Technical guidance from our team</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent/20 text-graphite">
+                <Headphones className="h-4 w-4 text-graphite" />
+              </div>
+              <div>
+                <p className="text-[12px] font-bold text-graphite">Reliable Support</p>
+                <p className="text-[11px] text-text-muted">From quotation to delivery and beyond</p>
+              </div>
+            </div>
+          </div>
+        </section>
 
-        <div className="mt-8">
-          <Suspense fallback={<div className="py-12 text-center text-sm text-text-muted">Loading request form...</div>}>
+        {/* Main Bulk Order Request Container */}
+        <section className="mx-auto max-w-[1280px] px-8 py-8 md:px-10">
+          <Suspense fallback={<div className="py-12 text-center text-sm text-text-muted">Loading request dashboard...</div>}>
             <BulkOrderRequestForm />
           </Suspense>
-        </div>
+        </section>
       </main>
       <Footer />
     </>
