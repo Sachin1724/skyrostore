@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+@theme {
+  --color-white: #FFFFFF;
+  --color-page: #FEFEFE;
+  --color-surface: #FFFFFF;
+  --color-surface-soft: #F8F8F8;
+  --color-surface-muted: #F3F4F5;
+
+  --color-graphite: #181B20;
+  --color-graphite-soft: #25292E;
+
+  --color-text-primary: #181B20;
+  --color-text-secondary: #646A70;
+  --color-text-muted: #8A9096;
+  --color-text-disabled: #AEB3B8;
+
+  --color-border: #E7EBEE;
+  --color-border-strong: #D9DEE2;
+
+  --color-accent: #D2F950;
+  --color-accent-hover: #C5ED43;
+  --color-accent-soft: #F2FBD2;
+
+  --color-success: #158143;
+  --color-success-soft: #EAF7EF;
+
+  --color-warning: #B77900;
+  --color-warning-soft: #FFF5D9;
+
+  --color-error: #C83A3A;
+  --color-error-soft: #FDECEC;
+
+  --color-info: #4F687D;
+  --color-info-soft: #EEF3F6;
+
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  body {
+    background: var(--color-page);
+    color: var(--color-text-primary);
+    font-family: var(--font-sans);
+    letter-spacing: -0.01em;
+  }
+  h1, h2, h3, h4 {
+    letter-spacing: -0.025em;
+  }
+}

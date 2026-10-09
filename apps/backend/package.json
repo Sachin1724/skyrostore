@@ -1,0 +1,24 @@
+{
+  "name": "@skyrostore/backend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "medusa develop",
+    "build": "medusa build",
+    "start": "medusa start",
+    "seed": "medusa exec ./src/scripts/seed.ts",
+    "typecheck": "tsc --noEmit",
+    "db:generate": "npx mikro-orm-cli schema:create",
+    "db:migrate": "medusa db:migrate"
+  },
+  "dependencies": {
+    "@medusajs/framework": "latest",
+    "@medusajs/medusa": "latest",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.0"
+  }
+}
