@@ -3,8 +3,10 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Heart, ShoppingCart, Check, Cpu } from "lucide-react";
+import { Heart, ShoppingCart, Check } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
+import { ProductMediaFallback } from "./product-media-fallback";
+import { getProductTechnicalHighlights } from "@/lib/technical-specs";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function ProductCard({ product }: { product: any }) {
@@ -15,6 +17,7 @@ export function ProductCard({ product }: { product: any }) {
   const price = variant?.calculated_price;
   const category = product.categories?.[0]?.name?.replace("[DEV] ", "") as string | undefined;
   const inStock = variant?.inventory_quantity != null ? variant.inventory_quantity > 0 : true;
+  const technicalHighlights = getProductTechnicalHighlights(product.metadata);
 
   async function handleQuickAdd(e: React.MouseEvent) {
     e.preventDefault();
@@ -60,25 +63,16 @@ export function ProductCard({ product }: { product: any }) {
             sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
           />
         ) : (
-          <div className="flex h-full flex-col items-center justify-center p-6 text-center select-none bg-surface-soft">
-            <div
-              className="flex h-11 w-11 items-center justify-center bg-surface"
-              style={{
-                borderRadius: "var(--radius-sm)",
-                border: "1px solid var(--color-border)",
-              }}
-            >
-              <Cpu className="h-5 w-5 text-text-disabled stroke-[1.4]" />
-            </div>
-            <span className="mt-2 font-mono text-[10px] uppercase tracking-[0.08em] text-text-muted">
-              Media Pending
-            </span>
-          </div>
+          <ProductMediaFallback
+            componentType={product.metadata?.component_type}
+            category={category}
+            title={product.title}
+          />
         )}
         <button
           type="button"
           aria-label={saved ? "Remove from wishlist" : "Save to wishlist"}
-          className="absolute right-3 top-3 text-text-muted transition-colors hover:text-graphite"
+          className="absolute right-3 top-3 z-10 text-text-muted transition-colors hover:text-graphite"
           onClick={(e) => {
             e.preventDefault();
             setSaved(!saved);
@@ -99,6 +93,22 @@ export function ProductCard({ product }: { product: any }) {
         <h3 className="mt-0.5 text-[14px] font-semibold leading-snug text-graphite line-clamp-1">
           {product.title?.replace("[DEV] ", "")}
         </h3>
+
+        {/* Real Technical Highlights */}
+        {technicalHighlights.length > 0 && (
+          <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+            {technicalHighlights.map((highlight, idx) => (
+              <span
+                key={idx}
+                className="inline-flex items-center rounded-xs bg-surface-muted px-1.5 py-0.5 font-mono text-[10px] text-text-secondary"
+                style={{ border: "1px solid var(--color-border)" }}
+              >
+                {highlight}
+              </span>
+            ))}
+          </div>
+        )}
+
         {price?.calculated_amount != null && (
           <p className="mt-2 text-[15px] font-semibold text-graphite">
             {formatPrice(price.calculated_amount, price.currency_code)}

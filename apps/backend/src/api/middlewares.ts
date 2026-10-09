@@ -22,5 +22,30 @@ export default defineMiddlewares({
       method: ["POST", "GET"],
       middlewares: [authenticate("customer", ["bearer", "session"])],
     },
+    {
+      matcher: "/store/bulk-orders",
+      method: ["POST"],
+      middlewares: [authenticate("customer", ["bearer", "session"], { allowUnauthenticated: true })],
+    },
+    {
+      matcher: "/store/bulk-orders",
+      method: ["GET"],
+      middlewares: [authenticate("customer", ["bearer", "session"])],
+    },
+    {
+      matcher: "/store/bulk-orders/:id",
+      method: ["GET"],
+      middlewares: [authenticate("customer", ["bearer", "session"])],
+    },
+    {
+      matcher: "/store/bulk-orders/:id/accept",
+      method: ["POST"],
+      middlewares: [authenticate("customer", ["bearer", "session"])],
+    },
+    {
+      matcher: "/store/bulk-orders/:id/decline",
+      method: ["POST"],
+      middlewares: [authenticate("customer", ["bearer", "session"])],
+    },
   ],
 });

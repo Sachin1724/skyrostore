@@ -25,19 +25,30 @@ function num(v: unknown): number | null {
 }
 
 export function parseSpec(metadata: Record<string, unknown>): ComponentSpec | null {
-  const ct = metadata.component_type as string;
+  const ts = metadata.technical_specs as
+    | { fields?: Record<string, unknown>; componentType?: string }
+    | undefined;
+  const source = ts?.fields
+    ? {
+        ...metadata,
+        ...ts.fields,
+        component_type: ts.componentType || metadata.component_type,
+      }
+    : metadata;
+
+  const ct = (source.component_type as string) || (source.componentType as string);
   if (!ct) return null;
 
-  const w = num(metadata.weight_g) ?? 0;
+  const w = num(source.weight_g) ?? 0;
 
   switch (ct) {
     case "FRAME":
       return {
         component_type: "FRAME",
-        motor_count: num(metadata.motor_count) ?? 4,
-        wheelbase_mm: num(metadata.wheelbase_mm) ?? 0,
-        max_propeller_size_in: num(metadata.max_propeller_size_in) ?? 0,
-        max_takeoff_weight_g: num(metadata.max_takeoff_weight_g) ?? 0,
+        motor_count: num(source.motor_count) ?? 4,
+        wheelbase_mm: num(source.wheelbase_mm) ?? 0,
+        max_propeller_size_in: num(source.max_propeller_size_in) ?? 0,
+        max_takeoff_weight_g: num(source.max_takeoff_weight_g) ?? 0,
         weight_g: w,
       };
     case "FLIGHT_CONTROLLER":
@@ -45,37 +56,37 @@ export function parseSpec(metadata: Record<string, unknown>): ComponentSpec | nu
     case "ESC":
       return {
         component_type: "ESC",
-        continuous_current_a: num(metadata.continuous_current_a) ?? 0,
-        peak_current_a: num(metadata.peak_current_a) ?? 0,
-        cell_count_min: num(metadata.cell_count_min) ?? 0,
-        cell_count_max: num(metadata.cell_count_max) ?? 0,
+        continuous_current_a: num(source.continuous_current_a) ?? 0,
+        peak_current_a: num(source.peak_current_a) ?? 0,
+        cell_count_min: num(source.cell_count_min) ?? 0,
+        cell_count_max: num(source.cell_count_max) ?? 0,
         weight_g: w,
       };
     case "MOTOR":
       return {
         component_type: "MOTOR",
-        kv: num(metadata.kv) ?? 0,
-        max_current_a: num(metadata.max_current_a) ?? 0,
-        recommended_voltage_min_v: num(metadata.recommended_voltage_min_v) ?? 0,
-        recommended_voltage_max_v: num(metadata.recommended_voltage_max_v) ?? 0,
+        kv: num(source.kv) ?? 0,
+        max_current_a: num(source.max_current_a) ?? 0,
+        recommended_voltage_min_v: num(source.recommended_voltage_min_v) ?? 0,
+        recommended_voltage_max_v: num(source.recommended_voltage_max_v) ?? 0,
         weight_g: w,
-        recommended_propeller_min_in: num(metadata.recommended_propeller_min_in) ?? 0,
-        recommended_propeller_max_in: num(metadata.recommended_propeller_max_in) ?? 0,
+        recommended_propeller_min_in: num(source.recommended_propeller_min_in) ?? 0,
+        recommended_propeller_max_in: num(source.recommended_propeller_max_in) ?? 0,
       };
     case "PROPELLER":
       return {
         component_type: "PROPELLER",
-        diameter_in: num(metadata.diameter_in) ?? 0,
-        pitch_in: num(metadata.pitch_in) ?? 0,
+        diameter_in: num(source.diameter_in) ?? 0,
+        pitch_in: num(source.pitch_in) ?? 0,
         weight_g: w,
       };
     case "BATTERY":
       return {
         component_type: "BATTERY",
-        cell_count: num(metadata.cell_count) ?? 0,
-        voltage_v: num(metadata.voltage_v) ?? 0,
-        capacity_mah: num(metadata.capacity_mah) ?? 0,
-        continuous_discharge_a: num(metadata.continuous_discharge_a) ?? 0,
+        cell_count: num(source.cell_count) ?? 0,
+        voltage_v: num(source.voltage_v) ?? 0,
+        capacity_mah: num(source.capacity_mah) ?? 0,
+        continuous_discharge_a: num(source.continuous_discharge_a) ?? 0,
         weight_g: w,
       };
     case "GPS":

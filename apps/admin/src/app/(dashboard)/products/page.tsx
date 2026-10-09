@@ -26,13 +26,19 @@ export default async function ProductsPage() {
                 <th className="pb-2 pr-4">Handle</th>
                 <th className="pb-2 pr-4">Status</th>
                 <th className="pb-2 pr-4">Variants</th>
+                <th className="pb-2 pr-4 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {products.map((product: Record<string, unknown>) => (
                 <tr key={product.id as string}>
                   <td className="py-2.5 pr-4 font-medium">
-                    {product.title as string}
+                    <a
+                      href={`/products/${product.id as string}`}
+                      className="hover:underline text-gray-900"
+                    >
+                      {product.title as string}
+                    </a>
                   </td>
                   <td className="py-2.5 pr-4 font-mono text-xs text-gray-500">
                     {product.handle as string}
@@ -44,6 +50,14 @@ export default async function ProductsPage() {
                   </td>
                   <td className="py-2.5 pr-4 text-gray-500">
                     {(product.variants as unknown[])?.length ?? 0}
+                  </td>
+                  <td className="py-2.5 pr-4 text-right">
+                    <a
+                      href={`/products/${product.id as string}`}
+                      className="rounded bg-gray-900 px-2.5 py-1 text-xs font-medium text-white hover:bg-gray-800"
+                    >
+                      Edit Specs
+                    </a>
                   </td>
                 </tr>
               ))}

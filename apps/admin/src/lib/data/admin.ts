@@ -39,6 +39,24 @@ export async function getProducts(token: string, params?: { limit?: number; offs
   );
 }
 
+export async function getProduct(token: string, id: string) {
+  return adminFetch(`/admin/products/${id}`, {
+    headers: authHeaders(token),
+  });
+}
+
+export async function updateProduct(
+  token: string,
+  id: string,
+  data: Record<string, unknown>
+) {
+  return adminFetch(`/admin/products/${id}`, {
+    method: "POST",
+    headers: authHeaders(token),
+    body: JSON.stringify(data),
+  });
+}
+
 export async function getCustomers(token: string, params?: { limit?: number }) {
   return adminFetch(
     `/admin/customers?limit=${params?.limit ?? 20}`,

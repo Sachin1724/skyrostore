@@ -13,11 +13,13 @@ import {
   CreditCard,
   MessageSquare,
   Settings,
+  FileText,
 } from "lucide-react";
 
 const NAV_ITEMS = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
   { href: "/orders", label: "Orders", icon: ShoppingCart },
+  { href: "/bulk-orders", label: "Bulk & Quotes", icon: FileText },
   { href: "/products", label: "Products", icon: Package },
   { href: "/inventory", label: "Inventory", icon: Warehouse },
   { href: "/customers", label: "Customers", icon: Users },

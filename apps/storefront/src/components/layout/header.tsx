@@ -5,6 +5,7 @@ const NAV_LINKS = [
   { href: "/uavs", label: "UAVs" },
   { href: "/parts", label: "UAV Parts" },
   { href: "/build", label: "Build" },
+  { href: "/bulk-orders", label: "Bulk Orders" },
   { href: "/accessories", label: "Accessories" },
   { href: "/support", label: "Support" },
 ] as const;

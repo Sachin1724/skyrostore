@@ -16,7 +16,7 @@ export async function getProducts(params?: {
     collection_id: params?.collection_id,
     q: params?.q,
     region_id: REGION_ID,
-    fields: "+variants.calculated_price,+variants.inventory_quantity",
+    fields: "+metadata,+variants.calculated_price,+variants.inventory_quantity",
   });
   return { products, count, offset, limit };
 }
@@ -24,7 +24,7 @@ export async function getProducts(params?: {
 export async function getProduct(id: string) {
   const { product } = await medusa.store.product.retrieve(id, {
     region_id: REGION_ID,
-    fields: "+variants.calculated_price,+variants.inventory_quantity",
+    fields: "+metadata,+variants.calculated_price,+variants.inventory_quantity",
   });
   return product;
 }
@@ -34,7 +34,7 @@ export async function getProductByHandle(handle: string) {
     handle,
     limit: 1,
     region_id: REGION_ID,
-    fields: "+variants.calculated_price,+variants.inventory_quantity",
+    fields: "+metadata,+variants.calculated_price,+variants.inventory_quantity",
   });
   return products[0] ?? null;
 }

@@ -157,12 +157,18 @@ export function AccountView() {
         )}
       </p>
 
-      <div className="mt-6 pt-4" style={{ borderTop: "1px solid var(--color-border)" }}>
+      <div className="mt-6 pt-4 flex items-center justify-between" style={{ borderTop: "1px solid var(--color-border)" }}>
         <Link
           href="/account/orders"
           className="text-[13px] font-medium text-text-secondary hover:text-graphite"
         >
-          View my orders
+          View my orders &rarr;
+        </Link>
+        <Link
+          href="/account/bulk-requests"
+          className="text-[13px] font-medium text-text-secondary hover:text-graphite"
+        >
+          My Bulk Requests &rarr;
         </Link>
       </div>
     </div>

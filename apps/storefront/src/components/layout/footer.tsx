@@ -7,6 +7,7 @@ const FOOTER_SECTIONS = [
       { href: "/uavs", label: "UAVs" },
       { href: "/parts", label: "Components" },
       { href: "/build", label: "Build Your UAV" },
+      { href: "/bulk-orders", label: "Bulk & Custom Orders" },
       { href: "/accessories", label: "Accessories" },
     ],
   },
