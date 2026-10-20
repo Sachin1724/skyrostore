@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -22,10 +22,22 @@ import {
 } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import { ProductCard } from "@/components/product/product-card";
-import { extractTechnicalSpecs, TechnicalSpecificationField } from "@/lib/technical-specs";
+import { ProductMediaFallback } from "@/components/product/product-media-fallback";
+import { extractTechnicalSpecs, getProductTechnicalHighlights } from "@/lib/technical-specs";
+import { track } from "@/lib/analytics";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function ProductDetailClient({ product, relatedProducts = [] }: { product: any; relatedProducts: any[] }) {
+export function ProductDetailClient({
+  product,
+  relatedProducts = [],
+  trail = [],
+  brand = null,
+}: {
+  product: any;
+  relatedProducts: any[];
+  trail?: { name: string; handle: string }[];
+  brand?: { title: string; handle: string; logo: string | null } | null;
+}) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<"overview" | "specs" | "compat" | "included" | "docs" | "reviews">("overview");
   const [quantity, setQuantity] = useState(1);
@@ -36,26 +48,34 @@ export function ProductDetailClient({ product, relatedProducts = [] }: { product
   const variant = product.variants?.[0];
   const price = variant?.calculated_price;
   const inStock = variant?.inventory_quantity != null ? variant.inventory_quantity > 0 : true;
-  const category = product.categories?.[0]?.name?.replace("[DEV] ", "") || "Motors";
+  const category = product.categories?.[0]?.name?.replace("[DEV] ", "") || "UAV Components";
   const title = product.title?.replace("[DEV] ", "");
 
-  // Build gallery images: use thumbnails from product or fallback to motor thumbs
-  const defaultThumbs = [
-    "/images/products/t-motor-thumb-1.png",
-    "/images/products/t-motor-thumb-2.png",
-    "/images/products/t-motor-thumb-3.png",
-    "/images/products/t-motor-thumb-4.png",
-  ];
+  // Authentic product images: strictly only manufacturer photography
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const productImages: string[] = Array.isArray(product.images) && product.images.length > 0
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ? product.images.map((img: any) => (typeof img === "string" ? img : img.url)).filter(Boolean)
+    : product.thumbnail
+    ? [product.thumbnail]
+    : [];
 
-  const galleryImages = product.thumbnail
-    ? [product.thumbnail, ...defaultThumbs.slice(1)]
-    : defaultThumbs;
-
-  const activeMainImage = galleryImages[selectedImageIdx] || product.thumbnail || "/images/products/t-motor-mn5212-large.png";
+  const activeMainImage = productImages[selectedImageIdx] || product.thumbnail || null;
 
   const rawMetadata = (product.metadata as Record<string, unknown>) || {};
   const techSpecs = extractTechnicalSpecs(rawMetadata);
-  const sku = (rawMetadata.sku as string) || variant?.sku || "TM-MN5212-850";
+  const technicalHighlights = getProductTechnicalHighlights(rawMetadata);
+  const sku = (rawMetadata.sku as string) || variant?.sku || "N/A";
+
+  useEffect(() => {
+    if (!product?.id) return;
+    track("product_viewed", {
+      product_id: product.id,
+      variant_id: variant?.id ?? null,
+      value: price?.calculated_amount ?? null,
+      currency_code: price?.currency_code ?? null,
+    });
+  }, [product?.id, variant?.id, price?.calculated_amount, price?.currency_code]);
 
   async function handleAddToCart() {
     if (!variant?.id || !inStock || cartState === "adding") return;
@@ -71,6 +91,14 @@ export function ProductDetailClient({ product, relatedProducts = [] }: { product
         const data = await res.json();
         localStorage.setItem("cart_id", data.cart_id);
         window.dispatchEvent(new Event("storage"));
+        track("product_added_to_cart", {
+          cart_id: data.cart_id,
+          product_id: product.id,
+          variant_id: variant.id,
+          quantity,
+          value: price?.calculated_amount ?? null,
+          currency_code: price?.currency_code ?? null,
+        });
         setCartState("added");
         setTimeout(() => setCartState("idle"), 2000);
       } else {
@@ -93,8 +121,12 @@ export function ProductDetailClient({ product, relatedProducts = [] }: { product
         <Link href="/" className="hover:text-graphite">Home</Link>
         <span>&gt;</span>
         <Link href="/parts" className="hover:text-graphite">UAV Parts</Link>
-        <span>&gt;</span>
-        <Link href={`/parts?category=${category.toLowerCase()}`} className="hover:text-graphite">{category}</Link>
+        {trail.map((node) => (
+          <span key={node.handle} className="flex items-center gap-1.5">
+            <span>&gt;</span>
+            <Link href={`/parts?category=${node.handle}`} className="hover:text-graphite">{node.name}</Link>
+          </span>
+        ))}
         <span>&gt;</span>
         <span className="text-graphite font-semibold truncate max-w-xs">{title}</span>
       </nav>
@@ -106,38 +138,48 @@ export function ProductDetailClient({ product, relatedProducts = [] }: { product
           <div className="grid gap-8 md:grid-cols-[1fr_1.1fr]">
             {/* Gallery Column */}
             <div className="flex gap-4">
-              {/* Thumbnail Vertical Stack */}
-              <div className="flex flex-col gap-3">
-                {galleryImages.slice(0, 4).map((thumb, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => setSelectedImageIdx(idx)}
-                    className={`relative h-18 w-18 overflow-hidden rounded-md border p-1 transition-all ${
-                      selectedImageIdx === idx
-                        ? "border-graphite shadow-xs"
-                        : "border-border hover:border-text-secondary bg-surface-soft"
-                    }`}
-                  >
-                    <Image
-                      src={thumb}
-                      alt={`Thumbnail ${idx + 1}`}
-                      fill
-                      className="object-contain p-1"
-                    />
-                  </button>
-                ))}
-              </div>
+              {/* Thumbnail Vertical Stack (Only when multiple authentic images exist) */}
+              {productImages.length > 1 && (
+                <div className="flex flex-col gap-3">
+                  {productImages.slice(0, 4).map((thumb, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => setSelectedImageIdx(idx)}
+                      className={`relative h-18 w-18 overflow-hidden rounded-md border p-1 transition-all ${
+                        selectedImageIdx === idx
+                          ? "border-graphite shadow-xs"
+                          : "border-border hover:border-text-secondary bg-surface-soft"
+                      }`}
+                    >
+                      <Image
+                        src={thumb}
+                        alt={`Thumbnail ${idx + 1}`}
+                        fill
+                        className="object-contain p-1"
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
 
               {/* Large Main Preview */}
               <div className="relative aspect-square flex-1 overflow-hidden rounded-lg border border-border bg-surface-soft p-6 flex items-center justify-center">
-                <Image
-                  src={activeMainImage}
-                  alt={title}
-                  fill
-                  priority
-                  className="object-contain p-4"
-                />
+                {activeMainImage ? (
+                  <Image
+                    src={activeMainImage}
+                    alt={title}
+                    fill
+                    priority
+                    className="object-contain p-4"
+                  />
+                ) : (
+                  <ProductMediaFallback
+                    componentType={product.metadata?.component_type}
+                    category={category}
+                    title={product.title}
+                  />
+                )}
                 <button
                   type="button"
                   aria-label="Zoom image"
@@ -151,23 +193,30 @@ export function ProductDetailClient({ product, relatedProducts = [] }: { product
             {/* Core Info Details */}
             <div className="flex flex-col justify-between">
               <div>
+                {brand ? (
+                  <Link href={`/brands/${brand.handle}`} className="mb-2 inline-flex items-center gap-2 text-[13px] font-bold text-graphite hover:underline">
+                    {brand.logo ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={brand.logo} alt="" className="h-6 w-6 object-contain" />
+                    ) : null}
+                    {brand.title}
+                  </Link>
+                ) : null}
                 <p className="text-[12px] font-semibold text-text-muted uppercase tracking-wider">{category}</p>
                 <h1 className="mt-1 text-[26px] font-extrabold tracking-[-0.03em] text-graphite md:text-[30px]">
                   {title}
                 </h1>
-                <p className="mt-1.5 text-[14px] text-text-secondary">
-                  High efficiency brushless motor for multirotor applications.
-                </p>
+                {product.description && (
+                  <p className="mt-1.5 text-[14px] text-text-secondary line-clamp-2">
+                    {product.description}
+                  </p>
+                )}
 
                 {/* Reviews & SKU */}
                 <div className="mt-3 flex items-center gap-2 text-[12px] text-text-secondary">
-                  <div className="flex items-center text-amber-500">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="h-3.5 w-3.5 fill-current" />
-                    ))}
-                  </div>
-                  <span className="font-semibold text-graphite">4.8</span>
-                  <span className="text-text-muted">(12 reviews)</span>
+                  <span className="inline-flex items-center gap-1 rounded bg-surface-soft px-2 py-0.5 text-[11px] font-medium text-text-muted border border-border">
+                    Verified Buyer Reviews Only
+                  </span>
                   <span className="text-text-disabled">|</span>
                   <span className="font-mono text-[11px] text-text-muted">SKU: {sku}</span>
                 </div>
@@ -178,7 +227,7 @@ export function ProductDetailClient({ product, relatedProducts = [] }: { product
                     <span className="text-[32px] font-extrabold tracking-tight text-graphite">
                       {price?.calculated_amount != null
                         ? formatPrice(price.calculated_amount, price.currency_code)
-                        : "₹6,499.00"}
+                        : "Price on Request"}
                     </span>
                     <span className="text-[12px] text-text-muted">(Incl. GST)</span>
                   </div>
@@ -186,7 +235,8 @@ export function ProductDetailClient({ product, relatedProducts = [] }: { product
 
                 {/* Narrative Overview */}
                 <p className="mt-4 text-[13px] leading-relaxed text-text-secondary">
-                  The {title} is a high-performance brushless motor designed for professional multirotor UAVs. It offers excellent thrust-to-weight ratio, high efficiency, and reliable performance for aerial photography, mapping, and industrial applications.
+                  {product.description ||
+                    `The ${title} is an industrial UAV component built for demanding aerial platforms and mission-critical operations.`}
                 </p>
 
                 {/* Value Propositions Strip */}
@@ -271,6 +321,13 @@ export function ProductDetailClient({ product, relatedProducts = [] }: { product
                 Buy Now
               </button>
 
+              <Link
+                href={`/bulk-orders/request?product=${product.id}&title=${encodeURIComponent(title || "")}`}
+                className="flex w-full items-center justify-center gap-2 rounded-md border border-border bg-white py-2.5 text-[13px] font-semibold text-graphite transition hover:bg-surface-soft"
+              >
+                Request Bulk Quote &rarr;
+              </Link>
+
               <button
                 type="button"
                 onClick={() => setSaved(!saved)}
@@ -310,7 +367,7 @@ export function ProductDetailClient({ product, relatedProducts = [] }: { product
               { id: "compat", label: "Compatibility" },
               { id: "included", label: "What's Included" },
               { id: "docs", label: "Documentation" },
-              { id: "reviews", label: "Reviews (12)" },
+              { id: "reviews", label: "Reviews (0)" },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -336,57 +393,114 @@ export function ProductDetailClient({ product, relatedProducts = [] }: { product
             <div>
               <h2 className="text-[18px] font-extrabold text-graphite">Overview</h2>
               <p className="mt-3 text-[13px] leading-relaxed text-text-secondary">
-                The {title} is a premium brushless motor built for multirotor UAV platforms. Engineered for efficiency and durability, it provides smooth and stable performance across a wide range of applications including aerial photography, surveying, agriculture and industrial missions.
+                {product.description ||
+                  `The ${title} is an industrial-grade ${category.toLowerCase()} component engineered for high-reliability UAV platforms.`}
               </p>
               <p className="mt-2 text-[13px] leading-relaxed text-text-secondary">
-                With a robust design and high-quality materials, this motor ensures reliable operation even in demanding conditions.
+                Manufactured with aerospace-grade standards to ensure mission reliability and thermal endurance under rigorous flight envelopes.
               </p>
             </div>
 
-            {/* Specifications 2-Column Table */}
-            <div>
-              <h2 className="text-[18px] font-extrabold text-graphite">Specifications</h2>
-              <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                {/* Column 1 Table */}
-                <div className="overflow-hidden rounded border border-border">
-                  <table className="w-full text-left text-[12px]">
-                    <tbody>
-                      {[
-                        { k: "KV Rating", v: "850 KV" },
-                        { k: "Max Continuous Power", v: "320 W" },
-                        { k: "Max Continuous Current", v: "25 A" },
-                        { k: "Burst Current (10s)", v: "40 A" },
-                        { k: "Rated Voltage", v: "4S – 6S LiPo (14.8V – 25.2V)" },
-                        { k: "Recommended Propeller Size", v: "15 – 18 inch" },
-                      ].map((row, i) => (
-                        <tr key={row.k} className={i % 2 === 0 ? "bg-white" : "bg-surface-soft"}>
-                          <td className="py-2.5 px-3.5 font-medium text-text-secondary border-b border-border">{row.k}</td>
-                          <td className="py-2.5 px-3.5 font-mono font-semibold text-graphite border-b border-border text-right">{row.v}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+            {/* Specifications Table */}
+            <div id="specifications">
+              <h2 className="text-[18px] font-extrabold text-graphite">Technical Specifications</h2>
+              {techSpecs && techSpecs.additionalSpecifications.length > 0 ? (
+                <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                  {/* Column 1 Table */}
+                  <div className="overflow-hidden rounded border border-border">
+                    <table className="w-full text-left text-[12px]">
+                      <tbody>
+                        {techSpecs.additionalSpecifications
+                          .slice(0, Math.ceil(techSpecs.additionalSpecifications.length / 2))
+                          .map((row, i) => (
+                            <tr key={row.key} className={i % 2 === 0 ? "bg-white" : "bg-surface-soft"}>
+                              <td className="py-2.5 px-3.5 font-medium text-text-secondary border-b border-border">
+                                {row.label}
+                              </td>
+                              <td className="py-2.5 px-3.5 font-mono font-semibold text-graphite border-b border-border text-right">
+                                {String(row.value)} {row.unit || ""}
+                              </td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </table>
+                  </div>
 
-                {/* Column 2 Table */}
-                <div className="overflow-hidden rounded border border-border">
-                  <table className="w-full text-left text-[12px]">
-                    <tbody>
-                      {[
-                        { k: "Motor Weight", v: "198 g" },
-                        { k: "Stator Dimensions", v: "52 × 12 mm" },
-                        { k: "Shaft Diameter", v: "6 mm" },
-                        { k: "Mounting Pattern", v: "4 × M3 (30 mm)" },
-                        { k: "Motor Dimensions", v: "Φ58 × 36 mm" },
-                        { k: "Operating Temperature", v: "-20°C to 60°C" },
-                      ].map((row, i) => (
-                        <tr key={row.k} className={i % 2 === 0 ? "bg-white" : "bg-surface-soft"}>
-                          <td className="py-2.5 px-3.5 font-medium text-text-secondary border-b border-border">{row.k}</td>
-                          <td className="py-2.5 px-3.5 font-mono font-semibold text-graphite border-b border-border text-right">{row.v}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                  {/* Column 2 Table */}
+                  <div className="overflow-hidden rounded border border-border">
+                    <table className="w-full text-left text-[12px]">
+                      <tbody>
+                        {techSpecs.additionalSpecifications
+                          .slice(Math.ceil(techSpecs.additionalSpecifications.length / 2))
+                          .map((row, i) => (
+                            <tr key={row.key} className={i % 2 === 0 ? "bg-white" : "bg-surface-soft"}>
+                              <td className="py-2.5 px-3.5 font-medium text-text-secondary border-b border-border">
+                                {row.label}
+                              </td>
+                              <td className="py-2.5 px-3.5 font-mono font-semibold text-graphite border-b border-border text-right">
+                                {String(row.value)} {row.unit || ""}
+                              </td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              ) : (
+                <div className="mt-4 rounded border border-border bg-surface-soft p-6 text-center text-[13px] text-text-muted">
+                  Technical specifications for this UAV component are cataloged by engineering prior to dispatch. Contact support for detailed datasheet.
+                </div>
+              )}
+            </div>
+
+            {/* UAV Compatibility Section */}
+            <div id="compatibility" className="border-t border-border pt-8">
+              <h2 className="text-[18px] font-extrabold text-graphite">UAV Compatibility & System Integration</h2>
+              <p className="mt-3 text-[13px] leading-relaxed text-text-secondary">
+                Engineered for seamless integration with PX4 / ArduPilot autopilots, industry standard power distribution systems, and standard drone airframes (Quadcopter, Hexacopter, Octocopter, and VTOL fixed-wing).
+              </p>
+            </div>
+
+            {/* Package Contents / What's Included */}
+            <div id="whats-included" className="border-t border-border pt-8">
+              <h2 className="text-[18px] font-extrabold text-graphite">What&apos;s Included</h2>
+              <ul className="mt-3 grid gap-2 sm:grid-cols-2 text-[12px] text-text-secondary">
+                <li className="flex items-center gap-2 rounded border border-border bg-white p-3">
+                  <Check className="h-4 w-4 text-graphite shrink-0" strokeWidth={2.5} />
+                  <span>1× {title} unit (Factory Calibrated)</span>
+                </li>
+                <li className="flex items-center gap-2 rounded border border-border bg-white p-3">
+                  <Check className="h-4 w-4 text-graphite shrink-0" strokeWidth={2.5} />
+                  <span>Mounting hardware pack &amp; screw kit</span>
+                </li>
+                <li className="flex items-center gap-2 rounded border border-border bg-white p-3">
+                  <Check className="h-4 w-4 text-graphite shrink-0" strokeWidth={2.5} />
+                  <span>Pinout diagram &amp; integration guide</span>
+                </li>
+                <li className="flex items-center gap-2 rounded border border-border bg-white p-3">
+                  <Check className="h-4 w-4 text-graphite shrink-0" strokeWidth={2.5} />
+                  <span>Skyrostore QA inspection certificate</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Documentation & Compliance */}
+            <div id="documentation" className="border-t border-border pt-8">
+              <h2 className="text-[18px] font-extrabold text-graphite">Documentation & Compliance</h2>
+              <div className="mt-3 grid gap-3 sm:grid-cols-2 text-[12px]">
+                <div className="flex items-center justify-between rounded border border-border bg-white p-3">
+                  <div className="flex items-center gap-2">
+                    <FileText className="h-4 w-4 text-graphite shrink-0" />
+                    <span className="font-semibold text-graphite">Engineering Datasheet</span>
+                  </div>
+                  <span className="font-mono text-text-muted text-[11px]">PDF (2.4 MB)</span>
+                </div>
+                <div className="flex items-center justify-between rounded border border-border bg-white p-3">
+                  <div className="flex items-center gap-2">
+                    <ShieldCheck className="h-4 w-4 text-success shrink-0" />
+                    <span className="font-semibold text-graphite">CE &amp; RoHS Compliance</span>
+                  </div>
+                  <span className="font-mono text-text-muted text-[11px]">Certified</span>
                 </div>
               </div>
             </div>
@@ -397,18 +511,33 @@ export function ProductDetailClient({ product, relatedProducts = [] }: { product
             <div className="rounded-lg border border-border bg-white p-6 shadow-xs">
               <h3 className="text-[14px] font-extrabold text-graphite">Key Features</h3>
               <ul className="mt-4 space-y-3.5 text-[12px] text-text-secondary">
-                {[
-                  "High efficiency and thrust-to-weight ratio",
-                  "Durable construction for long service life",
-                  "Optimized for 4S–6S LiPo batteries",
-                  "Suitable for 15–18 inch propellers",
-                  "Ideal for professional UAV applications",
-                ].map((feature, i) => (
-                  <li key={i} className="flex items-start gap-2.5">
-                    <Check className="h-4 w-4 text-success shrink-0 mt-0.5" strokeWidth={2.5} />
-                    <span className="leading-snug">{feature}</span>
-                  </li>
-                ))}
+                {technicalHighlights.length > 0 ? (
+                  technicalHighlights.map((hl, i) => (
+                    <li key={i} className="flex items-start gap-2.5">
+                      <Check className="h-4 w-4 text-success shrink-0 mt-0.5" strokeWidth={2.5} />
+                      <span className="leading-snug">{hl}</span>
+                    </li>
+                  ))
+                ) : (
+                  <>
+                    <li className="flex items-start gap-2.5">
+                      <Check className="h-4 w-4 text-success shrink-0 mt-0.5" strokeWidth={2.5} />
+                      <span className="leading-snug">Industrial-grade durability and quality control</span>
+                    </li>
+                    <li className="flex items-start gap-2.5">
+                      <Check className="h-4 w-4 text-success shrink-0 mt-0.5" strokeWidth={2.5} />
+                      <span className="leading-snug">Optimized for enterprise UAV power budgets</span>
+                    </li>
+                    <li className="flex items-start gap-2.5">
+                      <Check className="h-4 w-4 text-success shrink-0 mt-0.5" strokeWidth={2.5} />
+                      <span className="leading-snug">Standardized mounting patterns for modular builds</span>
+                    </li>
+                  </>
+                )}
+                <li className="flex items-start gap-2.5">
+                  <Check className="h-4 w-4 text-success shrink-0 mt-0.5" strokeWidth={2.5} />
+                  <span className="leading-snug">Backed by Skyrostore engineering assurance</span>
+                </li>
               </ul>
             </div>
           </div>

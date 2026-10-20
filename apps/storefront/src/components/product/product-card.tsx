@@ -16,6 +16,7 @@ export function ProductCard({ product }: { product: any }) {
   const variant = product.variants?.[0];
   const price = variant?.calculated_price;
   const category = product.categories?.[0]?.name?.replace("[DEV] ", "") as string | undefined;
+  const brandName = product.collection?.title as string | undefined;
   const inStock = variant?.inventory_quantity != null ? variant.inventory_quantity > 0 : true;
   const technicalHighlights = getProductTechnicalHighlights(product.metadata);
 
@@ -87,8 +88,12 @@ export function ProductCard({ product }: { product: any }) {
         </button>
       </div>
       <div className="p-3">
-        {category && (
-          <p className="text-[11px] text-text-muted">{category}</p>
+        {(brandName || category) && (
+          <p className="text-[11px] text-text-muted">
+            {brandName ? <span className="font-semibold text-text-secondary">{brandName}</span> : null}
+            {brandName && category ? " · " : null}
+            {category}
+          </p>
         )}
         <h3 className="mt-0.5 text-[14px] font-semibold leading-snug text-graphite line-clamp-1">
           {product.title?.replace("[DEV] ", "")}

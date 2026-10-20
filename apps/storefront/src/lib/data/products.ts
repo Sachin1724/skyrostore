@@ -2,6 +2,20 @@ import { medusa } from "@/lib/medusa";
 
 const REGION_ID = process.env.NEXT_PUBLIC_REGION_ID || "reg_01M4EBVQ7AW00SGW5JEMPAABK3";
 
+const INTERNAL_METADATA_KEYS = new Set([
+  "internal_batch_code",
+  "qa_test_result",
+]);
+
+function stripInternalMetadata<T extends { metadata?: Record<string, unknown> | null }>(product: T): T {
+  if (!product.metadata) return product;
+  const filtered: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(product.metadata)) {
+    if (!INTERNAL_METADATA_KEYS.has(k)) filtered[k] = v;
+  }
+  return { ...product, metadata: filtered };
+}
+
 export async function getProducts(params?: {
   limit?: number;
   offset?: number;
@@ -16,9 +30,9 @@ export async function getProducts(params?: {
     collection_id: params?.collection_id,
     q: params?.q,
     region_id: REGION_ID,
-    fields: "+metadata,+variants.calculated_price,+variants.inventory_quantity",
+    fields: "+metadata,+categories,+collection,+variants.calculated_price,+variants.inventory_quantity",
   });
-  return { products, count, offset, limit };
+  return { products: products.map(stripInternalMetadata), count, offset, limit };
 }
 
 export async function getProduct(id: string) {
@@ -26,7 +40,7 @@ export async function getProduct(id: string) {
     region_id: REGION_ID,
     fields: "+metadata,+variants.calculated_price,+variants.inventory_quantity",
   });
-  return product;
+  return stripInternalMetadata(product);
 }
 
 export async function getProductByHandle(handle: string) {
@@ -34,9 +48,10 @@ export async function getProductByHandle(handle: string) {
     handle,
     limit: 1,
     region_id: REGION_ID,
-    fields: "+metadata,+variants.calculated_price,+variants.inventory_quantity",
+    fields: "+metadata,+categories,+collection,+variants.calculated_price,+variants.inventory_quantity",
   });
-  return products[0] ?? null;
+  const p = products[0] ?? null;
+  return p ? stripInternalMetadata(p) : null;
 }
 
 export async function getCategories() {
