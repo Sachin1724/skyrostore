@@ -23,5 +23,26 @@ export default defineConfig({
     { resolve: "./src/modules/flight-test" },
     { resolve: "./src/modules/quality" },
     { resolve: "./src/modules/audit" },
+    { resolve: "./src/modules/analytics" },
+    {
+      resolve: "@medusajs/medusa/payment",
+      options: {
+        providers: [
+          ...(process.env.RAZORPAY_KEY_ID
+            ? [
+                {
+                  resolve: "./src/modules/razorpay",
+                  id: "razorpay",
+                  options: {
+                    key_id: process.env.RAZORPAY_KEY_ID,
+                    key_secret: process.env.RAZORPAY_KEY_SECRET,
+                    webhook_secret: process.env.RAZORPAY_WEBHOOK_SECRET,
+                  },
+                },
+              ]
+            : []),
+        ],
+      },
+    },
   ],
 });

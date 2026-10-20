@@ -14,3 +14,6 @@ playwright-report/
 coverage/
 *.tsbuildinfo
 .screenshots*/
+
+# uploaded media (Medusa local file provider)
+apps/backend/static/
