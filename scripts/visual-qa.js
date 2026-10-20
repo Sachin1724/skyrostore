@@ -90,21 +90,30 @@ async function runVisualQA() {
   // Select Bulk Custom Builds
   await page.click('button:has-text("Bulk Custom Builds")');
 
+  // Navigate to Contact Details step
+  await page.click('button:has-text("Contact Details")');
+
   // Fill in Form
   await page.fill('input[placeholder*="Dr. Rajesh"]', 'Air Commodore Rajiv Verma');
   await page.fill('input[placeholder*="rajesh@"]', 'verma@drdo-aeronautics.gov.in');
   await page.fill('input[placeholder*="+91"]', '+91 94480 12345');
   await page.fill('input[placeholder*="AeroTech Precision"]', 'Defense Aviation Lab');
   await page.fill('input[placeholder*="27AABCA"]', '07AAACD1234F1Z1');
+
+  // Navigate to Delivery & Notes step
+  await page.click('button:has-text("Delivery & Notes")');
   await page.fill('input[placeholder="City"]', 'New Delhi');
   await page.fill('input[placeholder="State"]', 'Delhi');
+
+  // Navigate to Review & Submit step
+  await page.click('button:has-text("Review & Submit")');
 
   await page.screenshot({ path: path.join(ARTIFACT_DIR, '06_request_form_filled.png'), fullPage: false });
   console.log('   Saved: 06_request_form_filled.png');
 
   // Submit form
   console.log('   Submitting request form...');
-  await page.click('button[type="submit"]:has-text("Submit Formal Request")');
+  await page.click('button:has-text("Submit Formal Request")');
 
   await page.waitForSelector('text="Request Submitted Successfully"', { timeout: 10000 });
   const refNo = await page.locator('.font-mono.text-\\[18px\\]').innerText();
