@@ -1,6 +1,6 @@
 import { describe, test, expect, beforeAll } from "vitest";
 
-const BASE = "http://localhost:9000";
+const BASE = process.env.MEDUSA_URL || "http://localhost:9000";
 const PK = "pk_11e52cb93d15418c56289d434fee7c53a391460b6a393b72ad48192afe3c4816";
 
 let adminToken = "";
@@ -339,9 +339,19 @@ describe("Bulk Order & Custom UAV Requests Workflow", () => {
     expect(res.status).toBe(200);
     const data = await res.json();
     expect(data.ok).toBe(true);
-    expect(data.order_id).toMatch(/^ord_bulk_/);
+    // Conversion now creates a real Medusa order so the bulk order is packed
+    // and shipped through the same fulfilment workflow as any other order.
+    expect(data.order_id).toMatch(/^order_/);
     expect(data.request.status).toBe("CONVERTED_TO_ORDER");
     expect(data.request.linked_order_id).toBe(data.order_id);
+
+    const fulfilmentRes = await fetch(`${BASE}/admin/fulfilment/orders/${data.order_id}`, {
+      headers: { Authorization: `Bearer ${adminToken}` },
+    });
+    expect(fulfilmentRes.ok).toBe(true);
+    const detail = await fulfilmentRes.json();
+    expect(detail.packing_list.length).toBeGreaterThan(0);
+    expect(detail.bulk_order_request?.id).toBe(createdRequestIdA);
   });
 
   test("Converting already converted order is idempotent and preserves order ID", async () => {

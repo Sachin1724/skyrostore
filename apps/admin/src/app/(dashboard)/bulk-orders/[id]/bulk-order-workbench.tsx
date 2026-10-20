@@ -264,9 +264,12 @@ export function BulkOrderWorkbench({ initialRequest }: BulkOrderWorkbenchProps) 
               </p>
             </div>
           </div>
-          <span className="rounded bg-lime-400 text-gray-950 font-mono text-xs px-2 py-0.5 font-bold">
-            CONVERTED
-          </span>
+          <a
+            href={`/orders/${request.linked_order_id}`}
+            className="rounded bg-lime-400 px-2 py-0.5 font-mono text-xs font-bold text-gray-950 hover:bg-lime-300"
+          >
+            OPEN FULFILMENT
+          </a>
         </div>
       )}
 

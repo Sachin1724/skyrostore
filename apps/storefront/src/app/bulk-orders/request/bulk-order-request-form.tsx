@@ -139,39 +139,39 @@ export function BulkOrderRequestForm() {
           id: `item-${Date.now()}`,
           title: initialTitle,
           subtitle: "Enterprise Component",
-          image: "/images/products/t-motor-mn5212.png",
-          unit_price: 7500,
+          image: "/images/products/pixhawk-6c-mini.webp",
+          unit_price: 14999,
           requested_quantity: 10,
           product_id: initialProductId,
         },
       ];
     }
-    return DEFAULT_ITEMS;
+    return [];
   });
 
   // Step 2: Custom Engineering Requirements
-  const [intendedApplication, setIntendedApplication] = useState("LiDAR Mapping & Land Survey");
-  const [targetPayloadG, setTargetPayloadG] = useState("1500");
-  const [targetFlightTimeMin, setTargetFlightTimeMin] = useState("35");
-  const [operatingEnvironment, setOperatingEnvironment] = useState("High Altitude, Dusty (-10°C to +45°C)");
-  const [sensorsPayload, setSensorsPayload] = useState("LiDAR scanner + RGB mapping camera");
-  const [telemetryRequirements, setTelemetryRequirements] = useState("Encrypted dual 868MHz telemetry + 4G LTE");
+  const [intendedApplication, setIntendedApplication] = useState("");
+  const [targetPayloadG, setTargetPayloadG] = useState("");
+  const [targetFlightTimeMin, setTargetFlightTimeMin] = useState("");
+  const [operatingEnvironment, setOperatingEnvironment] = useState("");
+  const [sensorsPayload, setSensorsPayload] = useState("");
+  const [telemetryRequirements, setTelemetryRequirements] = useState("");
   const [targetUnitCount, setTargetUnitCount] = useState("1");
   const [additionalSpecifications, setAdditionalSpecifications] = useState("");
 
   // Step 3: Contact Details
-  const [contactName, setContactName] = useState("Sachin Mallick");
-  const [email, setEmail] = useState("sachin@example.com");
-  const [phone, setPhone] = useState("+91 98765 43210");
-  const [companyName, setCompanyName] = useState("AeroDynamics India Pvt Ltd");
-  const [gstin, setGstin] = useState("27AABCA1234F1Z8");
+  const [contactName, setContactName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [gstin, setGstin] = useState("");
 
   // Step 4: Delivery & Notes
-  const [deliveryCity, setDeliveryCity] = useState("Rourkela");
-  const [deliveryState, setDeliveryState] = useState("Odisha");
-  const [deliveryPincode, setDeliveryPincode] = useState("769004");
+  const [deliveryCity, setDeliveryCity] = useState("");
+  const [deliveryState, setDeliveryState] = useState("");
+  const [deliveryPincode, setDeliveryPincode] = useState("");
   const [timeframeWeeks, setTimeframeWeeks] = useState("4");
-  const [budgetRange, setBudgetRange] = useState("INR 5,00,000 - 15,00,000");
+  const [budgetRange, setBudgetRange] = useState("");
 
   // Submission state
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -248,12 +248,22 @@ export function BulkOrderRequestForm() {
         company_name: companyName || null,
         gstin: gstin || null,
         request_type: requestType,
-        items: items.map((i) => ({
-          title: i.title,
-          requested_quantity: Number(i.requested_quantity),
-          product_id: i.product_id || null,
-          notes: i.subtitle || null,
-        })),
+        items: items.length > 0
+          ? items.map((i) => ({
+              title: i.title,
+              requested_quantity: Number(i.requested_quantity),
+              product_id: i.product_id || null,
+              notes: i.subtitle || null,
+            }))
+          : [
+              {
+                title: intendedApplication
+                  ? `Custom UAV Build — ${intendedApplication}`
+                  : "Custom Enterprise UAV Build Specification",
+                requested_quantity: Math.max(1, Number(targetUnitCount) || 1),
+                notes: operatingEnvironment || "Bespoke platform engineering",
+              },
+            ],
         intended_application: requestType !== "BULK_PURCHASE" ? intendedApplication : null,
         target_payload_g: requestType !== "BULK_PURCHASE" && targetPayloadG ? Number(targetPayloadG) : null,
         target_flight_time_min: requestType !== "BULK_PURCHASE" && targetFlightTimeMin ? Number(targetFlightTimeMin) : null,
@@ -321,12 +331,12 @@ export function BulkOrderRequestForm() {
           <CheckCircle2 className="h-8 w-8 stroke-[2.2] text-graphite" />
         </div>
         <h2 className="mt-4 text-[24px] font-bold text-graphite">
-          Bulk Order Request Submitted
+          Request Submitted Successfully
         </h2>
         <p className="mt-2 text-[14px] text-text-secondary">
           Your formal request has been recorded under reference number:
         </p>
-        <div className="mt-3 inline-block rounded border border-border bg-surface-soft px-5 py-2.5 font-mono text-[20px] font-bold tracking-wider text-graphite">
+        <div className="mt-3 inline-block rounded border border-border bg-surface-soft px-5 py-2.5 font-mono text-[18px] font-bold tracking-wider text-graphite">
           {submittedData.reference_no}
         </div>
         <p className="mx-auto mt-4 max-w-lg text-[13px] leading-relaxed text-text-muted">
@@ -445,7 +455,7 @@ export function BulkOrderRequestForm() {
               <Layers className="h-6 w-6 stroke-[1.8]" />
             </div>
             <div>
-              <h3 className="text-[15px] font-bold text-graphite">Bulk Custom Build</h3>
+              <h3 className="text-[15px] font-bold text-graphite">Bulk Custom Builds</h3>
               <p className="mt-0.5 text-[12px] text-text-muted">
                 Multiple custom UAVs
               </p>
@@ -663,13 +673,20 @@ export function BulkOrderRequestForm() {
                           </td>
                         </tr>
                       ))}
-                      {filteredItems.length === 0 && (
+                      {items.length === 0 ? (
                         <tr>
                           <td colSpan={5} className="py-8 text-center text-text-muted">
-                            No products found in this category.
+                            <p className="font-semibold text-graphite text-[14px]">No components added to request yet</p>
+                            <p className="mt-1 text-[12px] text-text-secondary">Click &quot;Add Another Product&quot; below or define custom requirements in Step 2.</p>
                           </td>
                         </tr>
-                      )}
+                      ) : filteredItems.length === 0 ? (
+                        <tr>
+                          <td colSpan={5} className="py-8 text-center text-text-muted">
+                            No products found in this category filter.
+                          </td>
+                        </tr>
+                      ) : null}
                     </tbody>
                   </table>
                 </div>
@@ -851,6 +868,7 @@ export function BulkOrderRequestForm() {
                       required
                       value={contactName}
                       onChange={(e) => setContactName(e.target.value)}
+                      placeholder="e.g. Dr. Rajesh Sharma"
                       className={inputClass}
                     />
                   </div>
@@ -861,6 +879,7 @@ export function BulkOrderRequestForm() {
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
+                      placeholder="e.g. rajesh@aerospace-labs.in"
                       className={inputClass}
                     />
                   </div>
@@ -870,6 +889,7 @@ export function BulkOrderRequestForm() {
                       type="tel"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
+                      placeholder="+91 98765 43210"
                       className={inputClass}
                     />
                   </div>
@@ -879,6 +899,7 @@ export function BulkOrderRequestForm() {
                       type="text"
                       value={companyName}
                       onChange={(e) => setCompanyName(e.target.value)}
+                      placeholder="e.g. AeroTech Precision Systems"
                       className={inputClass}
                     />
                   </div>
@@ -888,7 +909,7 @@ export function BulkOrderRequestForm() {
                       type="text"
                       value={gstin}
                       onChange={(e) => setGstin(e.target.value)}
-                      placeholder="e.g. 21AABCS1234D1Z5"
+                      placeholder="e.g. 27AABCA1234F1Z8"
                       className={inputClass}
                     />
                   </div>
@@ -933,6 +954,7 @@ export function BulkOrderRequestForm() {
                       type="text"
                       value={deliveryCity}
                       onChange={(e) => setDeliveryCity(e.target.value)}
+                      placeholder="City"
                       className={inputClass}
                     />
                   </div>
@@ -942,6 +964,7 @@ export function BulkOrderRequestForm() {
                       type="text"
                       value={deliveryState}
                       onChange={(e) => setDeliveryState(e.target.value)}
+                      placeholder="State"
                       className={inputClass}
                     />
                   </div>
@@ -951,6 +974,7 @@ export function BulkOrderRequestForm() {
                       type="text"
                       value={deliveryPincode}
                       onChange={(e) => setDeliveryPincode(e.target.value)}
+                      placeholder="Pincode"
                       className={inputClass}
                     />
                   </div>
