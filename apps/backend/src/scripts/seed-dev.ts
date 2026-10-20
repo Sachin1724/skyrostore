@@ -192,6 +192,7 @@ const PRODUCTS: ProductDef[] = [
   {
     title: "[DEV] Carbon Fiber Propeller Set 15x5.5",
     handle: "dev-cf-prop-15x55",
+    thumbnail: "/images/products/carbon-fiber-prop-15in.png",
     description:
       "Pair of carbon fiber propellers, 15-inch diameter, 5.5-inch pitch. CW/CCW matched set.",
     categoryHandle: "dev-propellers",
@@ -209,6 +210,7 @@ const PRODUCTS: ProductDef[] = [
   {
     title: "[DEV] uBlox M10 GPS Module",
     handle: "dev-ublox-m10-gps",
+    thumbnail: "/images/products/ublox-m10.png",
     description:
       "Multi-constellation GNSS receiver. GPS, GLONASS, Galileo, BeiDou. Integrated compass.",
     categoryHandle: "dev-gps-modules",
@@ -227,6 +229,7 @@ const PRODUCTS: ProductDef[] = [
   {
     title: "[DEV] LiPo 6S 5000mAh 50C",
     handle: "dev-lipo-6s-5000",
+    thumbnail: "/images/products/lipo-6s-5000mah.png",
     description:
       "6-cell lithium polymer battery. 22.2V nominal, 5000mAh capacity, 50C continuous discharge.",
     categoryHandle: "dev-batteries",
@@ -246,6 +249,7 @@ const PRODUCTS: ProductDef[] = [
   {
     title: "[DEV] X450 Carbon Frame Kit",
     handle: "dev-x450-carbon-frame",
+    thumbnail: "/images/products/x450-carbon-frame.png",
     description:
       "450mm quadcopter frame. 3K carbon fiber arms, CNC aluminum center plates, integrated PDB.",
     categoryHandle: "dev-frames",
