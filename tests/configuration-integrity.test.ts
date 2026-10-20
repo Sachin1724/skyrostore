@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll } from "vitest";
 
-const BASE = "http://localhost:9000";
+const BASE = process.env.MEDUSA_URL || "http://localhost:9000";
 const PK = "pk_11e52cb93d15418c56289d434fee7c53a391460b6a393b72ad48192afe3c4816";
 
 const VALID_CONFIG = {

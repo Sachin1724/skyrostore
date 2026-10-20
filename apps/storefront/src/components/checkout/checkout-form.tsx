@@ -17,6 +17,7 @@ import {
   Smartphone,
 } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
+import { getSessionId, getVisitorId, track } from "@/lib/analytics";
 
 type CartItem = {
   id: string;
@@ -55,16 +56,16 @@ export function CheckoutForm() {
   const [error, setError] = useState("");
 
   // Form fields
-  const [fullName, setFullName] = useState("Sachin Mallick");
-  const [phone, setPhone] = useState("9876543210");
-  const [email, setEmail] = useState("sachin@example.com");
-  const [company, setCompany] = useState("AeroTech Systems");
-  const [gst, setGst] = useState("21AAAAA0000A1Z5");
-  const [address1, setAddress1] = useState("Plot 42, Technology Corridor, Sector 5");
-  const [address2, setAddress2] = useState("Rourkela Aerodrome Area");
-  const [city, setCity] = useState("Rourkela");
+  const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [company, setCompany] = useState("");
+  const [gst, setGst] = useState("");
+  const [address1, setAddress1] = useState("");
+  const [address2, setAddress2] = useState("");
+  const [city, setCity] = useState("");
   const [state, setState] = useState("Odisha");
-  const [pinCode, setPinCode] = useState("769004");
+  const [pinCode, setPinCode] = useState("");
 
   useEffect(() => {
     const cartId = localStorage.getItem("cart_id");
@@ -75,11 +76,63 @@ export function CheckoutForm() {
     fetch(`/api/cart?id=${cartId}`)
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
-        if (data?.cart) setCart(data.cart);
+        if (data?.cart) {
+          setCart(data.cart);
+          track("checkout_started", {
+            cart_id: data.cart.id,
+            value: data.cart.total ?? null,
+            currency_code: data.cart.currency_code ?? null,
+            checkout_step: "customer",
+            quantity: (data.cart.items || []).reduce(
+              (sum: number, item: CartItem) => sum + Number(item.quantity || 0),
+              0
+            ),
+          });
+        }
       })
       .catch(() => null)
       .finally(() => setLoading(false));
   }, []);
+
+  function loadRazorpayScript(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if ((window as any).Razorpay) return resolve();
+      const s = document.createElement("script");
+      s.src = "https://checkout.razorpay.com/v1/checkout.js";
+      s.onload = () => resolve();
+      s.onerror = () => reject(new Error("Failed to load Razorpay SDK"));
+      document.head.appendChild(s);
+    });
+  }
+
+  function openRazorpayModal(options: {
+    key_id: string;
+    order_id: string;
+    amount: number;
+    currency: string;
+    name: string;
+    email: string;
+    phone: string;
+  }): Promise<{ razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }> {
+    return new Promise((resolve, reject) => {
+      const rzp = new (window as any).Razorpay({
+        key: options.key_id,
+        amount: options.amount,
+        currency: options.currency,
+        name: options.name || "Skyrostore",
+        description: "UAV Components Order",
+        order_id: options.order_id,
+        prefill: { email: options.email, contact: options.phone },
+        handler: (response: any) => resolve(response),
+        modal: { ondismiss: () => reject(new Error("Payment cancelled")) },
+        theme: { color: "#181B20" },
+      });
+      rzp.on("payment.failed", (response: any) => {
+        reject(new Error(response.error?.description || "Payment failed"));
+      });
+      rzp.open();
+    });
+  }
 
   async function handleCompleteOrder(e: React.FormEvent) {
     e.preventDefault();
@@ -87,12 +140,16 @@ export function CheckoutForm() {
     setSubmitting(true);
     setError("");
 
+    // Lets the server attribute each checkout step to this browser session.
+    const journey = { session_id: getSessionId().id, visitor_id: getVisitorId() };
+
     try {
       // 1. Set customer address
-      await fetch("/api/cart/checkout", {
+      const custRes = await fetch("/api/cart/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          ...journey,
           cart_id: cart.id,
           step: "customer",
           email,
@@ -108,78 +165,148 @@ export function CheckoutForm() {
           },
         }),
       });
+      if (!custRes.ok) {
+        const custData = await custRes.json();
+        throw new Error(custData.error || "Failed to save shipping address");
+      }
 
       // 2. Set shipping method
-      await fetch("/api/cart/checkout", {
+      const shipRes = await fetch("/api/cart/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          ...journey,
           cart_id: cart.id,
           step: "shipping",
         }),
       });
+      if (!shipRes.ok) {
+        const shipData = await shipRes.json();
+        throw new Error(shipData.error || "Failed to select shipping method");
+      }
 
-      // 3. Complete order
+      // 3. Initialize payment session with Medusa
+      const payRes = await fetch("/api/cart/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...journey,
+          cart_id: cart.id,
+          step: "payment",
+        }),
+      });
+      if (!payRes.ok) {
+        const payData = await payRes.json();
+        throw new Error(payData.error || "Failed to initialize payment session");
+      }
+      const payData = await payRes.json();
+
+      // 4. Razorpay modal flow if provider is Razorpay
+      const isRazorpay = payData.provider_id === "pp_razorpay";
+      const sessionData = payData.payment_session?.data;
+
+      if (isRazorpay && sessionData?.razorpay_order_id) {
+        await loadRazorpayScript();
+        const rzpResponse = await openRazorpayModal({
+          key_id: sessionData.razorpay_key_id,
+          order_id: sessionData.razorpay_order_id,
+          amount: sessionData.amount,
+          currency: sessionData.currency || "INR",
+          name: "Skyrostore",
+          email,
+          phone,
+        });
+
+        // Server-side verification — browser callback alone cannot mark order paid
+        const verifyRes = await fetch("/api/cart/checkout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ...journey,
+            cart_id: cart.id,
+            step: "verify-payment",
+            payment_collection_id: payData.payment_collection_id,
+            payment_session_id: payData.payment_session?.id,
+            razorpay_order_id: rzpResponse.razorpay_order_id,
+            razorpay_payment_id: rzpResponse.razorpay_payment_id,
+            razorpay_signature: rzpResponse.razorpay_signature,
+          }),
+        });
+        if (!verifyRes.ok) {
+          const verifyData = await verifyRes.json();
+          throw new Error(verifyData.error || "Payment verification failed");
+        }
+      }
+
+      // 5. Complete order
       const completeRes = await fetch("/api/cart/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          ...journey,
           cart_id: cart.id,
           step: "complete",
         }),
       });
 
       const completeData = await completeRes.json();
-      if (completeData.order) {
+      const placedOrder = completeData.order || (completeData.type === "order" ? completeData.order : null);
+      if (placedOrder?.id) {
         localStorage.removeItem("cart_id");
         window.dispatchEvent(new Event("storage"));
-        router.push(`/checkout/confirmation?order_id=${completeData.order.id}`);
+        router.push(`/checkout/confirmation?order_id=${placedOrder.id}`);
       } else {
-        router.push("/checkout/confirmation?order_id=SKY-2026-00124");
+        throw new Error(completeData.error || completeData.message || "Order placement could not be verified by backend");
       }
-    } catch {
-      router.push("/checkout/confirmation?order_id=SKY-2026-00124");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Unable to place order. Please review details.";
+      // Records that the attempt stopped here. A cancelled payment modal is not
+      // a payment failure, so no payment outcome is claimed.
+      track("checkout_step_failed", {
+        cart_id: cart.id,
+        checkout_step: "payment",
+        metadata: { reason: /cancel/i.test(msg) ? "customer_cancelled" : "client_error" },
+      });
+      setError(msg);
     } finally {
       setSubmitting(false);
     }
   }
 
-  const items = cart?.items || [
-    {
-      id: "item_1",
-      title: "T-Motor MN5212 Motor",
-      quantity: 1,
-      unit_price: 6499,
-      total: 6499,
-      thumbnail: "/images/products/t-motor-mn5212.png",
-    },
-    {
-      id: "item_2",
-      title: "Carbon Fiber Propeller 15 inch (Pair)",
-      quantity: 2,
-      unit_price: 899,
-      total: 1798,
-      thumbnail: "/images/products/carbon-fiber-prop-15in.png",
-    },
-    {
-      id: "item_3",
-      title: "LiPo 6S 5000mAh 50C",
-      quantity: 1,
-      unit_price: 8999,
-      total: 8999,
-      thumbnail: "/images/products/lipo-6s-5000mah.png",
-    },
-  ];
-
+  const items = cart?.items || [];
   const subtotal = items.reduce((s, it) => s + it.total, 0);
   const shippingFee = shippingMethod === "standard" ? 80 : shippingMethod === "express" ? 150 : 250;
   const gstAmount = Math.round(subtotal * 0.18);
   const grandTotal = subtotal + shippingFee + gstAmount;
 
+  if (!loading && items.length === 0) {
+    return (
+      <div className="rounded-lg border border-border bg-white p-12 text-center shadow-xs">
+        <h2 className="text-[20px] font-bold text-graphite">Your Cart is Empty</h2>
+        <p className="mt-2 text-[14px] text-text-secondary">
+          Add UAV parts or systems from our catalog before checking out.
+        </p>
+        <Link
+          href="/parts"
+          className="mt-6 inline-flex rounded-md bg-graphite px-6 py-2.5 text-[13px] font-bold text-white transition hover:bg-black"
+        >
+          Browse UAV Catalog &rarr;
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <form onSubmit={handleCompleteOrder} className="grid gap-8 lg:grid-cols-[1fr_380px]">
       {/* Left Column: Multi-Section Form */}
       <div className="space-y-6">
+        {error && (
+          <div className="rounded-md border border-rose-200 bg-rose-50 p-4 text-[13px] text-rose-800">
+            <p className="font-semibold text-rose-900">Checkout Error</p>
+            <p className="mt-0.5">{error}</p>
+          </div>
+        )}
+
         {/* Step 1: Shipping Address */}
         <div className="rounded-lg border border-border bg-white p-6 shadow-xs">
           <div className="flex items-center justify-between border-b border-border pb-4">
@@ -243,6 +370,18 @@ export function CheckoutForm() {
                   />
                 </div>
               </div>
+            </div>
+
+            <div>
+              <label className="block font-semibold text-graphite">Email Address *</label>
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email address"
+                className="mt-1 w-full rounded border border-border bg-white px-3 py-2 text-graphite focus:border-graphite focus:outline-none"
+              />
             </div>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

@@ -14,6 +14,7 @@ import {
   ShoppingCart,
 } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
+import { track } from "@/lib/analytics";
 
 type CartItem = {
   id: string;
@@ -64,7 +65,7 @@ export function CartView() {
   const [cart, setCart] = useState<Cart | null>(null);
   const [loading, setLoading] = useState(true);
   const [couponCode, setCouponCode] = useState("");
-  const [discountApplied, setDiscountApplied] = useState(true); // matching mockup discount of -1000
+  const [discountApplied, setDiscountApplied] = useState(false);
   const [selectedItems, setSelectedItems] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
@@ -91,6 +92,7 @@ export function CartView() {
 
   async function removeItem(lineItemId: string) {
     if (!cart) return;
+    const removed = cart.items?.find((i) => i.id === lineItemId);
     const res = await fetch("/api/cart/remove", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -100,11 +102,17 @@ export function CartView() {
       const data = await res.json();
       setCart(data.cart);
       window.dispatchEvent(new Event("storage"));
+      track("cart_item_removed", {
+        cart_id: cart.id,
+        line_item_id: lineItemId,
+        quantity: removed?.quantity ?? null,
+      });
     }
   }
 
   async function updateQuantity(lineItemId: string, quantity: number) {
     if (!cart || quantity < 1) return;
+    const previous = cart.items?.find((i) => i.id === lineItemId)?.quantity ?? null;
     const res = await fetch("/api/cart/update", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -114,6 +122,12 @@ export function CartView() {
       const data = await res.json();
       setCart(data.cart);
       window.dispatchEvent(new Event("storage"));
+      track("cart_item_quantity_changed", {
+        cart_id: cart.id,
+        line_item_id: lineItemId,
+        quantity,
+        metadata: { previous_quantity: previous },
+      });
     }
   }
 
@@ -149,7 +163,7 @@ export function CartView() {
   }
 
   const currency = cart?.region?.currency_code || cart?.currency_code || "INR";
-  const subtotal = cart?.total || 25593;
+  const subtotal = cart?.total ?? items.reduce((s, it) => s + it.total, 0);
   const discountAmount = discountApplied ? 1000 : 0;
   const shippingFee = 80;
   const taxableAmount = Math.max(0, subtotal - discountAmount);
@@ -221,9 +235,11 @@ export function CartView() {
                           <p className="font-bold text-[13px] text-graphite truncate">
                             {item.title?.replace("[DEV] ", "")}
                           </p>
-                          <p className="text-[11px] text-text-muted">
-                            850 KV | 320W | 4S–6S
-                          </p>
+                          {item.variant?.title && item.variant.title !== "Default Variant" && (
+                            <p className="text-[11px] text-text-muted">
+                              {item.variant.title}
+                            </p>
+                          )}
                           <div className="mt-1 flex items-center gap-1">
                             <span className="h-1.5 w-1.5 rounded-full bg-success" />
                             <span className="text-[10px] font-medium text-success">In Stock</span>

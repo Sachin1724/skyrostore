@@ -23,5 +23,6 @@ export const UavConfigurationSnapshot = model.define("uav_configuration_snapshot
   id: model.id().primaryKey(),
   configuration_id: model.text(),
   customer_id: model.text(),
+  order_id: model.text().nullable(),
   snapshot_data: model.json(),
 });

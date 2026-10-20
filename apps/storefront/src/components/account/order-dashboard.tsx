@@ -43,66 +43,10 @@ interface OrderItem {
   extraCount?: number;
 }
 
-const MOCK_ORDERS: OrderItem[] = [
-  {
-    id: "ord-1",
-    orderNumber: "#SKY-2026-00124",
-    date: "Oct 5, 2026",
-    itemCount: 3,
-    total: 20504,
-    status: "Delivered",
-    statusDescription: "Delivered on Oct 8, 2026 via Delhivery",
-    carrier: "Delhivery",
-    images: [
-      "/images/products/t-motor-mn5212.png",
-      "/images/products/carbon-fiber-prop-15in.png",
-      "/images/products/lipo-6s-5000mah.png",
-    ],
-    extraCount: 1,
-  },
-  {
-    id: "ord-2",
-    orderNumber: "#SKY-2026-00123",
-    date: "Oct 1, 2026",
-    itemCount: 1,
-    total: 14999,
-    status: "In Transit",
-    statusDescription: "Arriving Oct 10, 2026 via BlueDart",
-    carrier: "BlueDart",
-    images: ["/images/products/pixhawk-6x.png"],
-  },
-  {
-    id: "ord-3",
-    orderNumber: "#SKY-2026-00122",
-    date: "Sep 28, 2026",
-    itemCount: 4,
-    total: 36980,
-    status: "Processing",
-    statusDescription: "Preparing for shipment • Expected by Oct 12, 2026",
-    images: [
-      "/images/products/x450-carbon-frame.png",
-      "/images/products/t-motor-mn5212.png",
-      "/images/products/hobbywing-60a-esc.png",
-    ],
-    extraCount: 1,
-  },
-  {
-    id: "ord-4",
-    orderNumber: "#SKY-2026-00121",
-    date: "Sep 20, 2026",
-    itemCount: 2,
-    total: 12499,
-    status: "Delivered",
-    statusDescription: "Delivered on Sep 24, 2026 via Delhivery",
-    carrier: "Delhivery",
-    images: [
-      "/images/products/hobbywing-60a-esc.png",
-      "/images/products/carbon-fiber-prop-15in.png",
-    ],
-  },
-];
-
 export function OrderDashboard() {
+  const [orders, setOrders] = useState<OrderItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [unauthenticated, setUnauthenticated] = useState(false);
   const [activeTab, setActiveTab] = useState<
     "All Orders" | "Processing" | "Shipped" | "Delivered" | "Cancelled"
   >("All Orders");
@@ -110,8 +54,70 @@ export function OrderDashboard() {
   const [selectedOrder, setSelectedOrder] = useState<OrderItem | null>(null);
   const [showInvoiceAlert, setShowInvoiceAlert] = useState<string | null>(null);
 
+  useEffect(() => {
+    fetch("/api/account/orders")
+      .then((r) => {
+        if (r.status === 401) {
+          setUnauthenticated(true);
+          return null;
+        }
+        if (!r.ok) throw new Error("Failed to load orders");
+        return r.json();
+      })
+      .then((data) => {
+        if (data?.orders) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const mapped: OrderItem[] = data.orders.map((o: any) => {
+            const isDelivered = o.status === "completed" || o.fulfillment_status === "delivered";
+            const isShipped = o.fulfillment_status === "shipped";
+            const isCancelled = o.status === "canceled";
+            const status: OrderItem["status"] = isDelivered
+              ? "Delivered"
+              : isShipped
+              ? "In Transit"
+              : isCancelled
+              ? "Cancelled"
+              : "Processing";
+            return {
+              id: o.id,
+              orderNumber: `#SKY-${o.display_id || o.id.slice(-6)}`,
+              date: new Date(o.created_at).toLocaleDateString("en-IN", {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              }),
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              itemCount: o.items?.reduce((sum: number, it: any) => sum + (it.quantity || 1), 0) || 1,
+              total: o.total || 0,
+              status,
+              statusDescription: isDelivered
+                ? "Delivered to destination address"
+                : isShipped
+                ? "In transit with logistics carrier"
+                : isCancelled
+                ? "Order cancelled"
+                : "Order received • In fulfillment processing",
+              carrier: "Standard Express",
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              images: (o.items || []).map((it: any) => it.thumbnail).filter(Boolean),
+              extraCount: Math.max(0, (o.items?.length || 0) - 3),
+            };
+          });
+          setOrders(mapped);
+        }
+      })
+      .catch(() => null)
+      .finally(() => setLoading(false));
+  }, []);
+
+  const totalOrdersCount = orders.length;
+  const totalSpendAmount = orders.reduce((sum, o) => sum + o.total, 0);
+  const pendingDeliveriesCount = orders.filter(
+    (o) => o.status === "Processing" || o.status === "In Transit"
+  ).length;
+
   // Filter orders
-  const filteredOrders = MOCK_ORDERS.filter((order) => {
+  const filteredOrders = orders.filter((order) => {
     const matchesSearch =
       order.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
       order.carrier?.toLowerCase().includes(searchQuery.toLowerCase());
@@ -131,11 +137,15 @@ export function OrderDashboard() {
         {/* User Card */}
         <div className="flex items-center gap-3.5 border-b border-gray-800 pb-6">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#2a2f38] text-[15px] font-bold text-white">
-            SM
+            UAV
           </div>
           <div className="overflow-hidden">
-            <h3 className="truncate text-[14px] font-bold text-white">Sachin Mallick</h3>
-            <p className="truncate text-[11px] text-gray-400">sachin@example.com</p>
+            <h3 className="truncate text-[14px] font-bold text-white">
+              {unauthenticated ? "Guest Account" : "Enterprise Customer"}
+            </h3>
+            <p className="truncate text-[11px] text-gray-400">
+              {unauthenticated ? "Sign in to access orders" : "Verified Customer"}
+            </p>
           </div>
         </div>
 
@@ -228,7 +238,7 @@ export function OrderDashboard() {
             </div>
             <div>
               <p className="text-[11px] font-medium text-text-muted">Total Orders</p>
-              <p className="text-[20px] font-extrabold text-graphite">12</p>
+              <p className="text-[20px] font-extrabold text-graphite">{totalOrdersCount}</p>
               <p className="text-[10px] text-text-disabled">Across all time</p>
             </div>
           </div>
@@ -239,7 +249,7 @@ export function OrderDashboard() {
             </div>
             <div>
               <p className="text-[11px] font-medium text-text-muted">Total Spend</p>
-              <p className="text-[20px] font-extrabold text-graphite">₹1,24,580</p>
+              <p className="text-[20px] font-extrabold text-graphite">{formatINR(totalSpendAmount)}</p>
               <p className="text-[10px] text-text-disabled">Including taxes</p>
             </div>
           </div>
@@ -250,7 +260,7 @@ export function OrderDashboard() {
             </div>
             <div>
               <p className="text-[11px] font-medium text-text-muted">Pending Deliveries</p>
-              <p className="text-[20px] font-extrabold text-graphite">2</p>
+              <p className="text-[20px] font-extrabold text-graphite">{pendingDeliveriesCount}</p>
               <p className="text-[10px] text-text-disabled">Orders in transit</p>
             </div>
           </div>
@@ -430,7 +440,31 @@ export function OrderDashboard() {
 
           {filteredOrders.length === 0 && (
             <div className="rounded-lg border border-border bg-white p-8 text-center text-[13px] text-text-muted">
-              No orders found matching this status filter.
+              {loading ? (
+                "Loading orders from account..."
+              ) : unauthenticated ? (
+                <div>
+                  <p className="font-bold text-graphite text-[15px]">Sign in required to view order history</p>
+                  <p className="mt-1 text-text-secondary">Please sign in to view your verified orders and commercial invoices.</p>
+                  <Link
+                    href="/account"
+                    className="mt-4 inline-flex items-center justify-center rounded bg-graphite px-5 py-2 font-bold text-white hover:bg-black text-[12px]"
+                  >
+                    Sign In to Skyrostore
+                  </Link>
+                </div>
+              ) : (
+                <div>
+                  <p className="font-bold text-graphite text-[15px]">No orders placed yet</p>
+                  <p className="mt-1 text-text-secondary">Explore our catalog or configure your custom UAV build.</p>
+                  <Link
+                    href="/parts"
+                    className="mt-4 inline-flex items-center justify-center rounded bg-graphite px-5 py-2 font-bold text-white hover:bg-black text-[12px]"
+                  >
+                    Browse UAV Parts
+                  </Link>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -446,37 +480,43 @@ export function OrderDashboard() {
               href="/account"
               className="text-[11px] font-bold text-[#84cc16] hover:underline"
             >
-              Edit Profile
+              {unauthenticated ? "Sign In" : "Manage"}
             </Link>
           </div>
 
           <div className="mt-4 flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-full bg-surface-soft text-[14px] font-bold text-graphite border border-border">
-              SM
+              UAV
             </div>
             <div>
-              <p className="text-[13px] font-bold text-graphite">Sachin Mallick</p>
-              <p className="text-[11px] text-text-muted">sachin@example.com</p>
+              <p className="text-[13px] font-bold text-graphite">
+                {unauthenticated ? "Guest Customer" : "Enterprise Account"}
+              </p>
+              <p className="text-[11px] text-text-muted">
+                {unauthenticated ? "No active session" : "Verified Customer"}
+              </p>
             </div>
           </div>
 
           <div className="mt-4 space-y-2 border-t border-border pt-3 text-[12px]">
             <div className="flex justify-between">
-              <span className="text-text-muted">Member since</span>
-              <span className="font-semibold text-graphite">Aug 2024</span>
+              <span className="text-text-muted">Account Status</span>
+              <span className="font-semibold text-graphite">
+                {unauthenticated ? "Guest Mode" : "Active"}
+              </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-text-muted">Phone</span>
-              <span className="font-semibold text-graphite">+91 98765 43210</span>
+              <span className="text-text-muted">Procurement Currency</span>
+              <span className="font-semibold text-graphite">INR (₹)</span>
             </div>
             <div className="pt-1">
               <div className="flex justify-between">
-                <span className="text-text-muted">Default Address</span>
+                <span className="text-text-muted">Procurement Tier</span>
                 <Link href="/account" className="text-[11px] font-medium text-[#84cc16] hover:underline">
-                  Manage
+                  {unauthenticated ? "Sign In" : "Manage"}
                 </Link>
               </div>
-              <p className="mt-1 font-semibold text-graphite">Rourkela, Odisha, India</p>
+              <p className="mt-1 font-semibold text-graphite">Direct UAV Procurement</p>
             </div>
           </div>
         </div>
