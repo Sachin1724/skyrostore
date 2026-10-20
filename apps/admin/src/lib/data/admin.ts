@@ -1,4 +1,6 @@
-const BASE_URL = process.env.NEXT_PUBLIC_MEDUSA_URL || "http://localhost:9000";
+import { pathLabels, type Brand, type Category } from "@/lib/catalog";
+
+const BASE_URL =process.env.NEXT_PUBLIC_MEDUSA_URL || "http://localhost:9000";
 
 async function adminFetch(path: string, options?: RequestInit) {
   const res = await fetch(`${BASE_URL}${path}`, {
@@ -32,15 +34,46 @@ export async function getOrders(token: string, params?: { limit?: number; offset
   );
 }
 
-export async function getProducts(token: string, params?: { limit?: number; offset?: number }) {
-  return adminFetch(
-    `/admin/products?limit=${params?.limit ?? 20}&offset=${params?.offset ?? 0}`,
-    { headers: authHeaders(token) }
-  );
+export async function getProducts(
+  token: string,
+  params?: { limit?: number; offset?: number; category_id?: string; collection_id?: string; status?: string; q?: string }
+) {
+  const qs = new URLSearchParams({
+    limit: String(params?.limit ?? 20),
+    offset: String(params?.offset ?? 0),
+    fields: "id,title,handle,status,thumbnail,*variants,*categories,*collection",
+  });
+  if (params?.category_id) qs.set("category_id", params.category_id);
+  if (params?.collection_id) qs.set("collection_id", params.collection_id);
+  if (params?.status) qs.set("status", params.status);
+  if (params?.q) qs.set("q", params.q);
+  return adminFetch(`/admin/products?${qs}`, { headers: authHeaders(token) });
+}
+
+/** Categories (with "A › B › C" path labels, sorted) and brands, for pickers and filters. */
+export async function getCatalogOptions(token: string) {
+  const [cats, brands] = await Promise.all([
+    adminFetch("/admin/product-categories?limit=1000&fields=id,name,handle,is_active,parent_category_id,rank", {
+      headers: authHeaders(token),
+    }).catch(() => ({ product_categories: [] })),
+    adminFetch("/admin/collections?limit=500&fields=id,title,handle,metadata", {
+      headers: authHeaders(token),
+    }).catch(() => ({ collections: [] })),
+  ]);
+  const categories = cats.product_categories as Category[];
+  const labels = pathLabels(categories);
+  return {
+    categories: categories
+      .map((c) => ({ id: c.id, name: labels.get(c.id) || c.name }))
+      .sort((a, b) => a.name.localeCompare(b.name)),
+    brands: (brands.collections as Brand[])
+      .map((b) => ({ id: b.id, name: b.title }))
+      .sort((a, b) => a.name.localeCompare(b.name)),
+  };
 }
 
 export async function getProduct(token: string, id: string) {
-  return adminFetch(`/admin/products/${id}`, {
+  return adminFetch(`/admin/products/${id}?fields=%2Bcategories.id,%2Bcollection_id,%2Bimages.url`, {
     headers: authHeaders(token),
   });
 }

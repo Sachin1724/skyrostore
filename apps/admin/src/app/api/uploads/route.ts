@@ -1,0 +1,47 @@
+import { NextRequest, NextResponse } from "next/server";
+import { cookies } from "next/headers";
+
+const BASE_URL = process.env.NEXT_PUBLIC_MEDUSA_URL || "http://localhost:9000";
+const MAX_BYTES = 5 * 1024 * 1024;
+const ALLOWED = new Set(["image/png", "image/jpeg", "image/webp"]);
+
+/** Forwards product images to Medusa's file module and returns their public URLs. */
+export async function POST(request: NextRequest) {
+  const token = (await cookies()).get("admin_token")?.value;
+  if (!token) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const incoming = await request.formData().catch(() => null);
+  const files = (incoming?.getAll("files") ?? []).filter((f): f is File => f instanceof File);
+  if (files.length === 0) {
+    return NextResponse.json({ error: "No files received" }, { status: 400 });
+  }
+  for (const file of files) {
+    if (!ALLOWED.has(file.type)) {
+      return NextResponse.json({ error: `${file.name}: only PNG, JPEG or WebP images are allowed` }, { status: 400 });
+    }
+    if (file.size > MAX_BYTES) {
+      return NextResponse.json({ error: `${file.name}: larger than 5 MB` }, { status: 400 });
+    }
+  }
+
+  const form = new FormData();
+  for (const file of files) form.append("files", file, file.name);
+
+  const res = await fetch(`${BASE_URL}/admin/uploads`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+    body: form,
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    return NextResponse.json(
+      { error: data?.message || `Upload failed (${res.status})` },
+      { status: res.status }
+    );
+  }
+
+  const urls = ((data.files ?? []) as { url: string }[]).map((f) => f.url);
+  return NextResponse.json({ ok: true, urls });
+}

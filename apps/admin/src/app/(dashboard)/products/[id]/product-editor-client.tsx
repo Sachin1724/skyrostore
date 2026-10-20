@@ -21,11 +21,17 @@ import {
   Info,
 } from "lucide-react";
 
+import { VisibilityToggle } from "../visibility-toggle";
+import { ProductImages } from "./product-images";
+import { ProductClassification } from "./product-classification";
+
 interface ProductEditorClientProps {
   initialProduct: Record<string, unknown>;
+  categories: { id: string; name: string }[];
+  brands: { id: string; name: string }[];
 }
 
-export function ProductEditorClient({ initialProduct }: ProductEditorClientProps) {
+export function ProductEditorClient({ initialProduct, categories, brands }: ProductEditorClientProps) {
   const metadata = (initialProduct.metadata as Record<string, unknown>) || {};
   const existingSpecs = extractTechnicalSpecs(metadata);
 
@@ -71,7 +77,7 @@ export function ProductEditorClient({ initialProduct }: ProductEditorClientProps
   const [isSaving, setIsSaving] = useState(false);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<"specs" | "basic" | "commercial">("specs");
+  const [activeTab, setActiveTab] = useState<"specs" | "images" | "basic" | "commercial">("images");
 
   const currentTemplate = COMPONENT_SPEC_TEMPLATES[componentType] || null;
 
@@ -225,14 +231,17 @@ export function ProductEditorClient({ initialProduct }: ProductEditorClientProps
           </div>
         </div>
 
-        <button
-          type="submit"
-          disabled={isSaving}
-          className="inline-flex items-center gap-2 rounded-md bg-gray-900 px-4 py-2 text-sm font-semibold text-white shadow-xs hover:bg-gray-800 disabled:opacity-50"
-        >
-          <Save className="h-4 w-4" />
-          {isSaving ? "Saving..." : "Save Product"}
-        </button>
+        <div className="flex items-center gap-4">
+          <VisibilityToggle id={initialProduct.id as string} status={initialProduct.status as string} />
+          <button
+            type="submit"
+            disabled={isSaving}
+            className="inline-flex items-center gap-2 rounded-md bg-gray-900 px-4 py-2 text-sm font-semibold text-white shadow-xs hover:bg-gray-800 disabled:opacity-50"
+          >
+            <Save className="h-4 w-4" />
+            {isSaving ? "Saving..." : "Save Product"}
+          </button>
+        </div>
       </div>
 
       {/* Notifications */}
@@ -252,6 +261,17 @@ export function ProductEditorClient({ initialProduct }: ProductEditorClientProps
 
       {/* Tabs */}
       <div className="flex border-b border-gray-200 space-x-6 text-sm font-medium">
+        <button
+          type="button"
+          onClick={() => setActiveTab("images")}
+          className={`pb-3 ${
+            activeTab === "images"
+              ? "border-b-2 border-gray-900 font-semibold text-gray-900"
+              : "text-gray-500 hover:text-gray-700"
+          }`}
+        >
+          Images
+        </button>
         <button
           type="button"
           onClick={() => setActiveTab("specs")}
@@ -286,6 +306,14 @@ export function ProductEditorClient({ initialProduct }: ProductEditorClientProps
           Commercial & Variants ({variants.length})
         </button>
       </div>
+
+      {activeTab === "images" && (
+        <ProductImages
+          productId={initialProduct.id as string}
+          initialImages={((initialProduct.images as { url: string }[]) || []).map((i) => i.url)}
+          initialThumbnail={(initialProduct.thumbnail as string) || null}
+        />
+      )}
 
       {/* TAB 1: TECHNICAL SPECIFICATIONS */}
       {activeTab === "specs" && (
@@ -498,6 +526,14 @@ export function ProductEditorClient({ initialProduct }: ProductEditorClientProps
 
       {/* TAB 2: BASIC INFORMATION */}
       {activeTab === "basic" && (
+        <div className="space-y-4">
+        <ProductClassification
+          productId={initialProduct.id as string}
+          categories={categories}
+          brands={brands}
+          initialCategoryId={((initialProduct.categories as { id: string }[]) || [])[0]?.id || ""}
+          initialBrandId={(initialProduct.collection_id as string) || ""}
+        />
         <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-xs space-y-4">
           <div>
             <label className="block text-xs font-medium text-gray-700">Product Title</label>
@@ -528,6 +564,7 @@ export function ProductEditorClient({ initialProduct }: ProductEditorClientProps
               className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-xs focus:border-gray-900 focus:outline-none"
             />
           </div>
+        </div>
         </div>
       )}
 

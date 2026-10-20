@@ -1,5 +1,5 @@
 import { getAuthToken } from "@/lib/auth";
-import { getProduct } from "@/lib/data/admin";
+import { getProduct, getCatalogOptions } from "@/lib/data/admin";
 import { redirect, notFound } from "next/navigation";
 import { ProductEditorClient } from "./product-editor-client";
 
@@ -26,9 +26,11 @@ export default async function EditProductPage({
   const product = productData?.product;
   if (!product) notFound();
 
+  const { categories, brands } = await getCatalogOptions(token);
+
   return (
     <div className="mx-auto max-w-5xl pb-16">
-      <ProductEditorClient initialProduct={product} />
+      <ProductEditorClient initialProduct={product} categories={categories} brands={brands} />
     </div>
   );
 }
