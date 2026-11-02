@@ -1,3 +1,4 @@
+import path from "path";
 import type { NextConfig } from "next";
 
 const medusaUrl = new URL(process.env.NEXT_PUBLIC_MEDUSA_URL || "http://localhost:9000");
@@ -20,6 +21,10 @@ const SECURITY_HEADERS = [
 ];
 
 const nextConfig: NextConfig = {
+  // Self-contained server for the Docker image; tracing starts at the repo
+  // root so workspace dependencies are included.
+  output: "standalone",
+  outputFileTracingRoot: path.join(__dirname, "../.."),
   poweredByHeader: false,
   async headers() {
     return [{ source: "/:path*", headers: SECURITY_HEADERS }];

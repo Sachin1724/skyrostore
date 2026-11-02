@@ -2,7 +2,7 @@ packages:
   - "apps/*"
   - "packages/*"
 allowBuilds:
-  '@firebase/util': set this to true or false
+  '@firebase/util': false
   "@medusajs/telemetry": true
   esbuild: true
   msgpackr-extract: true

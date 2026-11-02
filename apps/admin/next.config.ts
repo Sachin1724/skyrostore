@@ -1,3 +1,4 @@
+import path from "path";
 import type { NextConfig } from "next";
 
 // Staff-only app: never framed, never indexed.
@@ -14,6 +15,10 @@ const SECURITY_HEADERS = [
 ];
 
 const nextConfig: NextConfig = {
+  // Self-contained server for the Docker image; tracing starts at the repo
+  // root so workspace dependencies are included.
+  output: "standalone",
+  outputFileTracingRoot: path.join(__dirname, "../.."),
   poweredByHeader: false,
   async headers() {
     return [{ source: "/:path*", headers: SECURITY_HEADERS }];

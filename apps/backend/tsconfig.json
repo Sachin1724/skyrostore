@@ -8,15 +8,23 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "declaration": true,
-    "declarationMap": true,
     "sourceMap": true,
-    "outDir": "./dist",
-    "rootDir": "./src",
+    "outDir": "./.medusa/server",
     "jsx": "react-jsx",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "src/admin", ".medusa"]
+  "include": [
+    "**/*",
+    ".medusa/types/*"
+  ],
+  "exclude": [
+    "**/__tests__",
+    "node_modules",
+    ".medusa/server",
+    ".medusa/admin",
+    ".cache",
+    "dist",
+    "src/admin"
+  ]
 }
