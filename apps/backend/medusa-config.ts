@@ -103,6 +103,17 @@ export default defineConfig({
                 },
               ]
             : []),
+          // Phone OTP, Google and email-link sign-in, done on our own pages
+          // with the Firebase SDK; only the ID token reaches the backend.
+          ...(process.env.FIREBASE_PROJECT_ID
+            ? [
+                {
+                  resolve: "./src/modules/firebase-auth",
+                  id: "firebase",
+                  options: { projectId: process.env.FIREBASE_PROJECT_ID },
+                },
+              ]
+            : []),
         ],
       },
     },

@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { FirebaseSignIn } from "./firebase-sign-in";
+import { firebaseConfigured } from "@/lib/firebase";
 
 type AuthMode = "login" | "register";
 
@@ -38,6 +40,7 @@ export function AccountView() {
   const [loading, setLoading] = useState(false);
   const [googleAvailable, setGoogleAvailable] = useState<boolean | null>(null);
   const [googleStarting, setGoogleStarting] = useState(false);
+  const [firebaseAvailable, setFirebaseAvailable] = useState(false);
 
   const searchParams = useSearchParams();
 
@@ -47,7 +50,10 @@ export function AccountView() {
     fetch("/api/auth/providers")
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
-        if (active) setGoogleAvailable(Boolean(data?.google));
+        if (!active) return;
+        setGoogleAvailable(Boolean(data?.google));
+        // Needs both the public web config here and the provider on the backend.
+        setFirebaseAvailable(firebaseConfigured && Boolean(data?.firebase));
       })
       .catch(() => {
         if (active) setGoogleAvailable(false);
@@ -136,7 +142,26 @@ export function AccountView() {
         </div>
       )}
 
-      {googleAvailable === true && (
+      {firebaseAvailable && (
+        <>
+          <FirebaseSignIn
+            onError={setError}
+            onSignedIn={() => {
+              router.push("/account/orders");
+              router.refresh();
+            }}
+          />
+          <div className="mt-6 flex items-center gap-3">
+            <span className="h-px flex-1" style={{ background: "var(--color-border)" }} />
+            <span className="text-[11px] font-medium uppercase tracking-wider text-text-muted">
+              or use email and password
+            </span>
+            <span className="h-px flex-1" style={{ background: "var(--color-border)" }} />
+          </div>
+        </>
+      )}
+
+      {!firebaseAvailable && googleAvailable === true && (
         <div className="mt-6">
           <button
             type="button"
@@ -168,7 +193,7 @@ export function AccountView() {
         </div>
       )}
 
-      {googleAvailable === false && (
+      {!firebaseAvailable && googleAvailable === false && (
         <p className="mt-4 text-[12px] text-text-muted">
           Google sign-in is not configured on this environment. Use your email and password.
         </p>

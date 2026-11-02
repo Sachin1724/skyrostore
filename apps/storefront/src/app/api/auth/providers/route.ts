@@ -17,7 +17,7 @@ export async function GET() {
     });
 
     if (!res.ok) {
-      return NextResponse.json({ providers: [], google: false });
+      return NextResponse.json({ providers: [], google: false, firebase: false });
     }
 
     const data = await res.json();
@@ -25,8 +25,9 @@ export async function GET() {
     return NextResponse.json({
       providers: providers.map((p) => p.id),
       google: providers.some((p) => p.id === "google"),
+      firebase: providers.some((p) => p.id === "firebase"),
     });
   } catch {
-    return NextResponse.json({ providers: [], google: false });
+    return NextResponse.json({ providers: [], google: false, firebase: false });
   }
 }

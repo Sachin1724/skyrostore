@@ -30,19 +30,24 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
 
     const provider = (identity?.provider_identities || [])[0];
     const metadata = provider?.user_metadata || {};
-    const email = metadata.email || provider?.entity_id;
+    const candidate = metadata.email || provider?.entity_id;
+    const email = typeof candidate === "string" && candidate.includes("@") ? candidate : null;
+    // A phone sign-in has no email; the storefront asks the customer for one.
+    const phone = typeof metadata.phone === "string" ? metadata.phone : null;
 
-    if (!email || typeof email !== "string" || !email.includes("@")) {
+    if (!email && !phone) {
       return res.status(422).json({
         error: "The identity provider did not supply a usable email address.",
       });
     }
 
+    const [first, ...rest] = String(metadata.name || "").trim().split(/\s+/);
     return res.json({
       provider: provider?.provider ?? null,
       email,
-      first_name: metadata.given_name ?? null,
-      last_name: metadata.family_name ?? null,
+      phone,
+      first_name: metadata.given_name ?? (first || null),
+      last_name: metadata.family_name ?? (rest.join(" ") || null),
     });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
