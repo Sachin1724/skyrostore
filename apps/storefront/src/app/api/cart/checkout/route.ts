@@ -1,3 +1,4 @@
+import { visitorHeaders } from "@/lib/visitor-headers";
 import { NextRequest, NextResponse } from "next/server";
 
 const BASE = process.env.NEXT_PUBLIC_MEDUSA_URL || "http://localhost:9000";
@@ -232,7 +233,7 @@ export async function POST(request: NextRequest) {
 
         const res = await fetch(`${BASE}/store/razorpay/confirm`, {
           method: "POST",
-          headers: { "Content-Type": "application/json", "x-publishable-api-key": PK },
+          headers: { "Content-Type": "application/json", "x-publishable-api-key": PK, ...visitorHeaders(request) },
           body: JSON.stringify({ cart_id, razorpay_order_id, razorpay_payment_id, razorpay_signature }),
         });
         const result = await res.json().catch(() => ({}));

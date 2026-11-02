@@ -1,3 +1,4 @@
+import { visitorHeaders } from "@/lib/visitor-headers";
 import { NextRequest, NextResponse } from "next/server";
 
 const BASE = process.env.NEXT_PUBLIC_MEDUSA_URL || "http://localhost:9000";
@@ -40,7 +41,7 @@ export async function POST(request: NextRequest) {
   try {
     const authRes = await fetch(`${BASE}/auth/customer/firebase`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", "x-publishable-api-key": PK },
+      headers: { "Content-Type": "application/json", "x-publishable-api-key": PK, ...visitorHeaders(request) },
       body: JSON.stringify({ id_token: body.id_token }),
       cache: "no-store",
     });
@@ -53,7 +54,7 @@ export async function POST(request: NextRequest) {
 
     // First sign-in: create the customer from the verified identity.
     const profileRes = await fetch(`${BASE}/store/auth/pending-profile`, {
-      headers: { Authorization: `Bearer ${token}`, "x-publishable-api-key": PK },
+      headers: { Authorization: `Bearer ${token}`, "x-publishable-api-key": PK, ...visitorHeaders(request) },
       cache: "no-store",
     });
     if (!profileRes.ok) {
@@ -82,7 +83,7 @@ export async function POST(request: NextRequest) {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
-        "x-publishable-api-key": PK,
+        "x-publishable-api-key": PK, ...visitorHeaders(request),
       },
       body: JSON.stringify({
         email,
@@ -106,7 +107,7 @@ export async function POST(request: NextRequest) {
     // The registration token has no customer bound to it; sign in again to get one.
     const again = await fetch(`${BASE}/auth/customer/firebase`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", "x-publishable-api-key": PK },
+      headers: { "Content-Type": "application/json", "x-publishable-api-key": PK, ...visitorHeaders(request) },
       body: JSON.stringify({ id_token: body.id_token }),
       cache: "no-store",
     });

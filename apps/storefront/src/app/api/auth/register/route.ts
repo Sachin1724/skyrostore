@@ -1,3 +1,4 @@
+import { visitorHeaders } from "@/lib/visitor-headers";
 import { NextRequest, NextResponse } from "next/server";
 
 const BASE = process.env.NEXT_PUBLIC_MEDUSA_URL || "http://localhost:9000";
@@ -19,7 +20,7 @@ export async function POST(request: NextRequest) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-publishable-api-key": PK,
+        "x-publishable-api-key": PK, ...visitorHeaders(request),
       },
       body: JSON.stringify({ email, password }),
     });
@@ -36,7 +37,7 @@ export async function POST(request: NextRequest) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-publishable-api-key": PK,
+        "x-publishable-api-key": PK, ...visitorHeaders(request),
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({ first_name, last_name }),

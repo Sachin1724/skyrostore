@@ -1,5 +1,6 @@
 import { defineMiddlewares, authenticate } from "@medusajs/framework/http";
 import { requireOrderOwner } from "./middlewares/require-order-owner";
+import { rateLimit } from "./middlewares/rate-limit";
 
 function captureRawBody(req: any, _res: any, next: any) {
   const chunks: Buffer[] = [];
@@ -18,6 +19,15 @@ function captureRawBody(req: any, _res: any, next: any) {
 
 export default defineMiddlewares({
   routes: [
+    // Abuse limits per IP. Sign-in is the brute-force target; the public
+    // collectors and Razorpay callbacks are the flood targets.
+    { matcher: "/auth/customer/*", method: ["POST"], middlewares: [rateLimit("auth-customer", 20, 300)] },
+    { matcher: "/auth/user/*", method: ["POST"], middlewares: [rateLimit("auth-admin", 10, 300)] },
+    { matcher: "/store/analytics/*", method: ["POST"], middlewares: [rateLimit("analytics", 120, 60)] },
+    { matcher: "/store/razorpay/confirm", method: ["POST"], middlewares: [rateLimit("rzp-confirm", 20, 300)] },
+    { matcher: "/razorpay/shipping-info", method: ["POST"], middlewares: [rateLimit("rzp-shipping", 120, 60)] },
+    { matcher: "/store/bulk-orders", method: ["POST"], middlewares: [rateLimit("bulk-orders", 10, 3600)] },
+    { matcher: "/store/customers", method: ["POST"], middlewares: [rateLimit("customer-create", 10, 3600)] },
     {
       matcher: "/webhooks/razorpay",
       method: ["POST"],

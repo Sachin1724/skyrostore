@@ -3,6 +3,15 @@ import { defineConfig, loadEnv } from "@medusajs/framework/utils";
 
 loadEnv(process.env.NODE_ENV || "development", process.cwd());
 
+// Never boot production with the development fallbacks below.
+if (process.env.NODE_ENV === "production") {
+  for (const key of ["JWT_SECRET", "COOKIE_SECRET", "DATABASE_URL", "REDIS_URL"]) {
+    if (!process.env[key] || /^(supersecret|dev-)/.test(process.env[key]!)) {
+      throw new Error(`${key} must be set to a real value in production`);
+    }
+  }
+}
+
 export default defineConfig({
   projectConfig: {
     databaseUrl: process.env.DATABASE_URL,

@@ -1,3 +1,4 @@
+import { visitorHeaders } from "@/lib/visitor-headers";
 import { NextRequest, NextResponse } from "next/server";
 
 const BASE = process.env.NEXT_PUBLIC_MEDUSA_URL || "http://localhost:9000";
@@ -50,7 +51,7 @@ export async function GET(request: NextRequest) {
     callbackUrl.searchParams.set("state", state);
 
     const authRes = await fetch(callbackUrl.toString(), {
-      headers: { "x-publishable-api-key": PK },
+      headers: { "x-publishable-api-key": PK, ...visitorHeaders(request) },
       cache: "no-store",
     });
 
@@ -71,7 +72,7 @@ export async function GET(request: NextRequest) {
     // never merges with an existing account on email alone.
     if (!claims.actor_id) {
       const profileRes = await fetch(`${BASE}/store/auth/pending-profile`, {
-        headers: { Authorization: `Bearer ${token}`, "x-publishable-api-key": PK },
+        headers: { Authorization: `Bearer ${token}`, "x-publishable-api-key": PK, ...visitorHeaders(request) },
         cache: "no-store",
       });
 
@@ -86,7 +87,7 @@ export async function GET(request: NextRequest) {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
-          "x-publishable-api-key": PK,
+          "x-publishable-api-key": PK, ...visitorHeaders(request),
         },
         body: JSON.stringify({
           email: profile.email,
