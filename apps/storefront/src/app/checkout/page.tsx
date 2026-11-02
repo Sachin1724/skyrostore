@@ -62,7 +62,7 @@ export default function CheckoutPage() {
         </section>
 
         {/* Checkout Main 2-Column Section */}
-        <section className="mx-auto max-w-[1280px] px-8 py-8 md:px-10">
+        <section className="px-8 py-8 md:px-10">
           <CheckoutForm />
         </section>
       </main>

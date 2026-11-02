@@ -12,7 +12,7 @@ export default function CartPage() {
       <main className="min-h-screen bg-surface-soft">
         {/* Cart Top Banner */}
         <section className="relative overflow-hidden border-b border-border bg-graphite text-white">
-          <div className="mx-auto flex max-w-[1280px] flex-col justify-between px-8 py-8 md:flex-row md:items-center md:px-10">
+          <div className="flex flex-col justify-between px-5 py-8 md:flex-row md:items-center md:px-10">
             <div className="relative z-10 max-w-xl">
               <span className="text-[13px] font-bold tracking-widest text-accent">
                 YOUR CART
@@ -77,7 +77,7 @@ export default function CartPage() {
         </section>
 
         {/* Main Cart Grid */}
-        <section className="mx-auto max-w-[1280px] px-8 py-8 md:px-10">
+        <section className="px-8 py-8 md:px-10">
           <CartView />
         </section>
       </main>

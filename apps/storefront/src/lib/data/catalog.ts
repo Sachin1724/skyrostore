@@ -88,7 +88,8 @@ export type CatalogIndex = {
 export async function getCatalogIndex(): Promise<CatalogIndex> {
   const { products } = await medusa.store.product.list({
     limit: 1000,
-    fields: "id,collection_id,categories.id",
+    // Relations need "*": Medusa 2.21 silently drops "categories.id" and "+categories".
+    fields: "id,collection_id,*categories",
   });
   const byCategory = new Map<string, Set<string>>();
   const byBrand = new Map<string, number>();

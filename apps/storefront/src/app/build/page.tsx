@@ -16,7 +16,7 @@ export default async function BuildPage() {
       <main className="min-h-screen bg-surface-soft">
         {/* Hero Banner */}
         <section className="relative overflow-hidden border-b border-border bg-white">
-          <div className="mx-auto flex max-w-[1280px] flex-col justify-between px-8 py-8 md:flex-row md:items-center md:px-10">
+          <div className="flex flex-col justify-between px-5 py-8 md:flex-row md:items-center md:px-10">
             <div className="relative z-10 max-w-xl">
               <h1 className="text-[34px] font-extrabold tracking-[-0.03em] text-graphite md:text-[40px]">
                 Build Your UAV
@@ -39,7 +39,7 @@ export default async function BuildPage() {
 
         {/* 3-Item Trust Strip */}
         <section className="border-b border-border bg-white">
-          <div className="mx-auto grid max-w-[1280px] grid-cols-1 gap-4 px-8 py-4 sm:grid-cols-3 md:px-10">
+          <div className="grid grid-cols-1 gap-4 px-5 py-4 sm:grid-cols-3 md:px-10">
             <div className="flex items-center gap-3">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent/20 text-graphite">
                 <ShieldCheck className="h-4 w-4 text-graphite" />
@@ -71,7 +71,7 @@ export default async function BuildPage() {
         </section>
 
         {/* 3-Column Main Builder View */}
-        <section className="mx-auto max-w-[1280px] px-8 py-8 md:px-10">
+        <section className="px-8 py-8 md:px-10">
           <BuilderView components={components} />
         </section>
       </main>

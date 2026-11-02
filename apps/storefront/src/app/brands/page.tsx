@@ -13,7 +13,7 @@ export default async function BrandsPage() {
     <>
       <Header />
       <main className="min-h-screen bg-surface-soft">
-        <div className="mx-auto max-w-[1280px] px-8 py-10 md:px-10">
+        <div className="px-8 py-10 md:px-10">
           <h1 className="text-[32px] font-extrabold tracking-[-0.03em] text-graphite">Brands</h1>
           <p className="mt-1.5 text-[14px] text-text-secondary">Shop by manufacturer.</p>
           {listed.length === 0 ? (

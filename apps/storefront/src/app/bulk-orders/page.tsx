@@ -24,7 +24,7 @@ export default function BulkOrdersLandingPage() {
   return (
     <>
       <Header />
-      <main className="mx-auto max-w-[1280px] px-8 py-10 md:px-10">
+      <main className="px-8 py-10 md:px-10">
         {/* Breadcrumb */}
         <nav className="text-[13px] font-mono tracking-[0.08em] text-text-muted">
           <Link href="/" className="hover:text-text-secondary">Home</Link>

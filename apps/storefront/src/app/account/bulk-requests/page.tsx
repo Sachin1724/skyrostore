@@ -89,7 +89,7 @@ export default async function CustomerBulkRequestsPage() {
   return (
     <>
       <Header />
-      <main className="mx-auto max-w-[1280px] px-8 py-10 md:px-10">
+      <main className="px-8 py-10 md:px-10">
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-color-border pb-5">
           <div>
             <nav className="text-[13px] font-mono tracking-[0.08em] text-text-muted">

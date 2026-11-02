@@ -32,7 +32,7 @@ export default async function BrandPage({ params }: { params: Promise<{ handle: 
     <>
       <Header />
       <main className="min-h-screen bg-surface-soft">
-        <div className="mx-auto max-w-[1280px] px-8 py-10 md:px-10">
+        <div className="px-8 py-10 md:px-10">
           <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-[14px] font-medium text-text-muted">
             <Link href="/" className="hover:text-graphite">Home</Link>
             <span>&gt;</span>

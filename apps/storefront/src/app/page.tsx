@@ -1,149 +1,201 @@
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
-import { Hero } from "@/components/home/hero";
-import { ProductGrid } from "@/components/product/product-grid";
-import { getProducts } from "@/lib/data/products";
 import Link from "next/link";
 import Image from "next/image";
-import { ShieldCheck, Truck, FileText, Headphones, ChevronRight } from "lucide-react";
+import { Header } from "@/components/layout/header";
+import { Footer } from "@/components/layout/footer";
+import { BuildStage } from "@/components/home/build-stage";
+import { CompatCheck } from "@/components/home/compat-check";
+import { BrandBar } from "@/components/home/brand-bar";
+import { ProductMediaFallback } from "@/components/product/product-media-fallback";
+import { getProducts } from "@/lib/data/products";
+import { getUAVComponents, type UAVComponent } from "@/lib/data/uav-components";
+import { getBrands, getCatalogIndex, getCategoryTree, countForNode, cleanName } from "@/lib/data/catalog";
+import { formatPrice } from "@/lib/utils";
 
-const SYSTEM_CATEGORIES = [
-  { name: "Complete UAVs", handle: "uavs", href: "/uavs", image: "/images/products/cat-complete-uavs.png" },
-  { name: "Flight Controllers", handle: "flight-controllers", href: "/parts?category=flight-controllers", image: "/images/products/cat-flight-controllers.png" },
-  { name: "ESCs", handle: "escs", href: "/parts?category=escs", image: "/images/products/cat-escs.png" },
-  { name: "Motors", handle: "motors", href: "/parts?category=motors", image: "/images/products/cat-motors.png" },
-  { name: "Propellers", handle: "propellers", href: "/parts?category=propellers", image: "/images/products/cat-propellers.png" },
-  { name: "GPS Modules", handle: "gps", href: "/parts?category=gps", image: "/images/products/cat-gps.png" },
-  { name: "Batteries", handle: "batteries", href: "/parts?category=batteries", image: "/images/products/cat-batteries.png" },
-  { name: "Frames", handle: "frames", href: "/parts?category=frames", image: "/images/products/cat-frames.png" },
+/** A one-line spec a builder recognises, from the product's own metadata. */
+function summary(c: UAVComponent): string {
+  const m = c.metadata;
+  const name = cleanName(c.title);
+  if (c.component_type === "MOTOR" && m.kv) return `${name} · KV${m.kv}`;
+  if (c.component_type === "PROPELLER" && m.diameter_in) return `${name} · ${m.diameter_in}×${m.pitch_in ?? "?"}`;
+  if (c.component_type === "BATTERY" && m.cell_count) return `${name} · ${m.cell_count}S ${m.capacity_mah ?? ""}mAh`;
+  return name;
+}
+
+const FAQ: Array<[string, string]> = [
+  ["How does the compatibility check work?", "It compares the published specifications of the parts you pick: motor voltage range against the pack, recommended prop size against the prop, current against the ESC. It flags a mismatch before you pay."],
+  ["Where do orders ship from?", "From our workshop in Odisha, by tracked courier (Delhivery and partners), to most PIN codes in India. Checkout tells you before payment if we cannot reach yours."],
+  ["How do I pay?", "Through Razorpay: UPI, cards, net banking or wallets. Your address is filled from Razorpay, so there is no long form."],
+  ["Do I get a GST invoice?", "Yes, with every order. Prices include GST."],
+  ["Can I track my parcel?", "Yes. The tracking number arrives by email when the courier is booked, and live status sits under My orders."],
+  ["What if a part arrives damaged?", "Tell us with photos and we replace or refund it. The returns page has the details."],
+  ["Do you supply teams and institutions?", "Yes. Send a bulk request with quantities and we reply with a quotation; accepted quotes become normal orders."],
+  ["Do I need permission to fly?", "Drone flying in India follows the Drone Rules, 2021. Registration and permissions are the operator's responsibility."],
 ];
 
 export default async function HomePage() {
-  const { products: featured } = await getProducts({ limit: 8 });
+  const [tree, brands, index, { products }, components] = await Promise.all([
+    getCategoryTree(),
+    getBrands(),
+    getCatalogIndex(),
+    getProducts({ limit: 12 }),
+    getUAVComponents(),
+  ]);
+
+  const options = Object.fromEntries(
+    (["MOTOR", "PROPELLER", "BATTERY"] as const).map((t) => [
+      t.toLowerCase(),
+      (components[t] || []).map((c) => ({ variant_id: c.variant_id, title: cleanName(c.title), price: c.price, summary: summary(c) })),
+    ])
+  );
+  const categories = tree
+    .map((node) => ({ node, count: countForNode(node, index) }))
+    .filter((c) => c.count > 0);
+  const brandRow = brands
+    .map((b) => ({ handle: b.handle, title: b.title, count: index.byBrand.get(b.id) ?? 0 }))
+    .filter((b) => b.count > 0);
 
   return (
     <>
       <Header />
-      <main>
-        <Hero />
-
-        {/* Trust strip */}
-        <section className="bg-white" style={{ borderBottom: "1px solid var(--color-border)" }}>
-          <div className="mx-auto grid max-w-[1280px] grid-cols-2 gap-0 px-8 md:grid-cols-4 md:px-10">
-            {[
-              { title: "Genuine Products", desc: "Trusted brands", icon: ShieldCheck },
-              { title: "Fast Shipping", desc: "Pan India", icon: Truck },
-              { title: "GST Invoicing", desc: "For businesses", icon: FileText },
-              { title: "Expert Support", desc: "For builders & teams", icon: Headphones },
-            ].map((item, i) => {
-              const Icon = item.icon;
-              return (
-                <div
-                  key={item.title}
-                  className="flex items-center gap-3 py-6 px-4 md:px-6"
-                  style={{
-                    borderRight: i < 3 ? "1px solid var(--color-border)" : undefined,
-                  }}
-                >
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border bg-surface-soft text-graphite">
-                    <Icon className="h-4 w-4" strokeWidth={1.8} />
-                  </div>
-                  <div>
-                    <p className="text-[13px] font-bold text-graphite">{item.title}</p>
-                    <p className="text-[14px] text-text-muted">{item.desc}</p>
-                  </div>
-                </div>
-              );
-            })}
+      <main className="bg-[#F4F8FC]">
+        <div className="lg:grid lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
+          {/* The fixed half: the quad assembles as the column scrolls. */}
+          <div className="h-[30svh] lg:sticky lg:top-16 lg:h-[calc(100svh-4rem)]">
+            <BuildStage />
           </div>
-        </section>
 
-        {/* Featured Products */}
-        <section className="mx-auto max-w-[1280px] px-8 py-14 md:px-10">
-          <div className="flex items-center justify-between">
-            <h2 className="text-[24px] font-extrabold tracking-[-0.03em] text-graphite">
-              Featured Products
-            </h2>
-            <Link
-              href="/parts"
-              className="text-[13px] font-semibold text-text-secondary hover:text-graphite transition-colors"
-            >
-              View all &rarr;
-            </Link>
-          </div>
-          <div className="mt-8">
-            <ProductGrid products={featured} />
-          </div>
-        </section>
-
-        {/* Shop by System */}
-        <section className="bg-surface-soft py-14" style={{ borderTop: "1px solid var(--color-border)" }}>
-          <div className="mx-auto max-w-[1280px] px-8 md:px-10">
-            <div className="flex items-center justify-between">
-              <h2 className="text-[24px] font-extrabold tracking-[-0.03em] text-graphite">
-                Shop by System
-              </h2>
-              <Link
-                href="/parts"
-                className="text-[13px] font-semibold text-text-secondary hover:text-graphite transition-colors"
-              >
-                View all &rarr;
-              </Link>
-            </div>
-            <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-              {SYSTEM_CATEGORIES.map((cat) => (
-                <Link
-                  key={cat.name}
-                  href={cat.href}
-                  className="group flex items-center justify-between rounded-lg border border-border bg-white p-3.5 transition-all hover:border-border-strong hover:shadow-xs"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded bg-surface-soft p-1">
-                      <Image
-                        src={cat.image}
-                        alt={cat.name}
-                        fill
-                        className="object-contain transition-transform group-hover:scale-105"
-                      />
-                    </div>
-                    <span className="text-[13px] font-bold text-graphite">
-                      {cat.name}
-                    </span>
-                  </div>
-                  <ChevronRight className="h-4 w-4 text-text-disabled transition-transform group-hover:translate-x-0.5 group-hover:text-graphite" />
-                </Link>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Build CTA */}
-        <section className="mx-auto max-w-[1280px] px-8 py-14 md:px-10">
-          <div className="relative overflow-hidden rounded-xl bg-graphite px-8 py-14 text-center md:px-14">
-            {/* Blueprint wireframe drone on right */}
-            <div className="pointer-events-none absolute inset-y-0 right-0 hidden w-1/2 md:block opacity-75">
-              <Image
-                src="/images/hero/blueprint-drone.png"
-                alt="UAV Blueprint Architecture"
-                fill
-                className="object-contain object-right"
-              />
-            </div>
-            <div className="relative z-10 max-w-lg mx-auto text-center">
-              <h2 className="text-[28px] font-extrabold tracking-[-0.02em] text-white md:text-[32px]">
-                Build Your UAV
-              </h2>
-              <p className="mt-2.5 text-[14px] leading-relaxed text-text-disabled">
-                Select components, validate compatibility, and configure a custom
-                aerial platform for your application.
+          <div className="px-5 md:px-10">
+            <section data-stage="1" className="pb-24 pt-10 lg:pt-24">
+              <h1 className="text-[clamp(3rem,1.6rem+5vw,6.5rem)] font-bold leading-[0.95] tracking-[-0.04em] text-balance text-navy">
+                Parts that fly together.
+              </h1>
+              <p className="mt-6 max-w-[40ch] text-[clamp(1.125rem,1rem+0.5vw,1.375rem)] leading-[1.5] text-navy">
+                Motors, props, ESCs, packs and frames, each checked against the others before it ships from Odisha.
               </p>
-              <Link
-                href="/build"
-                className="mt-7 inline-flex items-center gap-2 rounded-md bg-accent px-7 py-3.5 text-[13px] font-extrabold text-graphite transition-all hover:bg-accent-hover hover:shadow-md"
-              >
-                Start Configuration &rarr;
-              </Link>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <Link href="/parts" className="inline-flex min-h-12 items-center bg-navy px-7 text-[16px] font-semibold text-white hover:bg-brand">
+                  Shop parts
+                </Link>
+                <Link href="/uavs" className="inline-flex min-h-12 items-center bg-white px-7 text-[16px] font-semibold text-navy hover:text-brand">
+                  Complete drones
+                </Link>
+              </div>
+              <div className="mt-12">
+                <CompatCheck options={options} />
+              </div>
+            </section>
+
+            <section data-stage="2" aria-labelledby="shop-parts" className="pb-24">
+              <h2 id="shop-parts" className="text-[clamp(2rem,1.4rem+2.4vw,3.25rem)] font-bold leading-[1] tracking-[-0.03em] text-balance text-navy">
+                Shop by part
+              </h2>
+              <ul className="mt-8 bg-white px-6 py-4">
+                {categories.map(({ node, count }) => (
+                  <li key={node.id}>
+                    <Link
+                      href={`/parts?category=${node.handle}`}
+                      className="group flex items-baseline justify-between gap-6 py-4 text-navy"
+                    >
+                      <span className="text-[clamp(1.25rem,1.05rem+0.8vw,1.75rem)] font-semibold group-hover:text-brand">
+                        {cleanName(node.name)}
+                      </span>
+                      <span className="text-[16px] tabular-nums text-text-secondary">
+                        {count} {count === 1 ? "product" : "products"}
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          </div>
+        </div>
+
+        <BrandBar brands={brandRow} />
+
+        <div className="lg:grid lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
+          <div className="hidden lg:block" />
+          <div className="px-5 md:px-10">
+            <section data-stage="3" aria-labelledby="in-stock" className="py-24">
+              <div className="flex items-baseline justify-between gap-4">
+                <h2 id="in-stock" className="text-[clamp(2rem,1.4rem+2.4vw,3.25rem)] font-bold leading-[1] tracking-[-0.03em] text-balance text-navy">
+                  In stock now
+                </h2>
+                <Link href="/parts" className="text-[16px] font-semibold text-brand hover:text-navy">
+                  All parts
+                </Link>
+              </div>
+              <ul tabIndex={0} aria-label="Products in stock, scroll sideways" className="mt-8 flex snap-x gap-4 overflow-x-auto overscroll-x-contain pb-4 [scrollbar-width:none]">
+                {products.map((p) => {
+                  const price = p.variants?.[0]?.calculated_price?.calculated_amount;
+                  return (
+                    <li key={p.id} className="w-[72%] shrink-0 snap-start sm:w-[44%] xl:w-[34%]">
+                      <Link href={`/products/${p.handle}`} className="group block">
+                        <div className="relative aspect-[4/5] bg-white">
+                          {p.thumbnail ? (
+                            <Image src={p.thumbnail} alt={cleanName(p.title)} fill sizes="(min-width:1280px) 22vw, (min-width:640px) 44vw, 72vw" className="object-contain p-6 transition-transform duration-300 group-hover:scale-[1.03]" />
+                          ) : (
+                            <ProductMediaFallback title={p.title} componentType={(p.metadata as Record<string, string> | null)?.component_type} />
+                          )}
+                        </div>
+                        <p className="mt-3 text-[17px] font-semibold text-navy group-hover:text-brand">{cleanName(p.title)}</p>
+                        {price != null ? <p className="text-[16px] tabular-nums text-text-secondary">{formatPrice(price, "INR")}</p> : null}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+
+            <section data-stage="4" aria-labelledby="how-orders" className="pb-24">
+              <h2 id="how-orders" className="text-[clamp(2rem,1.4rem+2.4vw,3.25rem)] font-bold leading-[1] tracking-[-0.03em] text-balance text-navy">
+                From payment to your door
+              </h2>
+              <ol className="mt-8 bg-white px-6 py-6">
+                {[
+                  ["Pay with Razorpay", "UPI, card, net banking or wallet; address filled for you"],
+                  ["Checked and packed", "in our Odisha workshop"],
+                  ["Courier booked", "Delhivery tracking number by email"],
+                  ["Delivered", "live status under My orders"],
+                ].map(([title, detail]) => (
+                  <li key={title} className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 py-3">
+                    <span className="text-[20px] font-semibold text-navy">{title}</span>
+                    <span className="text-[16px] text-text-secondary">{detail}</span>
+                  </li>
+                ))}
+                <li className="mt-3 bg-navy px-4 py-3 text-[17px] font-semibold text-white">
+                  You hold a GST invoice and a tracked parcel.
+                </li>
+              </ol>
+            </section>
+
+            <section data-stage="5" aria-labelledby="faq" className="pb-24">
+              <h2 id="faq" className="text-[clamp(2rem,1.4rem+2.4vw,3.25rem)] font-bold leading-[1] tracking-[-0.03em] text-balance text-navy">
+                Questions, answered
+              </h2>
+              <div className="mt-8 gap-12 text-[17px] leading-[1.6] text-navy md:columns-2">
+                {FAQ.map(([q, a]) => (
+                  <p key={q} className="mb-5 break-inside-avoid">
+                    <strong className="font-semibold">{q}</strong> {a}
+                  </p>
+                ))}
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <section className="bg-brand-soft">
+          <div className="flex flex-col gap-6 px-5 py-20 md:flex-row md:items-end md:justify-between md:px-10">
+            <div>
+              <h2 className="text-[clamp(2rem,1.4rem+2.4vw,3.25rem)] font-bold leading-[1] tracking-[-0.03em] text-balance text-navy">
+                Equipping a team?
+              </h2>
+              <p className="mt-4 max-w-[46ch] text-[18px] text-navy">
+                Send quantities for a fleet, a lab or a course. We reply with a quotation and a GST invoice.
+              </p>
             </div>
+            <Link href="/bulk-orders/request" className="inline-flex min-h-12 items-center self-start bg-navy px-7 text-[16px] font-semibold text-white hover:bg-brand md:self-auto">
+              Request a bulk quote
+            </Link>
           </div>
         </section>
       </main>

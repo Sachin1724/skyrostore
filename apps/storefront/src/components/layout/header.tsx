@@ -47,7 +47,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 bg-white">
-      <div className="mx-auto flex h-16 max-w-[1280px] items-center justify-between gap-6 px-5 md:px-10">
+      <div className="flex h-16 items-center justify-between gap-6 px-5 md:px-10">
         <div className="flex items-center gap-10">
           <Link href="/" aria-label="Skyrostore home">
             <SkyroLogo />

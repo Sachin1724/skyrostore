@@ -117,7 +117,7 @@ export function ProductDetailClient({
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <nav className="mx-auto flex max-w-[1280px] items-center gap-1.5 px-8 pt-6 pb-4 text-[14px] font-medium text-text-muted md:px-10">
+      <nav className="flex items-center gap-1.5 px-5 pt-6 pb-4 text-[14px] font-medium text-text-muted md:px-10">
         <Link href="/" className="hover:text-graphite">Home</Link>
         <span>&gt;</span>
         <Link href="/parts" className="hover:text-graphite">UAV Parts</Link>
@@ -132,7 +132,7 @@ export function ProductDetailClient({
       </nav>
 
       {/* Main 3-Column Top Section */}
-      <section className="mx-auto max-w-[1280px] px-8 py-4 md:px-10">
+      <section className="px-8 py-4 md:px-10">
         <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
           {/* Gallery & Core Info */}
           <div className="grid gap-8 md:grid-cols-[1fr_1.1fr]">
@@ -358,7 +358,7 @@ export function ProductDetailClient({
       </section>
 
       {/* Tabs Section */}
-      <section className="mx-auto mt-12 max-w-[1280px] px-8 md:px-10">
+      <section className="mt-12 px-5 md:px-10">
         <div className="border-b border-border">
           <div className="flex gap-8 overflow-x-auto">
             {[
@@ -545,7 +545,7 @@ export function ProductDetailClient({
       </section>
 
       {/* Related Products Slider Section */}
-      <section className="mx-auto max-w-[1280px] px-8 py-16 md:px-10">
+      <section className="px-8 py-16 md:px-10">
         <div className="flex items-center justify-between">
           <h2 className="text-[22px] font-extrabold tracking-tight text-graphite">
             Related Products

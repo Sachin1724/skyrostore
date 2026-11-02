@@ -68,7 +68,7 @@ export default async function PartsPage({
       <Header />
       <main className="min-h-screen bg-surface-soft">
         <section className="relative overflow-hidden border-b border-border bg-white">
-          <div className="mx-auto flex max-w-[1280px] flex-col justify-between px-8 py-8 md:flex-row md:items-center md:px-10">
+          <div className="flex flex-col justify-between px-5 py-8 md:flex-row md:items-center md:px-10">
             <div className="relative z-10 max-w-lg">
               <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-1.5 text-[14px] font-medium text-text-muted">
                 <Link href="/" className="hover:text-graphite">Home</Link>
@@ -108,7 +108,7 @@ export default async function PartsPage({
           </div>
         </section>
 
-        <section className="mx-auto max-w-[1280px] px-8 py-8 md:px-10">
+        <section className="px-8 py-8 md:px-10">
           <div className="grid gap-8 lg:grid-cols-[240px_1fr]">
             <aside className="space-y-6">
               <div className="rounded-lg border border-border bg-white p-4">

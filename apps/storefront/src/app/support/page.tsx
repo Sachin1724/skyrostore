@@ -13,7 +13,7 @@ export default function SupportPage() {
     <>
       <Header />
       <main className="min-h-screen bg-surface-soft py-10">
-        <div className="mx-auto max-w-[1280px] px-8 md:px-10">
+        <div className="px-8 md:px-10">
           <SupportView />
         </div>
       </main>

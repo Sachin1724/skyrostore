@@ -18,7 +18,7 @@ export async function getUAVComponents(): Promise<Record<string, UAVComponent[]>
   const { products } = await medusa.store.product.list({
     limit: 100,
     region_id: REGION_ID,
-    fields: "+variants.calculated_price",
+    fields: "+metadata,+variants.calculated_price",
   });
 
   const grouped: Record<string, UAVComponent[]> = {};

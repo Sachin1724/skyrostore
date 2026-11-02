@@ -21,7 +21,7 @@ const POLICIES = [
 export function Footer() {
   return (
     <footer className="bg-navy text-white">
-      <div className="mx-auto max-w-[1280px] px-5 pb-10 pt-20 md:px-10">
+      <div className="px-5 pb-10 pt-20 md:px-10">
         <div className="grid gap-12 md:grid-cols-[1.2fr_1fr_1fr]">
           <p className="max-w-[34ch] text-[18px] leading-[1.5] text-[#C9D6E6]">
             Drone parts and complete UAVs, checked for compatibility before they ship from Odisha.

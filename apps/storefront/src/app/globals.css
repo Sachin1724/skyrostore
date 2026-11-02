@@ -41,9 +41,9 @@
   --color-info: #4F687D;
   --color-info-soft: #EEF3F6;
 
-  --font-sans: var(--font-zilla), Georgia, serif;
+  --font-sans: var(--font-brand), system-ui, sans-serif;
   /* No monospace on the storefront: figures use the text face with tabular numbers. */
-  --font-mono: var(--font-zilla), Georgia, serif;
+  --font-mono: var(--font-brand), system-ui, sans-serif;
 
   --radius-sm: 4px;
   --radius-md: 6px;
@@ -104,3 +104,11 @@
 @layer base {
   .font-mono, .tabular-nums { font-variant-numeric: tabular-nums; }
 }
+
+/* Landing: brand band and the stage's spinning props. */
+@keyframes brand-scroll { to { transform: translateX(-50%); } }
+.brand-bar-track { animation: brand-scroll 40s linear infinite; }
+.brand-bar:hover .brand-bar-track,
+.brand-bar:focus-within .brand-bar-track { animation-play-state: paused; }
+@keyframes prop-spin { to { transform: rotate(360deg); } }
+.stage-prop-spin { animation: prop-spin 0.6s linear infinite; }

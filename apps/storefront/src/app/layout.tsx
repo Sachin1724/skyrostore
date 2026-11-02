@@ -1,12 +1,12 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
-import { Zilla_Slab } from "next/font/google";
+import { Montserrat } from "next/font/google";
 import "./globals.css";
 
-const zilla = Zilla_Slab({
+const montserrat = Montserrat({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-zilla",
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-brand",
   display: "swap",
 });
 import { AnalyticsTracker } from "@/components/analytics/tracker";
@@ -26,7 +26,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en-IN" className={zilla.variable}>
+    <html lang="en-IN" className={montserrat.variable}>
       <body>
         {children}
         <Suspense fallback={null}>

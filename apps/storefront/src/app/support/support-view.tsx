@@ -159,7 +159,7 @@ export function SupportView() {
     <div className="space-y-12">
       {/* 1. HERO TOP BANNER WITH GLOWING DRONE GRAPHIC */}
       <section className="relative overflow-hidden rounded-2xl bg-[#181B20] text-white">
-        <div className="mx-auto flex max-w-[1280px] flex-col justify-between px-8 py-10 md:flex-row md:items-center md:px-12">
+        <div className="flex flex-col justify-between px-5 py-10 md:flex-row md:items-center md:px-12">
           {/* Left Text & Search */}
           <div className="relative z-10 max-w-xl">
             <span className="text-[13px] font-bold tracking-widest text-[#84cc16]">

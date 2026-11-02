@@ -20,7 +20,7 @@ export default async function SearchPage({
   return (
     <>
       <Header />
-      <main className="mx-auto max-w-[1280px] px-8 py-6 md:px-10">
+      <main className="px-8 py-6 md:px-10">
         <h1 className="text-[28px] font-bold tracking-[-0.025em] text-graphite">Search</h1>
         {query ? (
           <p className="mt-1 text-[14px] text-text-secondary">

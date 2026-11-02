@@ -45,7 +45,7 @@ async function fetchProducts(params?: ProductListParams) {
     collection_id: params?.collection_id,
     q: params?.q,
     region_id: REGION_ID,
-    fields: "+metadata,+categories,+collection,+variants.calculated_price,+variants.inventory_quantity",
+    fields: "+metadata,*categories,+collection,+variants.calculated_price,+variants.inventory_quantity",
   });
   return { products: products.map(stripInternalMetadata), count, offset, limit };
 }
@@ -86,7 +86,7 @@ async function fetchProductByHandle(handle: string) {
     handle,
     limit: 1,
     region_id: REGION_ID,
-    fields: "+metadata,+categories,+collection,+variants.calculated_price,+variants.inventory_quantity",
+    fields: "+metadata,*categories,+collection,+variants.calculated_price,+variants.inventory_quantity",
   });
   const p = products[0] ?? null;
   return p ? stripInternalMetadata(p) : null;
