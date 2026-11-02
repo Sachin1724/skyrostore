@@ -90,6 +90,7 @@ export const COMPONENT_SPEC_TEMPLATES: Record<string, ComponentSpecificationTemp
       { key: "voltage_v", label: "Nominal Voltage", unit: "V", group: "Electrical", type: "number", isCanonical: true, required: true, min: 3.7, max: 70 },
       { key: "capacity_mah", label: "Capacity", unit: "mAh", group: "Electrical", type: "number", isCanonical: true, required: true, min: 100, max: 100000 },
       { key: "continuous_discharge_a", label: "Continuous Discharge", unit: "A", group: "Electrical", type: "number", isCanonical: true, min: 1, max: 1000 },
+      { key: "c_rating", label: "Discharge Rating", unit: "C", group: "Electrical", type: "number", isCanonical: false, min: 1, max: 300 },
       { key: "weight_g", label: "Pack Weight", unit: "g", group: "Mechanical", type: "number", isCanonical: true, required: true, min: 10, max: 20000 },
       { key: "connector", label: "Main Connector", group: "Mechanical", type: "string", isCanonical: false },
     ],

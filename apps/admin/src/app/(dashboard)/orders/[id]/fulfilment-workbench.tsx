@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Package, Truck, CheckCircle2, AlertTriangle } from "lucide-react";
+import { Package, Truck, CheckCircle2, AlertTriangle, Printer } from "lucide-react";
 import { STATE_LABELS } from "@/lib/data/fulfilment";
 
 type Props = {
@@ -13,6 +13,8 @@ type Props = {
   paymentAttempts: Array<Record<string, any>>;
   bulkRequest: Record<string, any> | null;
   history: Array<{ at: string; event: string; detail?: string | null }>;
+  shipmozoConfigured: boolean;
+  suggestedWeightG: number;
 };
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -32,19 +34,30 @@ export function FulfilmentWorkbench({
   paymentAttempts,
   bulkRequest,
   history,
+  shipmozoConfigured,
+  suggestedWeightG,
 }: Props) {
   const router = useRouter();
   const [courier, setCourier] = useState("");
   const [trackingNumber, setTrackingNumber] = useState("");
   const [trackingUrl, setTrackingUrl] = useState("");
-  const [busy, setBusy] = useState<"" | "pack" | "ship" | "deliver">("");
+  const [pkg, setPkg] = useState({
+    weight_g: suggestedWeightG ? String(suggestedWeightG) : "",
+    length_cm: "",
+    width_cm: "",
+    height_cm: "",
+  });
+  const [busy, setBusy] = useState<"" | "pack" | "book" | "ship" | "deliver">("");
   const [message, setMessage] = useState<{ kind: "ok" | "error"; text: string } | null>(null);
 
   const state: string = order.fulfilment_state;
   const address = order.shipping_address || {};
   const isInvoiced = order.metadata?.payment_terms === "invoice";
 
-  async function run(action: "pack" | "ship" | "deliver", body: Record<string, unknown> = {}) {
+  const booked = fulfilments.find((f) => f.awb && !f.canceled_at);
+  const pkgReady = Object.values(pkg).every((v) => Number(v) > 0);
+
+  async function run(action: "pack" | "book" | "ship" | "deliver", body: Record<string, unknown> = {}) {
     setBusy(action);
     setMessage(null);
     try {
@@ -56,6 +69,14 @@ export function FulfilmentWorkbench({
       const data = await res.json();
       if (!res.ok) {
         setMessage({ kind: "error", text: data.error || `Could not ${action} this order.` });
+        return;
+      }
+      if (action === "book") {
+        setMessage({
+          kind: "ok",
+          text: `${data.already_booked ? "Already booked" : "Booked"} with ${data.courier} · AWB ${data.awb}. Customer notified — print the label below.`,
+        });
+        router.refresh();
         return;
       }
       const already = data.already_packed || data.already_shipped || data.already_delivered;
@@ -159,7 +180,97 @@ export function FulfilmentWorkbench({
             </div>
           </Section>
 
-          <Section title="Shipping details">
+          <Section title="Courier booking & label">
+            {booked ? (
+              <div className="flex flex-wrap items-center gap-3 text-sm">
+                <span>
+                  <span className="font-medium text-gray-900">{booked.courier}</span>
+                  <span className="ml-2 font-mono text-xs text-gray-600">AWB {booked.awb}</span>
+                </span>
+                <a
+                  href={`/api/fulfilment/${orderId}/label`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 rounded bg-gray-900 px-3 py-2 text-xs font-semibold text-white"
+                >
+                  <Printer className="h-4 w-4" />
+                  Print label
+                </a>
+                {booked.tracking_urls?.[0] ? (
+                  <a href={booked.tracking_urls[0]} target="_blank" rel="noreferrer" className="text-xs text-gray-600 underline">
+                    Track parcel
+                  </a>
+                ) : null}
+              </div>
+            ) : !shipmozoConfigured ? (
+              <p className="text-sm text-gray-600">
+                Shipmozo is not configured, so couriers cannot be booked automatically. Set
+                <span className="font-mono text-xs"> SHIPMOZO_PUBLIC_KEY</span> and
+                <span className="font-mono text-xs"> SHIPMOZO_PRIVATE_KEY</span> on the backend, or ship manually below.
+              </p>
+            ) : (
+              <>
+                <p className="text-sm text-gray-600">
+                  Weigh and measure the packed box. Booking sends the order to Shipmozo, assigns the courier
+                  (Delhivery, per your auto-assign rule), generates the label and notifies the customer.
+                </p>
+                <div className="mt-3 grid gap-3 sm:grid-cols-4">
+                  {(
+                    [
+                      ["weight_g", "Weight (g)"],
+                      ["length_cm", "Length (cm)"],
+                      ["width_cm", "Width (cm)"],
+                      ["height_cm", "Height (cm)"],
+                    ] as const
+                  ).map(([key, label]) => (
+                    <label key={key} className="text-xs font-medium text-gray-600">
+                      {label}
+                      <input
+                        type="number"
+                        inputMode="numeric"
+                        min={1}
+                        value={pkg[key]}
+                        onChange={(e) => setPkg({ ...pkg, [key]: e.target.value })}
+                        className="mt-1 w-full rounded border border-gray-300 px-2 py-1.5 text-sm"
+                      />
+                    </label>
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => run("book", pkg)}
+                  disabled={busy !== "" || state !== "packed" || !pkgReady}
+                  className="mt-4 inline-flex items-center gap-2 rounded bg-gray-900 px-3 py-2 text-xs font-semibold text-white disabled:opacity-40"
+                >
+                  <Printer className="h-4 w-4" />
+                  {busy === "book" ? "Booking courier…" : "Book courier & generate label"}
+                </button>
+                {state !== "packed" ? (
+                  <p className="mt-2 text-xs text-gray-500">Available once the order is marked packed.</p>
+                ) : null}
+              </>
+            )}
+            <div className="mt-4">
+              <button
+                type="button"
+                onClick={() => run("deliver")}
+                disabled={busy !== "" || state !== "shipped"}
+                className="inline-flex items-center gap-2 rounded border border-gray-300 px-3 py-2 text-xs font-semibold text-gray-800 disabled:opacity-40"
+              >
+                <CheckCircle2 className="h-4 w-4" />
+                {busy === "deliver" ? "Confirming…" : "Mark delivered"}
+              </button>
+              {booked ? (
+                <span className="ml-3 text-xs text-gray-500">Updates automatically when the courier reports delivery.</span>
+              ) : null}
+            </div>
+          </Section>
+
+          <details className="rounded-md border border-gray-200 bg-white p-5" open={!shipmozoConfigured}>
+            <summary className="cursor-pointer text-sm font-semibold uppercase tracking-wider text-gray-500">
+              Ship manually (own courier)
+            </summary>
+            <div className="mt-3">
             <div className="grid gap-3 sm:grid-cols-3">
               <label className="text-xs font-medium text-gray-600">
                 Courier
@@ -205,15 +316,6 @@ export function FulfilmentWorkbench({
                 <Truck className="h-4 w-4" />
                 {busy === "ship" ? "Marking shipped…" : "Mark shipped & notify customer"}
               </button>
-              <button
-                type="button"
-                onClick={() => run("deliver")}
-                disabled={busy !== "" || state !== "shipped"}
-                className="inline-flex items-center gap-2 rounded border border-gray-300 px-3 py-2 text-xs font-semibold text-gray-800 disabled:opacity-40"
-              >
-                <CheckCircle2 className="h-4 w-4" />
-                {busy === "deliver" ? "Confirming…" : "Mark delivered"}
-              </button>
             </div>
             <p className="mt-2 text-xs text-gray-500">
               Filling this form changes nothing on its own. The order moves to shipped only when you
@@ -238,7 +340,8 @@ export function FulfilmentWorkbench({
                 ))}
               </ul>
             ) : null}
-          </Section>
+            </div>
+          </details>
 
           <Section title="Status & transaction history">
             {history.length === 0 ? (

@@ -1,8 +1,11 @@
 import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http";
-import { ContainerRegistrationKeys, Modules } from "@medusajs/framework/utils";
-import { createOrderShipmentWorkflow, getOrderDetailWorkflow } from "@medusajs/medusa/core-flows";
-import { canShip, deriveFulfilmentState, validateTracking } from "../../../../../../lib/fulfilment";
-import { recordEvent } from "../../../../../../lib/analytics";
+import { getOrderDetailWorkflow } from "@medusajs/medusa/core-flows";
+import {
+  canShip,
+  deriveFulfilmentState,
+  validateTracking,
+} from "../../../../../../lib/fulfilment";
+import { markShipped } from "../../../../../../lib/ship";
 
 const FIELDS = [
   "id",
@@ -32,7 +35,6 @@ const FIELDS = [
  */
 export async function POST(req: MedusaRequest, res: MedusaResponse) {
   const { id } = req.params;
-  const db = req.scope.resolve(ContainerRegistrationKeys.PG_CONNECTION) as any;
   const actorId = (req as any).auth_context?.actor_id || "admin";
 
   const tracking = validateTracking((req.body || {}) as Record<string, unknown>);
@@ -73,57 +75,7 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
       });
     }
 
-    const items = (pending.items || []).map((fi: any) => ({
-      id: fi.line_item_id,
-      quantity: Number(fi.quantity || 0),
-    }));
-
-    await createOrderShipmentWorkflow(req.scope).run({
-      input: {
-        order_id: id,
-        fulfillment_id: pending.id,
-        items,
-        created_by: actorId,
-        no_notification: false, // Customer gets the shipping notification here.
-        labels: [
-          {
-            tracking_number: tracking.details.tracking_number,
-            tracking_url: tracking.details.tracking_url || "",
-            label_url: "",
-          },
-        ],
-        metadata: {
-          ...(pending.metadata || {}),
-          courier: tracking.details.courier,
-          shipped_by: actorId,
-        },
-      },
-    });
-
-    // The shipment workflow does not carry metadata onto the fulfilment, so the
-    // courier is written directly; the tracking number lives on the label.
-    try {
-      const fulfilmentModule = req.scope.resolve(Modules.FULFILLMENT) as any;
-      await fulfilmentModule.updateFulfillment(pending.id, {
-        metadata: { ...(pending.metadata || {}), courier: tracking.details.courier, shipped_by: actorId },
-      });
-    } catch (err: unknown) {
-      console.error("could not store courier on fulfilment:", err instanceof Error ? err.message : err);
-    }
-
-    await recordEvent(db, {
-      event_type: "order_shipped",
-      event_key: `fulfilment:shipped:${pending.id}`,
-      session_id: `admin:${actorId}`,
-      order_id: id,
-      source: "admin_fulfilment",
-      metadata: {
-        action: "shipped",
-        fulfillment_id: pending.id,
-        courier: tracking.details.courier,
-        tracking_number: tracking.details.tracking_number,
-      },
-    });
+    await markShipped(req.scope, id, pending, tracking.details, actorId);
 
     return res.json({
       ok: true,
@@ -131,7 +83,10 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
       fulfilment_state: "shipped",
       courier: tracking.details.courier,
       tracking_number: tracking.details.tracking_number,
-      notification_sent: true,
+      // The shipment event is emitted for the customer notification. Whether an
+      // email actually goes out depends on a notification provider being
+      // configured; none is registered yet.
+      notification_requested: true,
     });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);

@@ -57,3 +57,30 @@
     letter-spacing: -0.025em;
   }
 }
+
+@layer base {
+  /* Keyboard users need to see where they are. Many controls here set
+     focus:outline-none, so a visible ring is restored for keyboard focus only. */
+  :where(a, button, input, select, textarea, [tabindex]):focus-visible {
+    outline: 2px solid var(--color-graphite, #181b20);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+
+  /* Tells the browser which form-control palette to render. */
+  :root {
+    color-scheme: light;
+  }
+
+  /* Respect a reduced-motion preference: keep state changes, drop the movement. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Search, User, ShoppingCart, Menu } from "lucide-react";
+import { SearchAutocomplete } from "@/components/layout/search-autocomplete";
 
 const NAV_LINKS = [
   { href: "/uavs", label: "UAVs" },
@@ -58,26 +59,8 @@ export function Header() {
         </div>
 
         <div className="flex items-center gap-4 md:gap-5">
-          {/* Integrated search bar */}
-          <form
-            action="/parts"
-            method="GET"
-            className="relative hidden sm:block w-48 md:w-64"
-          >
-            <input
-              type="text"
-              name="search"
-              placeholder="Search products, parts..."
-              className="w-full rounded-md border border-border bg-surface-soft py-1.5 pl-3 pr-8 text-[12px] text-graphite placeholder:text-text-muted focus:border-graphite focus:bg-white focus:outline-none"
-            />
-            <button
-              type="submit"
-              aria-label="Search"
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-text-muted hover:text-graphite"
-            >
-              <Search className="h-3.5 w-3.5" strokeWidth={1.8} />
-            </button>
-          </form>
+          {/* Integrated search bar with product suggestions */}
+          <SearchAutocomplete className="hidden sm:block w-48 md:w-64" />
 
           <Link
             href="/account"

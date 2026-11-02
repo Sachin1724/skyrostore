@@ -67,6 +67,8 @@ export function CartView() {
   const [couponCode, setCouponCode] = useState("");
   const [discountApplied, setDiscountApplied] = useState(false);
   const [selectedItems, setSelectedItems] = useState<Record<string, boolean>>({});
+  const [pendingItemId, setPendingItemId] = useState<string | null>(null);
+  const [cartMessage, setCartMessage] = useState("");
 
   useEffect(() => {
     const cartId = localStorage.getItem("cart_id");
@@ -91,8 +93,9 @@ export function CartView() {
   }, []);
 
   async function removeItem(lineItemId: string) {
-    if (!cart) return;
+    if (!cart || pendingItemId) return;
     const removed = cart.items?.find((i) => i.id === lineItemId);
+    setPendingItemId(lineItemId);
     const res = await fetch("/api/cart/remove", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -107,11 +110,16 @@ export function CartView() {
         line_item_id: lineItemId,
         quantity: removed?.quantity ?? null,
       });
+      setCartMessage(`${removed?.title ?? "Item"} removed from your cart.`);
+    } else {
+      setCartMessage("That item could not be removed. Please try again.");
     }
+    setPendingItemId(null);
   }
 
   async function updateQuantity(lineItemId: string, quantity: number) {
-    if (!cart || quantity < 1) return;
+    if (!cart || quantity < 1 || pendingItemId) return;
+    setPendingItemId(lineItemId);
     const previous = cart.items?.find((i) => i.id === lineItemId)?.quantity ?? null;
     const res = await fetch("/api/cart/update", {
       method: "POST",
@@ -128,7 +136,11 @@ export function CartView() {
         quantity,
         metadata: { previous_quantity: previous },
       });
+      setCartMessage(`Quantity updated to ${quantity}.`);
+    } else {
+      setCartMessage("That quantity could not be updated. Please try again.");
     }
+    setPendingItemId(null);
   }
 
   async function clearCart() {
@@ -172,6 +184,10 @@ export function CartView() {
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
+      {/* Cart changes are visual for sighted users; this announces them for everyone else. */}
+      <p aria-live="polite" role="status" className="sr-only">
+        {cartMessage}
+      </p>
       {/* Left Column: Items Table & Frequently Bought */}
       <div className="space-y-8">
         {/* Cart Table Container */}
@@ -259,7 +275,8 @@ export function CartView() {
                         <button
                           type="button"
                           onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                          disabled={item.quantity <= 1}
+                          disabled={item.quantity <= 1 || pendingItemId === item.id}
+                          aria-label={`Decrease quantity of ${item.title}`}
                           className="flex h-full w-8 items-center justify-center text-text-secondary hover:bg-surface-soft disabled:opacity-30"
                         >
                           &minus;
@@ -270,7 +287,9 @@ export function CartView() {
                         <button
                           type="button"
                           onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                          className="flex h-full w-8 items-center justify-center text-text-secondary hover:bg-surface-soft"
+                          disabled={pendingItemId === item.id}
+                          aria-label={`Increase quantity of ${item.title}`}
+                          className="flex h-full w-8 items-center justify-center text-text-secondary hover:bg-surface-soft disabled:opacity-30"
                         >
                           +
                         </button>
@@ -288,7 +307,7 @@ export function CartView() {
                         type="button"
                         onClick={() => removeItem(item.id)}
                         className="text-text-muted hover:text-error transition-colors p-1"
-                        aria-label="Remove item"
+                        aria-label={`Remove ${item.title} from cart`}
                       >
                         <X className="h-4 w-4" />
                       </button>

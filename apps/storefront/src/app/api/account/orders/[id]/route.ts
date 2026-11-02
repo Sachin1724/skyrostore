@@ -17,7 +17,20 @@ export async function GET(
   }
 
   try {
-    const res = await fetch(`${BASE}/store/orders/${id}`, {
+    const fields = [
+      "*",
+      "items.*",
+      "shipping_address.*",
+      "fulfillments.id",
+      "fulfillments.shipped_at",
+      "fulfillments.delivered_at",
+      "fulfillments.canceled_at",
+      "fulfillments.metadata",
+      "fulfillments.labels.tracking_number",
+      "fulfillments.labels.tracking_url",
+    ].join(",");
+
+    const res = await fetch(`${BASE}/store/orders/${id}?fields=${encodeURIComponent(fields)}`, {
       headers: {
         "x-publishable-api-key": PK,
         Authorization: `Bearer ${token}`,

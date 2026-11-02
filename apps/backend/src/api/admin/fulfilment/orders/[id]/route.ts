@@ -2,6 +2,7 @@ import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http";
 import { ContainerRegistrationKeys } from "@medusajs/framework/utils";
 import { getOrderDetailWorkflow } from "@medusajs/medusa/core-flows";
 import { buildPackingList, deriveFulfilmentState } from "../../../../../lib/fulfilment";
+import { shipmozoConfigured } from "../../../../../lib/shipmozo";
 
 const DETAIL_FIELDS = [
   "id",
@@ -37,6 +38,7 @@ const DETAIL_FIELDS = [
   "items.detail.quantity",
   "items.detail.fulfilled_quantity",
   "items.detail.shipped_quantity",
+  "items.variant.weight",
   "shipping_methods.id",
   "shipping_methods.name",
   "shipping_methods.amount",
@@ -105,6 +107,7 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
       delivered_at: f.delivered_at,
       canceled_at: f.canceled_at,
       courier: f.metadata?.courier ?? null,
+      awb: f.metadata?.shipmozo_awb ?? null,
       tracking_numbers: (f.labels || []).map((l: any) => l.tracking_number).filter(Boolean),
       tracking_urls: (f.labels || []).map((l: any) => l.tracking_url).filter(Boolean),
     }));
@@ -144,6 +147,13 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
       payment_attempts: paymentAttempts,
       bulk_order_request: bulkRequest || null,
       history,
+      shipmozo_configured: shipmozoConfigured(),
+      // Starting point for the booking form; the packer corrects it from the scale.
+      suggested_weight_g: (order.items || []).reduce(
+        (sum: number, item: any) =>
+          sum + Number(item.variant?.weight || 0) * Number(item.quantity ?? item.detail?.quantity ?? 1),
+        0
+      ),
     });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);

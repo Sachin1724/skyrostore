@@ -25,20 +25,33 @@ export default async function CustomersPage() {
                 <th className="pb-2 pr-4">Name</th>
                 <th className="pb-2 pr-4">Email</th>
                 <th className="pb-2 pr-4">Created</th>
+                <th className="pb-2 pr-4 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {customers.map((c: Record<string, unknown>) => (
                 <tr key={c.id as string}>
                   <td className="py-2.5 pr-4 font-medium">
-                    {[c.first_name, c.last_name].filter(Boolean).join(" ") ||
-                      "—"}
+                    <a
+                      href={`/customers/${c.id as string}`}
+                      className="text-gray-900 hover:underline"
+                    >
+                      {[c.first_name, c.last_name].filter(Boolean).join(" ") || "—"}
+                    </a>
                   </td>
                   <td className="py-2.5 pr-4 text-gray-500">
                     {(c.email as string) || "—"}
                   </td>
                   <td className="py-2.5 pr-4 text-gray-500">
                     {new Date(c.created_at as string).toLocaleDateString()}
+                  </td>
+                  <td className="py-2.5 pr-4 text-right">
+                    <a
+                      href={`/customers/${c.id as string}`}
+                      className="rounded bg-gray-900 px-2.5 py-1 text-xs font-medium text-white hover:bg-gray-800"
+                    >
+                      View &amp; Edit
+                    </a>
                   </td>
                 </tr>
               ))}

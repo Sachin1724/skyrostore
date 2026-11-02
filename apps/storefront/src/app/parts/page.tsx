@@ -11,15 +11,17 @@ import {
   countForNode,
   type CategoryNode,
 } from "@/lib/data/catalog";
+import { applyFacets, buildFacets } from "@/lib/technical-specs";
 import Link from "next/link";
 import Image from "next/image";
 
 export const metadata = { title: "UAV Parts & Components — Skyrostore" };
 
-function href(category?: string, brand?: string) {
+function href(category?: string, brand?: string, specs: Record<string, string> = {}) {
   const qs = new URLSearchParams();
   if (category) qs.set("category", category);
   if (brand) qs.set("brand", brand);
+  for (const [key, value] of Object.entries(specs)) qs.set(`f_${key}`, value);
   const s = qs.toString();
   return s ? `/parts?${s}` : "/parts";
 }
@@ -27,7 +29,7 @@ function href(category?: string, brand?: string) {
 export default async function PartsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ category?: string; brand?: string }>;
+  searchParams: Promise<Record<string, string | undefined>>;
 }) {
   const params = await searchParams;
   const [tree, brands, index] = await Promise.all([getCategoryTree(), getBrands(), getCatalogIndex()]);
@@ -36,11 +38,25 @@ export default async function PartsPage({
   const active = trail ? trail[trail.length - 1] : null;
   const activeBrand = brands.find((b) => b.handle === params.brand) ?? null;
 
-  const { products } = await getProducts({
+  const { products: listed } = await getProducts({
     limit: 100,
     category_id: active ? descendantIds(active) : undefined,
     collection_id: activeBrand ? [activeBrand.id] : undefined,
   });
+
+  // "Shop by" spec filters (KV, stator size, cells…), carried as f_<key> params.
+  const selectedSpecs: Record<string, string> = {};
+  for (const [key, value] of Object.entries(params)) {
+    if (key.startsWith("f_") && value) selectedSpecs[key.slice(2)] = value;
+  }
+  const facets = active || activeBrand ? buildFacets(listed) : [];
+  const products = applyFacets(listed, selectedSpecs);
+  const toggleSpec = (key: string, value: string) => {
+    const next = { ...selectedSpecs };
+    if (next[key] === value) delete next[key];
+    else next[key] = value;
+    return href(params.category, params.brand, next);
+  };
 
   // Sidebar shows the children of the current node, or the roots at the top level.
   const levelNodes: CategoryNode[] = active ? active.children : tree;
@@ -121,6 +137,36 @@ export default async function PartsPage({
                 ) : null}
               </div>
 
+              {facets.map((facet) => (
+                <div key={facet.key} className="rounded-lg border border-border bg-white p-4">
+                  <div className="text-[13px] font-bold text-graphite">
+                    Shop by {facet.label}
+                    {facet.unit ? <span className="ml-1 font-normal text-text-muted">({facet.unit})</span> : null}
+                  </div>
+                  <div className="mt-3 flex flex-wrap gap-1.5">
+                    {facet.values.map(({ value, count }) => {
+                      const selected = selectedSpecs[facet.key] === value;
+                      return (
+                        <Link
+                          key={value}
+                          href={toggleSpec(facet.key, value)}
+                          aria-pressed={selected}
+                          className={`rounded border px-2 py-1 font-mono text-[11px] transition-colors ${
+                            selected
+                              ? "border-graphite bg-graphite text-white"
+                              : "border-border text-graphite hover:border-graphite"
+                          }`}
+                        >
+                          {value}
+                          {facet.unit && facet.unit.length <= 3 ? facet.unit : ""}
+                          <span className={selected ? "ml-1 text-white/70" : "ml-1 text-text-muted"}>{count}</span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+
               {visibleBrands.length > 0 ? (
                 <div className="rounded-lg border border-border bg-white p-4">
                   <div className="text-[13px] font-bold text-graphite">Brand</div>
@@ -143,7 +189,7 @@ export default async function PartsPage({
                 </div>
               ) : null}
 
-              {params.category || params.brand ? (
+              {params.category || params.brand || Object.keys(selectedSpecs).length ? (
                 <Link href="/parts" className="block w-full rounded-md border border-border bg-white py-2 text-center text-[12px] font-bold text-graphite transition-colors hover:bg-surface-soft">
                   Clear Filters
                 </Link>

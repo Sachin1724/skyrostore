@@ -1,10 +1,24 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 type AuthMode = "login" | "register";
+
+/** Reasons the Google callback can hand back, in words a customer can act on. */
+const GOOGLE_ERRORS: Record<string, string> = {
+  cancelled: "Google sign-in was cancelled.",
+  expired_or_used: "That Google sign-in link has expired. Please try again.",
+  invalid_callback: "The Google sign-in response was incomplete. Please try again.",
+  email_taken:
+    "An account already uses this email address. Sign in with your password instead, for security.",
+  account_creation_failed: "The account could not be created. Please try again.",
+  profile_unavailable: "Google did not share a verified email address.",
+  provider_error: "Google reported an error during sign-in.",
+  no_token: "Google sign-in did not return a session.",
+  unexpected: "Google sign-in did not complete. Please try again.",
+};
 
 const inputClass =
   "w-full px-3 py-3 text-[14px] text-graphite bg-surface placeholder:text-text-disabled focus:outline-none focus:ring-2 focus:ring-graphite/8 focus:border-graphite";
@@ -22,6 +36,51 @@ export function AccountView() {
   const [lastName, setLastName] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [googleAvailable, setGoogleAvailable] = useState<boolean | null>(null);
+  const [googleStarting, setGoogleStarting] = useState(false);
+
+  const searchParams = useSearchParams();
+
+  // Offer Google only if the backend really has the provider configured.
+  useEffect(() => {
+    let active = true;
+    fetch("/api/auth/providers")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (active) setGoogleAvailable(Boolean(data?.google));
+      })
+      .catch(() => {
+        if (active) setGoogleAvailable(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  // Surface why a Google round-trip came back without a session.
+  useEffect(() => {
+    const reason = searchParams.get("auth_error");
+    if (!reason) return;
+    setError(GOOGLE_ERRORS[reason] || "Google sign-in did not complete. Please try again.");
+  }, [searchParams]);
+
+  async function handleGoogle() {
+    setError("");
+    setGoogleStarting(true);
+    try {
+      const res = await fetch("/api/auth/google/start", { method: "POST" });
+      const data = await res.json();
+      if (!res.ok || !data.location) {
+        setError(data.error || "Google sign-in is unavailable right now.");
+        return;
+      }
+      window.location.href = data.location;
+    } catch {
+      setError("Could not reach Google sign-in.");
+    } finally {
+      setGoogleStarting(false);
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -65,6 +124,8 @@ export function AccountView() {
 
       {error && (
         <div
+          role="alert"
+          aria-live="assertive"
           className="mt-4 px-4 py-3 text-[13px] font-medium text-error"
           style={{
             borderRadius: "var(--radius-sm)",
@@ -75,11 +136,51 @@ export function AccountView() {
         </div>
       )}
 
+      {googleAvailable === true && (
+        <div className="mt-6">
+          <button
+            type="button"
+            onClick={handleGoogle}
+            disabled={googleStarting}
+            className="flex w-full items-center justify-center gap-2.5 px-4 py-3 text-[14px] font-semibold text-graphite transition-colors hover:bg-accent-hover disabled:opacity-50"
+            style={{
+              borderRadius: "var(--radius-sm)",
+              border: "1px solid var(--color-border-strong)",
+              background: "var(--color-surface)",
+            }}
+          >
+            <svg className="h-[18px] w-[18px]" viewBox="0 0 18 18" aria-hidden="true">
+              <path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.92c1.7-1.57 2.68-3.88 2.68-6.62Z" />
+              <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.81.54-1.84.86-3.04.86-2.34 0-4.32-1.58-5.03-3.7H.96v2.33A9 9 0 0 0 9 18Z" />
+              <path fill="#FBBC05" d="M3.97 10.72a5.4 5.4 0 0 1 0-3.44V4.95H.96a9 9 0 0 0 0 8.1l3.01-2.33Z" />
+              <path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.59C13.46.89 11.43 0 9 0A9 9 0 0 0 .96 4.95l3.01 2.33C4.68 5.16 6.66 3.58 9 3.58Z" />
+            </svg>
+            {googleStarting ? "Redirecting to Google…" : "Continue with Google"}
+          </button>
+
+          <div className="mt-5 flex items-center gap-3">
+            <span className="h-px flex-1" style={{ background: "var(--color-border)" }} />
+            <span className="text-[11px] font-medium uppercase tracking-wider text-text-muted">
+              or use email
+            </span>
+            <span className="h-px flex-1" style={{ background: "var(--color-border)" }} />
+          </div>
+        </div>
+      )}
+
+      {googleAvailable === false && (
+        <p className="mt-4 text-[12px] text-text-muted">
+          Google sign-in is not configured on this environment. Use your email and password.
+        </p>
+      )}
+
       <form onSubmit={handleSubmit} className="mt-6 space-y-4">
         {mode === "register" && (
           <div className="grid grid-cols-2 gap-3">
             <input
               required
+              aria-label="First name"
+              autoComplete="given-name"
               placeholder="First name"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
@@ -88,6 +189,8 @@ export function AccountView() {
             />
             <input
               required
+              aria-label="Last name"
+              autoComplete="family-name"
               placeholder="Last name"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
@@ -100,6 +203,9 @@ export function AccountView() {
         <input
           type="email"
           required
+          aria-label="Email address"
+          autoComplete="email"
+          inputMode="email"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -110,6 +216,8 @@ export function AccountView() {
         <input
           type="password"
           required
+          aria-label="Password"
+          autoComplete={mode === "login" ? "current-password" : "new-password"}
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}

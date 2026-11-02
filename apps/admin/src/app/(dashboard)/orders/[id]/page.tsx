@@ -46,6 +46,8 @@ export default async function OrderDetailPage({
         paymentAttempts={data.payment_attempts}
         bulkRequest={data.bulk_order_request}
         history={data.history}
+        shipmozoConfigured={data.shipmozo_configured}
+        suggestedWeightG={data.suggested_weight_g}
       />
     </div>
   );

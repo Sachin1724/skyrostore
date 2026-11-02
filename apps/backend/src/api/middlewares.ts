@@ -1,4 +1,5 @@
 import { defineMiddlewares, authenticate } from "@medusajs/framework/http";
+import { requireOrderOwner } from "./middlewares/require-order-owner";
 
 function captureRawBody(req: any, _res: any, next: any) {
   const chunks: Buffer[] = [];
@@ -42,6 +43,25 @@ export default defineMiddlewares({
       matcher: "/store/uav/configurations/:id/snapshot",
       method: ["POST", "GET"],
       middlewares: [authenticate("customer", ["bearer", "session"])],
+    },
+    {
+      // Medusa leaves order retrieval unauthenticated by design; this store
+      // requires the order to belong to the signed-in customer.
+      matcher: "/store/orders/:id",
+      method: ["GET"],
+      middlewares: [
+        authenticate("customer", ["bearer", "session"]),
+        requireOrderOwner,
+      ],
+    },
+    {
+      // A registration token has no customer yet, so unregistered identities
+      // must be allowed through to read their own pending profile.
+      matcher: "/store/auth/pending-profile",
+      method: ["GET"],
+      middlewares: [
+        authenticate("customer", ["bearer"], { allowUnregistered: true }),
+      ],
     },
     {
       // Optional auth: a signed-in customer's events get attributed to them,

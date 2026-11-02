@@ -54,20 +54,33 @@ class RazorpayProviderService extends AbstractPaymentProvider<RazorpayOptions> {
   }
 
   async initiatePayment(input: any): Promise<any> {
-    const { amount, currency_code, context } = input;
+    const { amount, currency_code, context, data } = input;
 
     // Amount in smallest unit (paise for INR)
-    const amountInSmallest = Math.round(amount);
+    const amountInSmallest = Math.round(Number(amount));
+
+    // Magic Checkout: Razorpay collects the address and adds shipping on top of
+    // line_items_total, so the order is created for the items only and the
+    // remainder of the cart total is returned as the shipping fee.
+    const lineItems = Array.isArray(data?.line_items) ? data.line_items : null;
+    const lineItemsTotal = lineItems
+      ? lineItems.reduce((sum: number, li: any) => sum + Number(li.offer_price) * Number(li.quantity), 0)
+      : amountInSmallest;
+    if (lineItems && (lineItemsTotal <= 0 || lineItemsTotal > amountInSmallest)) {
+      throw this.paymentError("Line items do not match the cart total");
+    }
 
     const order = await this.razorpay_.orders.create({
-      amount: amountInSmallest,
+      amount: lineItemsTotal,
       currency: (currency_code || "INR").toUpperCase(),
       receipt: context?.session_id || `rcpt_${Date.now()}`,
       notes: {
         session_id: context?.session_id || "",
-        cart_id: context?.extra?.cart_id || "",
+        cart_id: data?.cart_id || context?.extra?.cart_id || "",
+        shipping_fee: String(amountInSmallest - lineItemsTotal),
       },
-    });
+      ...(lineItems ? { line_items_total: lineItemsTotal, line_items: lineItems } : {}),
+    } as any);
 
     return {
       id: order.id,
@@ -77,6 +90,7 @@ class RazorpayProviderService extends AbstractPaymentProvider<RazorpayOptions> {
         amount: amountInSmallest,
         currency: order.currency,
         status: order.status,
+        magic_checkout: Boolean(lineItems),
       },
     };
   }
@@ -87,6 +101,7 @@ class RazorpayProviderService extends AbstractPaymentProvider<RazorpayOptions> {
       razorpay_order_id,
       razorpay_payment_id,
       razorpay_signature,
+      amount: expectedAmount,
     } = data || {};
 
     if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
@@ -112,6 +127,15 @@ class RazorpayProviderService extends AbstractPaymentProvider<RazorpayOptions> {
     // Fetch payment from Razorpay to confirm status
     const payment = await this.razorpay_.payments.fetch(razorpay_payment_id);
 
+    // The payment must belong to this order and cover the whole cart, so a
+    // tampered order (e.g. cheaper line items) can never complete a cart.
+    if (payment.order_id !== razorpay_order_id || Number(payment.amount) < Number(expectedAmount || 0)) {
+      return {
+        status: PaymentSessionStatus.ERROR,
+        data: { razorpay_payment_id, error: "Payment does not match this order" },
+      };
+    }
+
     if (payment.status === "captured" || payment.status === "authorized") {
       return {
         status: PaymentSessionStatus.AUTHORIZED,
@@ -120,6 +144,7 @@ class RazorpayProviderService extends AbstractPaymentProvider<RazorpayOptions> {
           razorpay_payment_id,
           razorpay_signature,
           razorpay_status: payment.status,
+          razorpay_key_id: data.razorpay_key_id,
           amount: payment.amount,
           currency: payment.currency,
           method: payment.method,

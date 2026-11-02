@@ -32,6 +32,14 @@ type Order = {
     postal_code: string;
     country_code: string;
   };
+  fulfillments?: Array<{
+    id: string;
+    shipped_at?: string | null;
+    delivered_at?: string | null;
+    canceled_at?: string | null;
+    metadata?: { courier?: string } | null;
+    labels?: Array<{ tracking_number?: string | null; tracking_url?: string | null }>;
+  }>;
 };
 
 export function OrderDetail({ orderId }: { orderId: string }) {
@@ -79,6 +87,9 @@ export function OrderDetail({ orderId }: { orderId: string }) {
   if (!order) return <p className="text-[14px] text-text-secondary">Order not found.</p>;
 
   const currency = order.currency_code || "inr";
+  const shipments = (order.fulfillments || []).filter(
+    (fulfillment) => fulfillment.shipped_at && !fulfillment.canceled_at
+  );
 
   return (
     <div>
@@ -144,6 +155,51 @@ export function OrderDetail({ orderId }: { orderId: string }) {
           <span className="text-[20px] font-bold text-graphite">{formatPrice(order.total, currency)}</span>
         </div>
       </div>
+
+      {/* Shipment tracking — only shown once the order has actually shipped. */}
+      {shipments.length > 0 && (
+        <div className="mt-6 pt-4" style={{ borderTop: "1px solid var(--color-border)" }}>
+          <h2 className="text-[14px] font-semibold text-graphite">Shipment</h2>
+          {shipments.map((fulfillment) => {
+            const label = fulfillment.labels?.[0];
+            const courier = fulfillment.metadata?.courier;
+            return (
+              <div key={fulfillment.id} className="mt-2 text-[13px] text-text-secondary">
+                <p>
+                  {fulfillment.delivered_at ? "Delivered" : "Shipped"}
+                  {courier ? ` via ${courier}` : ""} on{" "}
+                  {new Date(
+                    (fulfillment.delivered_at || fulfillment.shipped_at) as string
+                  ).toLocaleDateString("en-IN", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </p>
+                {label?.tracking_number && (
+                  <p className="mt-1">
+                    Tracking:{" "}
+                    {label.tracking_url ? (
+                      <a
+                        href={label.tracking_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-medium text-graphite underline"
+                      >
+                        {label.tracking_number}
+                      </a>
+                    ) : (
+                      <span className="font-mono font-medium text-graphite">
+                        {label.tracking_number}
+                      </span>
+                    )}
+                  </p>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* Shipping address */}
       {order.shipping_address && (
