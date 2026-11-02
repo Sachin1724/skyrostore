@@ -16,6 +16,18 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // Serve Firebase's sign-in handler from our own domain, so Google's account
+  // chooser says "continue to <our domain>" instead of *.firebaseapp.com.
+  // NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN must then be this site's host.
+  // https://firebase.google.com/docs/auth/web/redirect-best-practices#proxy-requests
+  async rewrites() {
+    const project = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
+    if (!project) return [];
+    return [
+      { source: "/__/auth/:path*", destination: `https://${project}.firebaseapp.com/__/auth/:path*` },
+      { source: "/__/firebase/:path*", destination: `https://${project}.firebaseapp.com/__/firebase/:path*` },
+    ];
+  },
 };
 
 export default nextConfig;
