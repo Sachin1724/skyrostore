@@ -153,7 +153,7 @@ export function AccountView() {
           />
           <div className="mt-6 flex items-center gap-3">
             <span className="h-px flex-1" style={{ background: "var(--color-border)" }} />
-            <span className="text-[11px] font-medium uppercase tracking-wider text-text-muted">
+            <span className="text-[13px] font-medium tracking-wider text-text-muted">
               or use email and password
             </span>
             <span className="h-px flex-1" style={{ background: "var(--color-border)" }} />
@@ -185,7 +185,7 @@ export function AccountView() {
 
           <div className="mt-5 flex items-center gap-3">
             <span className="h-px flex-1" style={{ background: "var(--color-border)" }} />
-            <span className="text-[11px] font-medium uppercase tracking-wider text-text-muted">
+            <span className="text-[13px] font-medium tracking-wider text-text-muted">
               or use email
             </span>
             <span className="h-px flex-1" style={{ background: "var(--color-border)" }} />
@@ -194,7 +194,7 @@ export function AccountView() {
       )}
 
       {!firebaseAvailable && googleAvailable === false && (
-        <p className="mt-4 text-[12px] text-text-muted">
+        <p className="mt-4 text-[14px] text-text-muted">
           Google sign-in is not configured on this environment. Use your email and password.
         </p>
       )}

@@ -14,7 +14,7 @@ export default function CartPage() {
         <section className="relative overflow-hidden border-b border-border bg-graphite text-white">
           <div className="mx-auto flex max-w-[1280px] flex-col justify-between px-8 py-8 md:flex-row md:items-center md:px-10">
             <div className="relative z-10 max-w-xl">
-              <span className="text-[11px] font-bold uppercase tracking-widest text-accent">
+              <span className="text-[13px] font-bold tracking-widest text-accent">
                 YOUR CART
               </span>
               <h1 className="mt-2 text-[32px] font-extrabold tracking-tight md:text-[38px]">
@@ -41,36 +41,36 @@ export default function CartPage() {
           <div className="mx-auto flex max-w-[700px] items-center justify-between px-8 py-4">
             {/* Step 1: Cart */}
             <div className="flex items-center gap-3">
-              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-accent font-bold text-[12px] text-graphite shadow-xs">
+              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-accent font-bold text-[14px] text-graphite shadow-xs">
                 1
               </div>
               <div>
-                <p className="text-[12px] font-bold text-graphite">Cart</p>
-                <p className="text-[10px] text-text-muted">Review items</p>
+                <p className="text-[14px] font-bold text-graphite">Cart</p>
+                <p className="text-[13px] text-text-muted">Review items</p>
               </div>
             </div>
             <div className="h-px flex-1 bg-border mx-4" />
 
             {/* Step 2: Checkout */}
             <div className="flex items-center gap-3 opacity-60">
-              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-surface-muted font-bold text-[12px] text-text-secondary">
+              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-surface-muted font-bold text-[14px] text-text-secondary">
                 2
               </div>
               <div>
-                <p className="text-[12px] font-bold text-graphite">Checkout</p>
-                <p className="text-[10px] text-text-muted">Address &amp; payment</p>
+                <p className="text-[14px] font-bold text-graphite">Checkout</p>
+                <p className="text-[13px] text-text-muted">Address &amp; payment</p>
               </div>
             </div>
             <div className="h-px flex-1 bg-border mx-4" />
 
             {/* Step 3: Confirmation */}
             <div className="flex items-center gap-3 opacity-60">
-              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-surface-muted font-bold text-[12px] text-text-secondary">
+              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-surface-muted font-bold text-[14px] text-text-secondary">
                 3
               </div>
               <div>
-                <p className="text-[12px] font-bold text-graphite">Confirmation</p>
-                <p className="text-[10px] text-text-muted">Order placed</p>
+                <p className="text-[14px] font-bold text-graphite">Confirmation</p>
+                <p className="text-[13px] text-text-muted">Order placed</p>
               </div>
             </div>
           </div>

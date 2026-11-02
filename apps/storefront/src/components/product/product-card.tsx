@@ -89,7 +89,7 @@ export function ProductCard({ product }: { product: any }) {
       </div>
       <div className="p-3">
         {(brandName || category) && (
-          <p className="text-[11px] text-text-muted">
+          <p className="text-[13px] text-text-muted">
             {brandName ? <span className="font-semibold text-text-secondary">{brandName}</span> : null}
             {brandName && category ? " · " : null}
             {category}
@@ -101,7 +101,7 @@ export function ProductCard({ product }: { product: any }) {
 
         {/* Real Technical Highlights */}
         {technicalHighlights.length > 0 && (
-          <p className="mt-1 text-[11px] font-medium text-text-muted line-clamp-1">
+          <p className="mt-1 text-[13px] font-medium text-text-muted line-clamp-1">
             {technicalHighlights.join("  |  ")}
           </p>
         )}
@@ -115,7 +115,7 @@ export function ProductCard({ product }: { product: any }) {
             )}
             <div className="mt-0.5 flex items-center gap-1.5">
               <span className="h-1.5 w-1.5 rounded-full bg-success" />
-              <span className="text-[11px] font-medium text-success">
+              <span className="text-[13px] font-medium text-success">
                 {inStock ? "In Stock" : "Out of Stock"}
               </span>
             </div>

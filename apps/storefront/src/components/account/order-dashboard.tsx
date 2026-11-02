@@ -143,7 +143,7 @@ export function OrderDashboard() {
             <h3 className="truncate text-[14px] font-bold text-white">
               {unauthenticated ? "Guest Account" : "Enterprise Customer"}
             </h3>
-            <p className="truncate text-[11px] text-gray-400">
+            <p className="truncate text-[13px] text-gray-400">
               {unauthenticated ? "Sign in to access orders" : "Verified Customer"}
             </p>
           </div>
@@ -219,7 +219,7 @@ export function OrderDashboard() {
       {/* 2. CENTER: MY ORDERS WORKSPACE (6 cols) */}
       <section className="space-y-6 lg:col-span-6">
         <div>
-          <span className="text-[11px] font-bold uppercase tracking-wider text-[#84cc16]">
+          <span className="text-[13px] font-bold tracking-wider text-[#84cc16]">
             MY ACCOUNT
           </span>
           <h1 className="mt-1 text-[28px] font-extrabold tracking-tight text-graphite">
@@ -237,9 +237,9 @@ export function OrderDashboard() {
               <Package className="h-5 w-5 stroke-[2]" />
             </div>
             <div>
-              <p className="text-[11px] font-medium text-text-muted">Total Orders</p>
+              <p className="text-[13px] font-medium text-text-muted">Total Orders</p>
               <p className="text-[20px] font-extrabold text-graphite">{totalOrdersCount}</p>
-              <p className="text-[10px] text-text-disabled">Across all time</p>
+              <p className="text-[13px] text-text-disabled">Across all time</p>
             </div>
           </div>
 
@@ -248,9 +248,9 @@ export function OrderDashboard() {
               <ShoppingCart className="h-5 w-5 stroke-[2]" />
             </div>
             <div>
-              <p className="text-[11px] font-medium text-text-muted">Total Spend</p>
+              <p className="text-[13px] font-medium text-text-muted">Total Spend</p>
               <p className="text-[20px] font-extrabold text-graphite">{formatINR(totalSpendAmount)}</p>
-              <p className="text-[10px] text-text-disabled">Including taxes</p>
+              <p className="text-[13px] text-text-disabled">Including taxes</p>
             </div>
           </div>
 
@@ -259,9 +259,9 @@ export function OrderDashboard() {
               <Clock className="h-5 w-5 stroke-[2]" />
             </div>
             <div>
-              <p className="text-[11px] font-medium text-text-muted">Pending Deliveries</p>
+              <p className="text-[13px] font-medium text-text-muted">Pending Deliveries</p>
               <p className="text-[20px] font-extrabold text-graphite">{pendingDeliveriesCount}</p>
-              <p className="text-[10px] text-text-disabled">Orders in transit</p>
+              <p className="text-[13px] text-text-disabled">Orders in transit</p>
             </div>
           </div>
         </div>
@@ -294,13 +294,13 @@ export function OrderDashboard() {
               placeholder="Search by order number..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-md border border-border bg-white py-1.5 pl-8 pr-3 text-[12px] text-graphite placeholder:text-text-disabled focus:border-graphite focus:outline-none"
+              className="w-full rounded-md border border-border bg-white py-1.5 pl-8 pr-3 text-[14px] text-graphite placeholder:text-text-disabled focus:border-graphite focus:outline-none"
             />
           </div>
         </div>
 
         {showInvoiceAlert && (
-          <div className="flex items-center justify-between rounded border border-emerald-200 bg-emerald-50 p-3 text-[12px] text-emerald-800">
+          <div className="flex items-center justify-between rounded border border-emerald-200 bg-emerald-50 p-3 text-[14px] text-emerald-800">
             <div className="flex items-center gap-2">
               <CheckCircle2 className="h-4 w-4 text-emerald-600" />
               <span>Tax invoice for {showInvoiceAlert} prepared and downloaded.</span>
@@ -324,32 +324,32 @@ export function OrderDashboard() {
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border pb-4">
                 <div>
                   <h3 className="text-[14px] font-bold text-graphite">{order.orderNumber}</h3>
-                  <p className="mt-0.5 text-[11px] text-text-muted">
+                  <p className="mt-0.5 text-[13px] text-text-muted">
                     {order.date} • {order.itemCount} {order.itemCount === 1 ? "item" : "items"} •{" "}
                     {formatINR(order.total)}
                   </p>
                 </div>
                 <div>
                   {order.status === "Delivered" && (
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-0.5 text-[11px] font-bold text-emerald-700 border border-emerald-200">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-0.5 text-[13px] font-bold text-emerald-700 border border-emerald-200">
                       <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                       Delivered
                     </span>
                   )}
                   {order.status === "In Transit" && (
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-sky-50 px-2.5 py-0.5 text-[11px] font-bold text-sky-700 border border-sky-200">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-sky-50 px-2.5 py-0.5 text-[13px] font-bold text-sky-700 border border-sky-200">
                       <span className="h-1.5 w-1.5 rounded-full bg-sky-500" />
                       In Transit
                     </span>
                   )}
                   {order.status === "Processing" && (
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-0.5 text-[11px] font-bold text-amber-700 border border-amber-200">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-0.5 text-[13px] font-bold text-amber-700 border border-amber-200">
                       <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
                       Processing
                     </span>
                   )}
                   {order.status === "Cancelled" && (
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-50 px-2.5 py-0.5 text-[11px] font-bold text-rose-700 border border-rose-200">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-50 px-2.5 py-0.5 text-[13px] font-bold text-rose-700 border border-rose-200">
                       <span className="h-1.5 w-1.5 rounded-full bg-rose-500" />
                       Cancelled
                     </span>
@@ -375,12 +375,12 @@ export function OrderDashboard() {
                       </div>
                     ))}
                     {order.extraCount && (
-                      <div className="flex h-12 w-12 items-center justify-center rounded border border-border bg-surface-soft text-[12px] font-bold text-text-muted">
+                      <div className="flex h-12 w-12 items-center justify-center rounded border border-border bg-surface-soft text-[14px] font-bold text-text-muted">
                         +{order.extraCount}
                       </div>
                     )}
                   </div>
-                  <p className="mt-2 text-[11px] text-text-secondary">{order.statusDescription}</p>
+                  <p className="mt-2 text-[13px] text-text-secondary">{order.statusDescription}</p>
                 </div>
 
                 {/* Action Buttons */}
@@ -389,7 +389,7 @@ export function OrderDashboard() {
                     <button
                       type="button"
                       onClick={() => setSelectedOrder(order)}
-                      className="w-full sm:w-36 rounded bg-graphite px-4 py-2 text-center text-[12px] font-bold text-white transition-colors hover:bg-graphite-soft"
+                      className="w-full sm:w-36 rounded bg-graphite px-4 py-2 text-center text-[14px] font-bold text-white transition-colors hover:bg-graphite-soft"
                     >
                       Track Order
                     </button>
@@ -397,7 +397,7 @@ export function OrderDashboard() {
                     <button
                       type="button"
                       onClick={() => setSelectedOrder(order)}
-                      className="w-full sm:w-36 rounded bg-graphite px-4 py-2 text-center text-[12px] font-bold text-white transition-colors hover:bg-graphite-soft"
+                      className="w-full sm:w-36 rounded bg-graphite px-4 py-2 text-center text-[14px] font-bold text-white transition-colors hover:bg-graphite-soft"
                     >
                       View Details
                     </button>
@@ -407,7 +407,7 @@ export function OrderDashboard() {
                     <button
                       type="button"
                       onClick={() => setShowInvoiceAlert(order.orderNumber)}
-                      className="inline-flex w-full sm:w-36 items-center justify-center gap-1.5 rounded border border-border bg-white px-3 py-1.5 text-[12px] font-bold text-graphite transition-colors hover:bg-surface-soft"
+                      className="inline-flex w-full sm:w-36 items-center justify-center gap-1.5 rounded border border-border bg-white px-3 py-1.5 text-[14px] font-bold text-graphite transition-colors hover:bg-surface-soft"
                     >
                       <Download className="h-3.5 w-3.5" />
                       Download Invoice
@@ -418,7 +418,7 @@ export function OrderDashboard() {
                     <button
                       type="button"
                       onClick={() => alert(`Cancel request received for ${order.orderNumber}. Support team notified.`)}
-                      className="w-full sm:w-36 rounded border border-border bg-white px-3 py-1.5 text-center text-[12px] font-bold text-rose-600 transition-colors hover:bg-rose-50"
+                      className="w-full sm:w-36 rounded border border-border bg-white px-3 py-1.5 text-center text-[14px] font-bold text-rose-600 transition-colors hover:bg-rose-50"
                     >
                       Cancel Order
                     </button>
@@ -428,7 +428,7 @@ export function OrderDashboard() {
                     <button
                       type="button"
                       onClick={() => setSelectedOrder(order)}
-                      className="w-full sm:w-36 rounded border border-border bg-white px-3 py-1.5 text-center text-[12px] font-bold text-graphite transition-colors hover:bg-surface-soft"
+                      className="w-full sm:w-36 rounded border border-border bg-white px-3 py-1.5 text-center text-[14px] font-bold text-graphite transition-colors hover:bg-surface-soft"
                     >
                       View Details
                     </button>
@@ -448,7 +448,7 @@ export function OrderDashboard() {
                   <p className="mt-1 text-text-secondary">Please sign in to view your verified orders and commercial invoices.</p>
                   <Link
                     href="/account"
-                    className="mt-4 inline-flex items-center justify-center rounded bg-graphite px-5 py-2 font-bold text-white hover:bg-black text-[12px]"
+                    className="mt-4 inline-flex items-center justify-center rounded bg-graphite px-5 py-2 font-bold text-white hover:bg-black text-[14px]"
                   >
                     Sign In to Skyrostore
                   </Link>
@@ -459,7 +459,7 @@ export function OrderDashboard() {
                   <p className="mt-1 text-text-secondary">Explore our catalog or configure your custom UAV build.</p>
                   <Link
                     href="/parts"
-                    className="mt-4 inline-flex items-center justify-center rounded bg-graphite px-5 py-2 font-bold text-white hover:bg-black text-[12px]"
+                    className="mt-4 inline-flex items-center justify-center rounded bg-graphite px-5 py-2 font-bold text-white hover:bg-black text-[14px]"
                   >
                     Browse UAV Parts
                   </Link>
@@ -478,7 +478,7 @@ export function OrderDashboard() {
             <h3 className="text-[14px] font-bold text-graphite">Account Overview</h3>
             <Link
               href="/account"
-              className="text-[11px] font-bold text-[#84cc16] hover:underline"
+              className="text-[13px] font-bold text-[#84cc16] hover:underline"
             >
               {unauthenticated ? "Sign In" : "Manage"}
             </Link>
@@ -492,13 +492,13 @@ export function OrderDashboard() {
               <p className="text-[13px] font-bold text-graphite">
                 {unauthenticated ? "Guest Customer" : "Enterprise Account"}
               </p>
-              <p className="text-[11px] text-text-muted">
+              <p className="text-[13px] text-text-muted">
                 {unauthenticated ? "No active session" : "Verified Customer"}
               </p>
             </div>
           </div>
 
-          <div className="mt-4 space-y-2 border-t border-border pt-3 text-[12px]">
+          <div className="mt-4 space-y-2 border-t border-border pt-3 text-[14px]">
             <div className="flex justify-between">
               <span className="text-text-muted">Account Status</span>
               <span className="font-semibold text-graphite">
@@ -512,7 +512,7 @@ export function OrderDashboard() {
             <div className="pt-1">
               <div className="flex justify-between">
                 <span className="text-text-muted">Procurement Tier</span>
-                <Link href="/account" className="text-[11px] font-medium text-[#84cc16] hover:underline">
+                <Link href="/account" className="text-[13px] font-medium text-[#84cc16] hover:underline">
                   {unauthenticated ? "Sign In" : "Manage"}
                 </Link>
               </div>
@@ -533,8 +533,8 @@ export function OrderDashboard() {
                 <Search className="h-4 w-4" />
               </div>
               <div>
-                <p className="text-[12px] font-bold text-graphite">Track an Order</p>
-                <p className="text-[10px] text-text-muted">Enter order ID</p>
+                <p className="text-[14px] font-bold text-graphite">Track an Order</p>
+                <p className="text-[13px] text-text-muted">Enter order ID</p>
               </div>
             </Link>
 
@@ -546,8 +546,8 @@ export function OrderDashboard() {
                 <Boxes className="h-4 w-4" />
               </div>
               <div>
-                <p className="text-[12px] font-bold text-graphite">Bulk Order Request</p>
-                <p className="text-[10px] text-text-muted">Request quote for multiple units</p>
+                <p className="text-[14px] font-bold text-graphite">Bulk Order Request</p>
+                <p className="text-[13px] text-text-muted">Request quote for multiple units</p>
               </div>
             </Link>
 
@@ -559,8 +559,8 @@ export function OrderDashboard() {
                 <Sliders className="h-4 w-4" />
               </div>
               <div>
-                <p className="text-[12px] font-bold text-graphite">Build New UAV</p>
-                <p className="text-[10px] text-text-muted">Configure and save</p>
+                <p className="text-[14px] font-bold text-graphite">Build New UAV</p>
+                <p className="text-[13px] text-text-muted">Configure and save</p>
               </div>
             </Link>
 
@@ -572,8 +572,8 @@ export function OrderDashboard() {
                 <MapPin className="h-4 w-4" />
               </div>
               <div>
-                <p className="text-[12px] font-bold text-graphite">Manage Addresses</p>
-                <p className="text-[10px] text-text-muted">View and edit addresses</p>
+                <p className="text-[14px] font-bold text-graphite">Manage Addresses</p>
+                <p className="text-[13px] text-text-muted">View and edit addresses</p>
               </div>
             </Link>
           </div>
@@ -591,8 +591,8 @@ export function OrderDashboard() {
                 <RotateCcw className="h-4 w-4" />
               </div>
               <div>
-                <p className="text-[12px] font-bold text-graphite">Return or Replace</p>
-                <p className="text-[10px] text-text-muted">Request a return</p>
+                <p className="text-[14px] font-bold text-graphite">Return or Replace</p>
+                <p className="text-[13px] text-text-muted">Request a return</p>
               </div>
             </Link>
 
@@ -604,8 +604,8 @@ export function OrderDashboard() {
                 <Headphones className="h-4 w-4" />
               </div>
               <div>
-                <p className="text-[12px] font-bold text-graphite">Order Support</p>
-                <p className="text-[10px] text-text-muted">Get help with your order</p>
+                <p className="text-[14px] font-bold text-graphite">Order Support</p>
+                <p className="text-[13px] text-text-muted">Get help with your order</p>
               </div>
             </Link>
           </div>
@@ -621,7 +621,7 @@ export function OrderDashboard() {
                 <h3 className="text-[16px] font-bold text-graphite">
                   Order Details {selectedOrder.orderNumber}
                 </h3>
-                <p className="text-[12px] text-text-muted">Placed on {selectedOrder.date}</p>
+                <p className="text-[14px] text-text-muted">Placed on {selectedOrder.date}</p>
               </div>
               <button
                 type="button"
@@ -658,14 +658,14 @@ export function OrderDashboard() {
                   setShowInvoiceAlert(selectedOrder.orderNumber);
                   setSelectedOrder(null);
                 }}
-                className="rounded border border-border px-4 py-2 text-[12px] font-bold text-graphite hover:bg-surface-soft"
+                className="rounded border border-border px-4 py-2 text-[14px] font-bold text-graphite hover:bg-surface-soft"
               >
                 Download Invoice
               </button>
               <button
                 type="button"
                 onClick={() => setSelectedOrder(null)}
-                className="rounded bg-graphite px-5 py-2 text-[12px] font-bold text-white hover:bg-graphite-soft"
+                className="rounded bg-graphite px-5 py-2 text-[14px] font-bold text-white hover:bg-graphite-soft"
               >
                 Close
               </button>

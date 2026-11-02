@@ -70,7 +70,7 @@ export default async function PartsPage({
         <section className="relative overflow-hidden border-b border-border bg-white">
           <div className="mx-auto flex max-w-[1280px] flex-col justify-between px-8 py-8 md:flex-row md:items-center md:px-10">
             <div className="relative z-10 max-w-lg">
-              <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-1.5 text-[12px] font-medium text-text-muted">
+              <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-1.5 text-[14px] font-medium text-text-muted">
                 <Link href="/" className="hover:text-graphite">Home</Link>
                 <span>&gt;</span>
                 {trail || activeBrand ? (
@@ -114,14 +114,14 @@ export default async function PartsPage({
               <div className="rounded-lg border border-border bg-white p-4">
                 <div className="text-[13px] font-bold text-graphite">{siblingsLabel}</div>
                 {levelNodes.length === 0 ? (
-                  <p className="mt-3 text-[12px] text-text-muted">No further sub-categories.</p>
+                  <p className="mt-3 text-[14px] text-text-muted">No further sub-categories.</p>
                 ) : (
-                  <ul className="mt-3 space-y-2 text-[12px] text-text-secondary">
+                  <ul className="mt-3 space-y-2 text-[14px] text-text-secondary">
                     {levelNodes.map((node) => (
                       <li key={node.id}>
                         <Link href={href(node.handle, params.brand)} className="flex items-center justify-between hover:text-graphite">
                           <span>{node.name}</span>
-                          <span className="text-[11px] text-text-muted">({countForNode(node, index)})</span>
+                          <span className="text-[13px] text-text-muted">({countForNode(node, index)})</span>
                         </Link>
                       </li>
                     ))}
@@ -130,7 +130,7 @@ export default async function PartsPage({
                 {active ? (
                   <Link
                     href={href(trail && trail.length > 1 ? trail[trail.length - 2].handle : undefined, params.brand)}
-                    className="mt-3 block text-[11px] font-semibold text-graphite hover:underline"
+                    className="mt-3 block text-[13px] font-semibold text-graphite hover:underline"
                   >
                     ← Back to {trail && trail.length > 1 ? trail[trail.length - 2].name : "all categories"}
                   </Link>
@@ -151,7 +151,7 @@ export default async function PartsPage({
                           key={value}
                           href={toggleSpec(facet.key, value)}
                           aria-pressed={selected}
-                          className={`rounded border px-2 py-1 font-mono text-[11px] transition-colors ${
+                          className={`rounded border px-2 py-1 font-mono text-[13px] transition-colors ${
                             selected
                               ? "border-graphite bg-graphite text-white"
                               : "border-border text-graphite hover:border-graphite"
@@ -170,7 +170,7 @@ export default async function PartsPage({
               {visibleBrands.length > 0 ? (
                 <div className="rounded-lg border border-border bg-white p-4">
                   <div className="text-[13px] font-bold text-graphite">Brand</div>
-                  <ul className="mt-3 space-y-2 text-[12px] text-text-secondary">
+                  <ul className="mt-3 space-y-2 text-[14px] text-text-secondary">
                     {visibleBrands.map((b) => {
                       const selected = activeBrand?.id === b.id;
                       return (
@@ -180,7 +180,7 @@ export default async function PartsPage({
                             className={`flex items-center justify-between hover:text-graphite ${selected ? "font-bold text-graphite" : ""}`}
                           >
                             <span>{b.title}</span>
-                            <span className="text-[11px] text-text-muted">({index.byBrand.get(b.id)})</span>
+                            <span className="text-[13px] text-text-muted">({index.byBrand.get(b.id)})</span>
                           </Link>
                         </li>
                       );
@@ -190,7 +190,7 @@ export default async function PartsPage({
               ) : null}
 
               {params.category || params.brand || Object.keys(selectedSpecs).length ? (
-                <Link href="/parts" className="block w-full rounded-md border border-border bg-white py-2 text-center text-[12px] font-bold text-graphite transition-colors hover:bg-surface-soft">
+                <Link href="/parts" className="block w-full rounded-md border border-border bg-white py-2 text-center text-[14px] font-bold text-graphite transition-colors hover:bg-surface-soft">
                   Clear Filters
                 </Link>
               ) : null}
@@ -202,7 +202,7 @@ export default async function PartsPage({
                   {active.children.map((child) => (
                     <Link key={child.id} href={href(child.handle)} className="rounded-lg border border-border bg-white p-4 transition-colors hover:border-graphite">
                       <div className="text-[13px] font-bold text-graphite">{child.name}</div>
-                      <div className="mt-0.5 text-[11px] text-text-muted">{countForNode(child, index)} products</div>
+                      <div className="mt-0.5 text-[13px] text-text-muted">{countForNode(child, index)} products</div>
                     </Link>
                   ))}
                 </div>
@@ -213,7 +213,7 @@ export default async function PartsPage({
                   {tree.map((node) => (
                     <Link key={node.id} href={href(node.handle)} className="rounded-lg border border-border bg-white p-4 transition-colors hover:border-graphite">
                       <div className="text-[13px] font-bold text-graphite">{node.name}</div>
-                      <div className="mt-0.5 text-[11px] text-text-muted">{countForNode(node, index)} products</div>
+                      <div className="mt-0.5 text-[13px] text-text-muted">{countForNode(node, index)} products</div>
                     </Link>
                   ))}
                 </div>

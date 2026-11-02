@@ -117,7 +117,7 @@ export function ProductDetailClient({
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <nav className="mx-auto flex max-w-[1280px] items-center gap-1.5 px-8 pt-6 pb-4 text-[12px] font-medium text-text-muted md:px-10">
+      <nav className="mx-auto flex max-w-[1280px] items-center gap-1.5 px-8 pt-6 pb-4 text-[14px] font-medium text-text-muted md:px-10">
         <Link href="/" className="hover:text-graphite">Home</Link>
         <span>&gt;</span>
         <Link href="/parts" className="hover:text-graphite">UAV Parts</Link>
@@ -202,7 +202,7 @@ export function ProductDetailClient({
                     {brand.title}
                   </Link>
                 ) : null}
-                <p className="text-[12px] font-semibold text-text-muted uppercase tracking-wider">{category}</p>
+                <p className="text-[14px] font-semibold text-text-muted tracking-wider">{category}</p>
                 <h1 className="mt-1 text-[26px] font-extrabold tracking-[-0.03em] text-graphite md:text-[30px]">
                   {title}
                 </h1>
@@ -213,12 +213,12 @@ export function ProductDetailClient({
                 )}
 
                 {/* Reviews & SKU */}
-                <div className="mt-3 flex items-center gap-2 text-[12px] text-text-secondary">
-                  <span className="inline-flex items-center gap-1 rounded bg-surface-soft px-2 py-0.5 text-[11px] font-medium text-text-muted border border-border">
+                <div className="mt-3 flex items-center gap-2 text-[14px] text-text-secondary">
+                  <span className="inline-flex items-center gap-1 rounded bg-surface-soft px-2 py-0.5 text-[13px] font-medium text-text-muted border border-border">
                     Verified Buyer Reviews Only
                   </span>
                   <span className="text-text-disabled">|</span>
-                  <span className="font-mono text-[11px] text-text-muted">SKU: {sku}</span>
+                  <span className="font-mono text-[13px] text-text-muted">SKU: {sku}</span>
                 </div>
 
                 {/* Price Display */}
@@ -229,7 +229,7 @@ export function ProductDetailClient({
                         ? formatPrice(price.calculated_amount, price.currency_code)
                         : "Price on Request"}
                     </span>
-                    <span className="text-[12px] text-text-muted">(Incl. GST)</span>
+                    <span className="text-[14px] text-text-muted">(Incl. GST)</span>
                   </div>
                 </div>
 
@@ -241,15 +241,15 @@ export function ProductDetailClient({
 
                 {/* Value Propositions Strip */}
                 <div className="mt-6 flex flex-wrap gap-4 border-t border-border pt-5">
-                  <div className="flex items-center gap-2 text-[12px] font-medium text-graphite">
+                  <div className="flex items-center gap-2 text-[14px] font-medium text-graphite">
                     <Zap className="h-4 w-4 text-graphite" />
                     <span>High Efficiency</span>
                   </div>
-                  <div className="flex items-center gap-2 text-[12px] font-medium text-graphite">
+                  <div className="flex items-center gap-2 text-[14px] font-medium text-graphite">
                     <ShieldCheck className="h-4 w-4 text-graphite" />
                     <span>Reliable Performance</span>
                   </div>
-                  <div className="flex items-center gap-2 text-[12px] font-medium text-graphite">
+                  <div className="flex items-center gap-2 text-[14px] font-medium text-graphite">
                     <Award className="h-4 w-4 text-graphite" />
                     <span>Professional Grade</span>
                   </div>
@@ -264,12 +264,12 @@ export function ProductDetailClient({
             <div className="flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-success" />
               <span className="text-[13px] font-bold text-success">In Stock</span>
-              <span className="text-[12px] text-text-muted">Ships in 1–2 business days</span>
+              <span className="text-[14px] text-text-muted">Ships in 1–2 business days</span>
             </div>
 
             {/* Quantity Selector */}
             <div className="mt-6">
-              <label className="text-[12px] font-semibold text-graphite">Quantity</label>
+              <label className="text-[14px] font-semibold text-graphite">Quantity</label>
               <div className="mt-2 flex h-10 w-32 items-center rounded-md border border-border">
                 <button
                   type="button"
@@ -339,7 +339,7 @@ export function ProductDetailClient({
             </div>
 
             {/* Value Bullets */}
-            <div className="mt-6 space-y-3 border-t border-border pt-6 text-[12px] text-text-secondary">
+            <div className="mt-6 space-y-3 border-t border-border pt-6 text-[14px] text-text-secondary">
               <div className="flex items-center gap-3">
                 <Truck className="h-4 w-4 text-graphite shrink-0" />
                 <span>Free shipping on orders over ₹10,000</span>
@@ -408,7 +408,7 @@ export function ProductDetailClient({
                 <div className="mt-4 grid gap-4 sm:grid-cols-2">
                   {/* Column 1 Table */}
                   <div className="overflow-hidden rounded border border-border">
-                    <table className="w-full text-left text-[12px]">
+                    <table className="w-full text-left text-[14px]">
                       <tbody>
                         {techSpecs.additionalSpecifications
                           .slice(0, Math.ceil(techSpecs.additionalSpecifications.length / 2))
@@ -428,7 +428,7 @@ export function ProductDetailClient({
 
                   {/* Column 2 Table */}
                   <div className="overflow-hidden rounded border border-border">
-                    <table className="w-full text-left text-[12px]">
+                    <table className="w-full text-left text-[14px]">
                       <tbody>
                         {techSpecs.additionalSpecifications
                           .slice(Math.ceil(techSpecs.additionalSpecifications.length / 2))
@@ -464,7 +464,7 @@ export function ProductDetailClient({
             {/* Package Contents / What's Included */}
             <div id="whats-included" className="border-t border-border pt-8">
               <h2 className="text-[18px] font-extrabold text-graphite">What&apos;s Included</h2>
-              <ul className="mt-3 grid gap-2 sm:grid-cols-2 text-[12px] text-text-secondary">
+              <ul className="mt-3 grid gap-2 sm:grid-cols-2 text-[14px] text-text-secondary">
                 <li className="flex items-center gap-2 rounded border border-border bg-white p-3">
                   <Check className="h-4 w-4 text-graphite shrink-0" strokeWidth={2.5} />
                   <span>1× {title} unit (Factory Calibrated)</span>
@@ -487,20 +487,20 @@ export function ProductDetailClient({
             {/* Documentation & Compliance */}
             <div id="documentation" className="border-t border-border pt-8">
               <h2 className="text-[18px] font-extrabold text-graphite">Documentation & Compliance</h2>
-              <div className="mt-3 grid gap-3 sm:grid-cols-2 text-[12px]">
+              <div className="mt-3 grid gap-3 sm:grid-cols-2 text-[14px]">
                 <div className="flex items-center justify-between rounded border border-border bg-white p-3">
                   <div className="flex items-center gap-2">
                     <FileText className="h-4 w-4 text-graphite shrink-0" />
                     <span className="font-semibold text-graphite">Engineering Datasheet</span>
                   </div>
-                  <span className="font-mono text-text-muted text-[11px]">PDF (2.4 MB)</span>
+                  <span className="font-mono text-text-muted text-[13px]">PDF (2.4 MB)</span>
                 </div>
                 <div className="flex items-center justify-between rounded border border-border bg-white p-3">
                   <div className="flex items-center gap-2">
                     <ShieldCheck className="h-4 w-4 text-success shrink-0" />
                     <span className="font-semibold text-graphite">CE &amp; RoHS Compliance</span>
                   </div>
-                  <span className="font-mono text-text-muted text-[11px]">Certified</span>
+                  <span className="font-mono text-text-muted text-[13px]">Certified</span>
                 </div>
               </div>
             </div>
@@ -510,7 +510,7 @@ export function ProductDetailClient({
           <div>
             <div className="rounded-lg border border-border bg-white p-6 shadow-xs">
               <h3 className="text-[14px] font-extrabold text-graphite">Key Features</h3>
-              <ul className="mt-4 space-y-3.5 text-[12px] text-text-secondary">
+              <ul className="mt-4 space-y-3.5 text-[14px] text-text-secondary">
                 {technicalHighlights.length > 0 ? (
                   technicalHighlights.map((hl, i) => (
                     <li key={i} className="flex items-start gap-2.5">

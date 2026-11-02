@@ -153,7 +153,7 @@ export function SearchAutocomplete({ className = "" }: { className?: string }) {
           aria-activedescendant={
             activeIndex >= 0 ? `${listId}-option-${activeIndex}` : undefined
           }
-          className="w-full rounded-md border border-border bg-surface-soft py-1.5 pl-3 pr-8 text-[12px] text-graphite placeholder:text-text-muted focus:border-graphite focus:bg-white focus:outline-none"
+          className="w-full rounded-md border border-border bg-surface-soft py-1.5 pl-3 pr-8 text-[14px] text-graphite placeholder:text-text-muted focus:border-graphite focus:bg-white focus:outline-none"
         />
         <button
           type="submit"
@@ -181,7 +181,7 @@ export function SearchAutocomplete({ className = "" }: { className?: string }) {
           style={{ minWidth: "320px" }}
         >
           {suggestions.length === 0 ? (
-            <p className="px-3 py-3 text-[12px] text-text-muted">
+            <p className="px-3 py-3 text-[14px] text-text-muted">
               {loading ? "Searching…" : `No products match “${query.trim()}”.`}
             </p>
           ) : (
@@ -216,10 +216,10 @@ export function SearchAutocomplete({ className = "" }: { className?: string }) {
                     </span>
 
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-[12px] font-semibold text-graphite">
+                      <span className="block truncate text-[14px] font-semibold text-graphite">
                         {suggestion.title}
                       </span>
-                      <span className="block truncate text-[11px] text-text-muted">
+                      <span className="block truncate text-[13px] text-text-muted">
                         {[suggestion.brand, suggestion.category].filter(Boolean).join(" · ") ||
                           "UAV component"}
                         {!suggestion.in_stock ? " · Out of stock" : ""}
@@ -227,7 +227,7 @@ export function SearchAutocomplete({ className = "" }: { className?: string }) {
                     </span>
 
                     {suggestion.price !== null && (
-                      <span className="shrink-0 font-mono text-[12px] font-bold text-graphite">
+                      <span className="shrink-0 font-mono text-[14px] font-bold text-graphite">
                         {formatPrice(suggestion.price, suggestion.currency_code || "INR")}
                       </span>
                     )}
@@ -240,7 +240,7 @@ export function SearchAutocomplete({ className = "" }: { className?: string }) {
           <button
             type="button"
             onClick={() => goToResults(query)}
-            className="block w-full border-t border-border bg-surface-soft px-3 py-2 text-left text-[11px] font-semibold text-graphite hover:bg-accent-hover"
+            className="block w-full border-t border-border bg-surface-soft px-3 py-2 text-left text-[13px] font-semibold text-graphite hover:bg-accent-hover"
           >
             See all results for “{query.trim()}”
           </button>

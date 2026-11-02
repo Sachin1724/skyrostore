@@ -196,14 +196,14 @@ export function CheckoutForm() {
           <div className="flex items-center justify-between border-b border-border pb-4">
             <h2 className="text-[17px] font-extrabold text-graphite">Checkout</h2>
             {!cart?.email ? (
-              <p className="text-[12px] text-text-secondary">
+              <p className="text-[14px] text-text-secondary">
                 Have an account?{" "}
                 <Link href="/account" className="font-semibold text-graphite hover:underline">
                   Sign in
                 </Link>
               </p>
             ) : (
-              <p className="text-[12px] text-text-secondary">{cart.email}</p>
+              <p className="text-[14px] text-text-secondary">{cart.email}</p>
             )}
           </div>
 
@@ -239,7 +239,7 @@ export function CheckoutForm() {
           >
             {submitting ? "Processing…" : "Buy Now"}
           </button>
-          <p className="mt-2 flex items-center justify-center gap-1 text-[11px] text-text-muted">
+          <p className="mt-2 flex items-center justify-center gap-1 text-[13px] text-text-muted">
             <Lock className="h-3 w-3" />
             Secured by Razorpay
           </p>
@@ -254,7 +254,7 @@ export function CheckoutForm() {
             <h3 className="text-[16px] font-extrabold text-graphite">
               Order Summary ({items.length} items)
             </h3>
-            <Link href="/cart" className="text-[12px] font-semibold text-graphite hover:underline">
+            <Link href="/cart" className="text-[14px] font-semibold text-graphite hover:underline">
               Edit Cart
             </Link>
           </div>
@@ -267,14 +267,14 @@ export function CheckoutForm() {
                   {item.thumbnail ? (
                     <Image src={item.thumbnail} alt={item.title} fill className="object-contain p-1" />
                   ) : (
-                    <div className="flex h-full items-center justify-center font-mono text-[10px] text-text-muted">
+                    <div className="flex h-full items-center justify-center font-mono text-[13px] text-text-muted">
                       UAV
                     </div>
                   )}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="font-bold text-[12px] text-graphite truncate">{item.title}</p>
-                  <p className="text-[10px] text-text-muted">Qty: {item.quantity}</p>
+                  <p className="font-bold text-[14px] text-graphite truncate">{item.title}</p>
+                  <p className="text-[13px] text-text-muted">Qty: {item.quantity}</p>
                 </div>
                 <span className="font-mono font-bold text-[13px] text-graphite">
                   {formatPrice(item.total, "INR")}
@@ -283,7 +283,7 @@ export function CheckoutForm() {
             ))}
           </div>
 
-          <div className="mt-5 space-y-2.5 border-t border-border pt-4 text-[12px] text-text-secondary">
+          <div className="mt-5 space-y-2.5 border-t border-border pt-4 text-[14px] text-text-secondary">
             <div className="flex justify-between">
               <span>Items</span>
               <span className="font-mono font-semibold text-graphite">{formatPrice(itemsTotal, "INR")}</span>
@@ -299,41 +299,41 @@ export function CheckoutForm() {
           </div>
 
           {/* Secure Checkout Note */}
-          <div className="mt-5 flex items-center gap-2 rounded bg-surface-soft p-2.5 text-[11px] text-text-secondary">
+          <div className="mt-5 flex items-center gap-2 rounded bg-surface-soft p-2.5 text-[13px] text-text-secondary">
             <ShieldCheck className="h-4 w-4 text-success shrink-0" />
             <span>Secure Checkout: Your payment information is encrypted and secure.</span>
           </div>
         </div>
 
         {/* Why Shop with Skyrostore */}
-        <div className="rounded-lg border border-border bg-white p-5 shadow-xs space-y-3.5 text-[12px]">
+        <div className="rounded-lg border border-border bg-white p-5 shadow-xs space-y-3.5 text-[14px]">
           <h4 className="font-extrabold text-[13px] text-graphite">Why Shop with Skyrostore?</h4>
           <div className="flex items-center gap-3">
             <ShieldCheck className="h-4 w-4 text-success shrink-0" />
             <div>
               <p className="font-bold text-graphite">Genuine Products</p>
-              <p className="text-[10px] text-text-muted">Sourced from trusted brands</p>
+              <p className="text-[13px] text-text-muted">Sourced from trusted brands</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
             <Truck className="h-4 w-4 text-success shrink-0" />
             <div>
               <p className="font-bold text-graphite">Fast Shipping</p>
-              <p className="text-[10px] text-text-muted">Pan India delivery</p>
+              <p className="text-[13px] text-text-muted">Pan India delivery</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
             <FileText className="h-4 w-4 text-success shrink-0" />
             <div>
               <p className="font-bold text-graphite">GST Invoicing</p>
-              <p className="text-[10px] text-text-muted">For businesses and organizations</p>
+              <p className="text-[13px] text-text-muted">For businesses and organizations</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
             <Headphones className="h-4 w-4 text-success shrink-0" />
             <div>
               <p className="font-bold text-graphite">Expert Support</p>
-              <p className="text-[10px] text-text-muted">Pre and post purchase assistance</p>
+              <p className="text-[13px] text-text-muted">Pre and post purchase assistance</p>
             </div>
           </div>
         </div>

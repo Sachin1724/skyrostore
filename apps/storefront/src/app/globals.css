@@ -2,25 +2,25 @@
 
 @theme {
   --color-white: #FFFFFF;
-  --color-page: #FEFEFE;
+  --color-page: #F7FAFD;
   --color-surface: #FFFFFF;
-  --color-surface-soft: #F8F8F8;
-  --color-surface-muted: #F3F4F5;
+  --color-surface-soft: #F4F8FC;
+  --color-surface-muted: #EAF3FC;
 
-  --color-graphite: #181B20;
-  --color-graphite-soft: #25292E;
+  --color-graphite: #0A1A2F;
+  --color-graphite-soft: #13294A;
 
-  --color-text-primary: #181B20;
-  --color-text-secondary: #646A70;
-  --color-text-muted: #8A9096;
-  --color-text-disabled: #AEB3B8;
+  --color-text-primary: #0A1A2F;
+  --color-text-secondary: #3E4F66;
+  --color-text-muted: #5D6B7E;
+  --color-text-disabled: #8C99AA;
 
-  --color-border: #E7EBEE;
-  --color-border-strong: #D9DEE2;
+  --color-border: #DCE7F3;
+  --color-border-strong: #C3D3E6;
 
-  --color-accent: #D2F950;
-  --color-accent-hover: #C5ED43;
-  --color-accent-soft: #F2FBD2;
+  --color-accent: #9CCBF5;
+  --color-accent-hover: #84BDF2;
+  --color-accent-soft: #EAF3FC;
 
   /* Brand, sampled from the Skyro logo. --color-brand passes 4.5:1 with white text. */
   --color-brand: #1D6AC2;
@@ -41,8 +41,9 @@
   --color-info: #4F687D;
   --color-info-soft: #EEF3F6;
 
-  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --font-sans: var(--font-zilla), Georgia, serif;
+  /* No monospace on the storefront: figures use the text face with tabular numbers. */
+  --font-mono: var(--font-zilla), Georgia, serif;
 
   --radius-sm: 4px;
   --radius-md: 6px;
@@ -58,7 +59,7 @@
     background: var(--color-page);
     color: var(--color-text-primary);
     font-family: var(--font-sans);
-    letter-spacing: -0.01em;
+    font-size: 16px;
   }
   h1, h2, h3, h4 {
     letter-spacing: -0.025em;
@@ -69,7 +70,7 @@
   /* Keyboard users need to see where they are. Many controls here set
      focus:outline-none, so a visible ring is restored for keyboard focus only. */
   :where(a, button, input, select, textarea, [tabindex]):focus-visible {
-    outline: 2px solid var(--color-graphite, #181b20);
+    outline: 2px solid var(--color-brand, #1D6AC2);
     outline-offset: 2px;
     border-radius: var(--radius-sm);
   }
@@ -98,4 +99,8 @@
   .success-playing :is(.quad-arm, .quad-motor, .quad-prop, .quad-body, .quad-check, .success-rise) {
     opacity: 0;
   }
+}
+
+@layer base {
+  .font-mono, .tabular-nums { font-variant-numeric: tabular-nums; }
 }

@@ -98,7 +98,7 @@ export function OrderDetail({ orderId }: { orderId: string }) {
           Order #{order.display_id}
         </h1>
         <span
-          className="text-[12px] font-medium text-text-secondary"
+          className="text-[14px] font-medium text-text-secondary"
           style={{
             borderRadius: "var(--radius-sm)",
             background: "var(--color-surface-soft)",
@@ -130,7 +130,7 @@ export function OrderDetail({ orderId }: { orderId: string }) {
             >
               <div>
                 <p className="font-medium text-graphite">{item.title?.replace("[DEV] ", "")}</p>
-                <p className="text-[11px] text-text-muted">Qty: {item.quantity}</p>
+                <p className="text-[13px] text-text-muted">Qty: {item.quantity}</p>
               </div>
               <p className="font-medium text-graphite">
                 {formatPrice(item.total, currency)}

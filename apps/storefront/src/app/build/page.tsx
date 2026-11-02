@@ -45,8 +45,8 @@ export default async function BuildPage() {
                 <ShieldCheck className="h-4 w-4 text-graphite" />
               </div>
               <div>
-                <p className="text-[12px] font-bold text-graphite">Real-time Compatibility</p>
-                <p className="text-[11px] text-text-muted">Avoid incompatible components</p>
+                <p className="text-[14px] font-bold text-graphite">Real-time Compatibility</p>
+                <p className="text-[13px] text-text-muted">Avoid incompatible components</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -54,8 +54,8 @@ export default async function BuildPage() {
                 <Activity className="h-4 w-4 text-graphite" />
               </div>
               <div>
-                <p className="text-[12px] font-bold text-graphite">Live Performance Estimate</p>
-                <p className="text-[11px] text-text-muted">Weight, power and flight time</p>
+                <p className="text-[14px] font-bold text-graphite">Live Performance Estimate</p>
+                <p className="text-[13px] text-text-muted">Weight, power and flight time</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -63,8 +63,8 @@ export default async function BuildPage() {
                 <ShoppingCart className="h-4 w-4 text-graphite" />
               </div>
               <div>
-                <p className="text-[12px] font-bold text-graphite">Add to Cart or Request Quote</p>
-                <p className="text-[11px] text-text-muted">Buy single or bulk quantities</p>
+                <p className="text-[14px] font-bold text-graphite">Add to Cart or Request Quote</p>
+                <p className="text-[13px] text-text-muted">Buy single or bulk quantities</p>
               </div>
             </div>
           </div>

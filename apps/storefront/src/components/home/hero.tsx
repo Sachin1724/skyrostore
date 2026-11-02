@@ -7,7 +7,7 @@ export function Hero() {
       <div className="mx-auto flex flex-col md:flex-row max-w-[1280px] items-center justify-between px-8 py-10 md:px-10 md:py-16">
         <div className="w-full max-w-xl md:w-[52%]">
           <div className="inline-block">
-            <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-success">
+            <span className="text-[13px] font-bold tracking-[0.1em] text-success">
               BUILT FOR PROFESSIONAL APPLICATIONS
             </span>
             <div className="mt-1 h-0.5 w-12 bg-accent" />

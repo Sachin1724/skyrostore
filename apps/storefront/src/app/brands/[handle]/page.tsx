@@ -33,7 +33,7 @@ export default async function BrandPage({ params }: { params: Promise<{ handle: 
       <Header />
       <main className="min-h-screen bg-surface-soft">
         <div className="mx-auto max-w-[1280px] px-8 py-10 md:px-10">
-          <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-[12px] font-medium text-text-muted">
+          <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-[14px] font-medium text-text-muted">
             <Link href="/" className="hover:text-graphite">Home</Link>
             <span>&gt;</span>
             <Link href="/brands" className="hover:text-graphite">Brands</Link>
@@ -51,7 +51,7 @@ export default async function BrandPage({ params }: { params: Promise<{ handle: 
                 <h2 className="flex items-baseline gap-3 text-[16px] font-bold text-graphite">
                   {group.label}
                   {group.handle ? (
-                    <Link href={`/parts?category=${group.handle}&brand=${brand.handle}`} className="text-[12px] font-semibold text-text-secondary hover:text-graphite hover:underline">
+                    <Link href={`/parts?category=${group.handle}&brand=${brand.handle}`} className="text-[14px] font-semibold text-text-secondary hover:text-graphite hover:underline">
                       View in catalogue
                     </Link>
                   ) : null}

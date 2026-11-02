@@ -26,7 +26,7 @@ export default function BulkOrdersLandingPage() {
       <Header />
       <main className="mx-auto max-w-[1280px] px-8 py-10 md:px-10">
         {/* Breadcrumb */}
-        <nav className="text-[11px] font-mono uppercase tracking-[0.08em] text-text-muted">
+        <nav className="text-[13px] font-mono tracking-[0.08em] text-text-muted">
           <Link href="/" className="hover:text-text-secondary">Home</Link>
           <span className="mx-2 text-text-disabled">/</span>
           <span className="text-graphite">Bulk & Custom Orders</span>
@@ -36,7 +36,7 @@ export default function BulkOrdersLandingPage() {
         <div className="mt-8 grid gap-10 lg:grid-cols-2 lg:items-center">
           <div>
             <div
-              className="inline-flex items-center gap-2 bg-surface-soft px-3 py-1 font-mono text-[11px] font-medium tracking-[0.08em] text-graphite"
+              className="inline-flex items-center gap-2 bg-surface-soft px-3 py-1 font-mono text-[13px] font-medium tracking-[0.08em] text-graphite"
               style={{ borderRadius: "var(--radius-sm)", border: "1px solid var(--color-border)" }}
             >
               <Cpu className="h-3.5 w-3.5 text-accent" />
@@ -105,7 +105,7 @@ export default function BulkOrdersLandingPage() {
                 >
                   <Icon className="h-5 w-5 text-graphite" strokeWidth={1.8} />
                   <h3 className="mt-2 text-[13px] font-bold text-graphite">{card.title}</h3>
-                  <p className="mt-1 text-[11px] leading-relaxed text-text-muted">{card.desc}</p>
+                  <p className="mt-1 text-[13px] leading-relaxed text-text-muted">{card.desc}</p>
                 </div>
               );
             })}
@@ -149,11 +149,11 @@ export default function BulkOrdersLandingPage() {
                 className="bg-surface p-5"
                 style={{ borderRadius: "var(--radius-md)", border: "1px solid var(--color-border)" }}
               >
-                <span className="font-mono text-[12px] font-bold text-accent bg-graphite px-2 py-0.5 rounded-xs">
+                <span className="font-mono text-[14px] font-bold text-accent bg-graphite px-2 py-0.5 rounded-xs">
                   STEP {step.step}
                 </span>
                 <h3 className="mt-3 text-[14px] font-bold text-graphite">{step.title}</h3>
-                <p className="mt-1 text-[12px] leading-relaxed text-text-muted">{step.desc}</p>
+                <p className="mt-1 text-[14px] leading-relaxed text-text-muted">{step.desc}</p>
               </div>
             ))}
           </div>
@@ -192,7 +192,7 @@ export default function BulkOrdersLandingPage() {
                 style={{ borderRadius: "var(--radius-sm)", border: "1px solid var(--color-border)" }}
               >
                 <h3 className="text-[14px] font-bold text-graphite">{scenario.title}</h3>
-                <ul className="mt-3 space-y-2 text-[12px] text-text-secondary">
+                <ul className="mt-3 space-y-2 text-[14px] text-text-secondary">
                   {scenario.specs.map((s) => (
                     <li key={s} className="flex items-center gap-2">
                       <CheckCircle2 className="h-3.5 w-3.5 text-success shrink-0" />

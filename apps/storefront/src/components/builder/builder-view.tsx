@@ -233,7 +233,7 @@ export function BuilderView({
                 }`}
               >
                 <div
-                  className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${
+                  className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[13px] font-bold ${
                     isCurrent
                       ? "bg-accent text-graphite"
                       : isCompleted
@@ -244,10 +244,10 @@ export function BuilderView({
                   {isCompleted && !isCurrent ? <Check className="h-3.5 w-3.5" /> : step.stepNum}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-[12px] leading-tight font-semibold text-graphite truncate">
+                  <p className="text-[14px] leading-tight font-semibold text-graphite truncate">
                     {step.label}
                   </p>
-                  <p className="text-[10px] text-text-muted truncate">
+                  <p className="text-[13px] text-text-muted truncate">
                     {step.sublabel}
                   </p>
                 </div>
@@ -262,19 +262,19 @@ export function BuilderView({
         {/* Step Header */}
         <div className="flex flex-col justify-between gap-2 border-b border-border pb-4 sm:flex-row sm:items-center">
           <div>
-            <span className="text-[11px] font-bold text-text-muted uppercase tracking-wider">
+            <span className="text-[13px] font-bold text-text-muted tracking-wider">
               Step {currentStep.stepNum} of 11
             </span>
             <h2 className="text-[20px] font-extrabold text-graphite">
               Select a {currentStep.label}
             </h2>
-            <p className="text-[12px] text-text-secondary">
+            <p className="text-[14px] text-text-secondary">
               Choose a {currentStep.label.toLowerCase()} that matches your application and motor configuration.
             </p>
           </div>
           <button
             type="button"
-            className="flex items-center gap-1.5 self-start rounded-md border border-border bg-white px-3 py-1.5 text-[11px] font-semibold text-text-secondary hover:bg-surface-soft hover:text-graphite"
+            className="flex items-center gap-1.5 self-start rounded-md border border-border bg-white px-3 py-1.5 text-[13px] font-semibold text-text-secondary hover:bg-surface-soft hover:text-graphite"
           >
             <BookOpen className="h-3.5 w-3.5" />
             Learn about {currentStep.label.toLowerCase()}s
@@ -283,7 +283,7 @@ export function BuilderView({
 
         {/* Filter Tabs for Frames */}
         {currentStep.id === "frame" && (
-          <div className="mt-4 flex gap-2 overflow-x-auto pb-2 border-b border-border text-[12px]">
+          <div className="mt-4 flex gap-2 overflow-x-auto pb-2 border-b border-border text-[14px]">
             {[
               { id: "all", label: "All Frames" },
               { id: "quad", label: "Quadcopters" },
@@ -343,10 +343,10 @@ export function BuilderView({
                     {/* Title & Subtitle */}
                     <div>
                       <h3 className="text-[13px] font-bold text-graphite">{frame.title}</h3>
-                      <p className="text-[11px] text-text-muted">{frame.subtitle}</p>
+                      <p className="text-[13px] text-text-muted">{frame.subtitle}</p>
 
                       {/* Technical Specs List */}
-                      <div className="mt-3 space-y-1.5 border-t border-border pt-2 text-[11px]">
+                      <div className="mt-3 space-y-1.5 border-t border-border pt-2 text-[13px]">
                         {frame.specs.map((s) => (
                           <div key={s.label} className="flex justify-between text-text-secondary">
                             <span>{s.label}</span>
@@ -365,13 +365,13 @@ export function BuilderView({
                           </p>
                           <div className="flex items-center gap-1">
                             <span className="h-1.5 w-1.5 rounded-full bg-success" />
-                            <span className="text-[10px] font-medium text-success">In Stock</span>
+                            <span className="text-[13px] font-medium text-success">In Stock</span>
                           </div>
                         </div>
                         <button
                           type="button"
                           onClick={() => handleSelectFrame(frame)}
-                          className={`rounded px-4 py-1.5 text-[12px] font-bold transition-all ${
+                          className={`rounded px-4 py-1.5 text-[14px] font-bold transition-all ${
                             isSelected
                               ? "bg-graphite text-white"
                               : "border border-border bg-white text-graphite hover:bg-surface-soft"
@@ -402,7 +402,7 @@ export function BuilderView({
                         {comp.title?.replace("[DEV] ", "")}
                       </h3>
                       {comp.weight_g && (
-                        <p className="text-[11px] text-text-muted mt-1">{comp.weight_g} g</p>
+                        <p className="text-[13px] text-text-muted mt-1">{comp.weight_g} g</p>
                       )}
                     </div>
                     <div className="mt-4 flex items-center justify-between border-t border-border pt-3">
@@ -412,7 +412,7 @@ export function BuilderView({
                       <button
                         type="button"
                         onClick={() => handleSelectComponent(currentStep.id, comp)}
-                        className={`rounded px-3 py-1.5 text-[11px] font-bold ${
+                        className={`rounded px-3 py-1.5 text-[13px] font-bold ${
                           isSelected ? "bg-graphite text-white" : "border border-border bg-white text-graphite"
                         }`}
                       >
@@ -435,7 +435,7 @@ export function BuilderView({
             <h3 className="text-[14px] font-extrabold text-graphite">Your Build</h3>
             <button
               type="button"
-              className="flex items-center gap-1 text-[11px] font-semibold text-text-secondary hover:text-graphite"
+              className="flex items-center gap-1 text-[13px] font-semibold text-text-secondary hover:text-graphite"
             >
               <Bookmark className="h-3.5 w-3.5" />
               Save
@@ -449,11 +449,11 @@ export function BuilderView({
               return (
                 <div
                   key={step.id}
-                  className="flex items-center justify-between rounded border border-border bg-surface-soft p-2.5 text-[12px]"
+                  className="flex items-center justify-between rounded border border-border bg-surface-soft p-2.5 text-[14px]"
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
                     <span
-                      className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold ${
+                      className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[13px] font-bold ${
                         selectedItem ? "bg-accent text-graphite" : "bg-surface-muted text-text-muted"
                       }`}
                     >
@@ -463,7 +463,7 @@ export function BuilderView({
                       <p className="font-semibold text-graphite truncate">
                         {selectedItem ? selectedItem.title : step.label}
                       </p>
-                      <p className="text-[10px] text-text-muted">
+                      <p className="text-[13px] text-text-muted">
                         {selectedItem ? formatPrice(selectedItem.price, "INR") : step.required ? "Not selected +" : "Optional +"}
                       </p>
                     </div>
@@ -478,8 +478,8 @@ export function BuilderView({
 
           {/* Estimated Summary */}
           <div className="mt-6 border-t border-border pt-4">
-            <h4 className="text-[12px] font-bold text-graphite">Estimated Summary</h4>
-            <div className="mt-2 space-y-1 text-[12px]">
+            <h4 className="text-[14px] font-bold text-graphite">Estimated Summary</h4>
+            <div className="mt-2 space-y-1 text-[14px]">
               {selectedParts.frame && (
                 <div className="flex justify-between text-text-secondary">
                   <span>Frame (1)</span>
@@ -515,7 +515,7 @@ export function BuilderView({
           </div>
 
           {/* Compatibility Status Alert Box */}
-          <div className="mt-4 flex items-center gap-2.5 rounded border border-success/30 bg-success/10 p-3 text-[11px] text-graphite">
+          <div className="mt-4 flex items-center gap-2.5 rounded border border-success/30 bg-success/10 p-3 text-[13px] text-graphite">
             <CheckCircle2 className="h-4 w-4 text-success shrink-0" />
             <div>
               <p className="font-bold text-success">Compatibility Check</p>

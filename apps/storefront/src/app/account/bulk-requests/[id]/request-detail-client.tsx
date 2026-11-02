@@ -91,17 +91,17 @@ export function RequestDetailClient({ initialRequest }: RequestDetailClientProps
             <h1 className="text-[26px] font-bold text-graphite tracking-tight">
               {request.reference_no}
             </h1>
-            <span className="font-mono text-[11px] font-bold uppercase tracking-wider bg-surface-soft px-2.5 py-1 rounded border border-color-border text-graphite">
+            <span className="font-mono text-[13px] font-bold tracking-wider bg-surface-soft px-2.5 py-1 rounded border border-color-border text-graphite">
               {request.request_type.replace(/_/g, " ")}
             </span>
           </div>
-          <p className="mt-1 font-mono text-[12px] text-text-muted">
+          <p className="mt-1 font-mono text-[14px] text-text-muted">
             Submitted on {new Date(request.created_at).toLocaleDateString()} &bull; ID: {request.id}
           </p>
         </div>
 
         <div>
-          <span className="font-mono text-[12px] font-semibold px-3 py-1 rounded border border-color-border bg-surface">
+          <span className="font-mono text-[14px] font-semibold px-3 py-1 rounded border border-color-border bg-surface">
             STATUS: <span className="text-graphite font-bold">{request.status}</span>
           </span>
         </div>
@@ -139,7 +139,7 @@ export function RequestDetailClient({ initialRequest }: RequestDetailClientProps
               </h2>
             </div>
             {request.quote_valid_until && (
-              <div className="flex items-center gap-1.5 text-[12px] font-mono">
+              <div className="flex items-center gap-1.5 text-[14px] font-mono">
                 <Clock className="h-3.5 w-3.5 text-text-muted" />
                 <span className={isExpired ? "text-rose-600 font-bold" : "text-text-muted"}>
                   Valid Until: {new Date(request.quote_valid_until).toLocaleDateString()}
@@ -153,7 +153,7 @@ export function RequestDetailClient({ initialRequest }: RequestDetailClientProps
           <div className="mt-6 space-y-3">
             <div className="overflow-x-auto rounded border border-color-border">
               <table className="w-full text-left text-[13px]">
-                <thead className="bg-surface-soft font-mono text-[11px] uppercase text-text-muted border-b border-color-border">
+                <thead className="bg-surface-soft font-mono text-[13px] text-text-muted border-b border-color-border">
                   <tr>
                     <th className="py-2.5 px-4">Item</th>
                     <th className="py-2.5 px-4 text-center">Quantity</th>
@@ -199,7 +199,7 @@ export function RequestDetailClient({ initialRequest }: RequestDetailClientProps
             </div>
 
             {request.quote_notes && (
-              <div className="mt-4 p-3 bg-surface-soft rounded text-[12px] text-text-secondary border border-color-border">
+              <div className="mt-4 p-3 bg-surface-soft rounded text-[14px] text-text-secondary border border-color-border">
                 <span className="font-bold text-graphite block">Engineering Notes:</span>
                 {request.quote_notes}
               </div>
@@ -263,27 +263,27 @@ export function RequestDetailClient({ initialRequest }: RequestDetailClientProps
 
           <div className="mt-4 grid gap-4 sm:grid-cols-3 text-[13px]">
             <div>
-              <span className="text-[11px] font-mono uppercase text-text-muted block">Intended Application</span>
+              <span className="text-[13px] font-mono text-text-muted block">Intended Application</span>
               <p className="font-medium text-graphite">{request.intended_application || "General Aerial Operation"}</p>
             </div>
             <div>
-              <span className="text-[11px] font-mono uppercase text-text-muted block">Target Payload</span>
+              <span className="text-[13px] font-mono text-text-muted block">Target Payload</span>
               <p className="font-medium text-graphite">{request.target_payload_g ? `${request.target_payload_g}g` : "Not specified"}</p>
             </div>
             <div>
-              <span className="text-[11px] font-mono uppercase text-text-muted block">Target Flight Time</span>
+              <span className="text-[13px] font-mono text-text-muted block">Target Flight Time</span>
               <p className="font-medium text-graphite">{request.target_flight_time_min ? `${request.target_flight_time_min} mins` : "Not specified"}</p>
             </div>
             <div>
-              <span className="text-[11px] font-mono uppercase text-text-muted block">Operating Environment</span>
+              <span className="text-[13px] font-mono text-text-muted block">Operating Environment</span>
               <p className="font-medium text-graphite">{request.operating_environment || "Standard"}</p>
             </div>
             <div>
-              <span className="text-[11px] font-mono uppercase text-text-muted block">Sensors / Payload</span>
+              <span className="text-[13px] font-mono text-text-muted block">Sensors / Payload</span>
               <p className="font-medium text-graphite">{request.sensors_payload || "Standard"}</p>
             </div>
             <div>
-              <span className="text-[11px] font-mono uppercase text-text-muted block">Telemetry & Link</span>
+              <span className="text-[13px] font-mono text-text-muted block">Telemetry & Link</span>
               <p className="font-medium text-graphite">{request.telemetry_requirements || "Standard"}</p>
             </div>
           </div>
@@ -301,19 +301,19 @@ export function RequestDetailClient({ initialRequest }: RequestDetailClientProps
 
         <div className="mt-4 grid gap-4 sm:grid-cols-3 text-[13px]">
           <div>
-            <span className="text-[11px] font-mono uppercase text-text-muted block">Contact Person</span>
+            <span className="text-[13px] font-mono text-text-muted block">Contact Person</span>
             <p className="font-medium text-graphite">{request.contact_name}</p>
-            <p className="text-[12px] text-text-secondary">{request.email}</p>
+            <p className="text-[14px] text-text-secondary">{request.email}</p>
           </div>
           <div>
-            <span className="text-[11px] font-mono uppercase text-text-muted block">Organization / GST</span>
+            <span className="text-[13px] font-mono text-text-muted block">Organization / GST</span>
             <p className="font-medium text-graphite">{request.company_name || "Direct Purchaser"}</p>
-            <p className="text-[12px] font-mono text-text-muted">{request.gstin ? `GST: ${request.gstin}` : "No GST provided"}</p>
+            <p className="text-[14px] font-mono text-text-muted">{request.gstin ? `GST: ${request.gstin}` : "No GST provided"}</p>
           </div>
           <div>
-            <span className="text-[11px] font-mono uppercase text-text-muted block">Destination</span>
+            <span className="text-[13px] font-mono text-text-muted block">Destination</span>
             <p className="font-medium text-graphite">{request.delivery_city ? `${request.delivery_city}, ${request.delivery_state || ""}` : "Pan-India Express"}</p>
-            <p className="text-[12px] text-text-muted">Target Timeframe: {request.timeframe_weeks ? `${request.timeframe_weeks} weeks` : "Standard"}</p>
+            <p className="text-[14px] text-text-muted">Target Timeframe: {request.timeframe_weeks ? `${request.timeframe_weeks} weeks` : "Standard"}</p>
           </div>
         </div>
       </div>
@@ -329,11 +329,11 @@ export function RequestDetailClient({ initialRequest }: RequestDetailClientProps
           </h2>
           <div className="mt-4 space-y-3">
             {request.audit_logs.map((log: any) => (
-              <div key={log.id} className="flex items-start gap-3 text-[12px]">
-                <span className="font-mono text-[11px] text-text-muted shrink-0 w-36">
+              <div key={log.id} className="flex items-start gap-3 text-[14px]">
+                <span className="font-mono text-[13px] text-text-muted shrink-0 w-36">
                   {new Date(log.created_at).toLocaleString()}
                 </span>
-                <span className="font-semibold text-graphite shrink-0 w-28 uppercase">
+                <span className="font-semibold text-graphite shrink-0 w-28 ">
                   [{log.action}]
                 </span>
                 <span className="text-text-secondary">{log.message}</span>

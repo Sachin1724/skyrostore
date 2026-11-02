@@ -162,7 +162,7 @@ export function SupportView() {
         <div className="mx-auto flex max-w-[1280px] flex-col justify-between px-8 py-10 md:flex-row md:items-center md:px-12">
           {/* Left Text & Search */}
           <div className="relative z-10 max-w-xl">
-            <span className="text-[11px] font-bold uppercase tracking-widest text-[#84cc16]">
+            <span className="text-[13px] font-bold tracking-widest text-[#84cc16]">
               SUPPORT CENTER
             </span>
             <h1 className="mt-2 text-[36px] font-extrabold tracking-tight text-white md:text-[44px]">
@@ -191,7 +191,7 @@ export function SupportView() {
             </div>
 
             {/* Popular Searches Tag Strip */}
-            <div className="mt-4 flex flex-wrap items-center gap-2 text-[12px] text-gray-400">
+            <div className="mt-4 flex flex-wrap items-center gap-2 text-[14px] text-gray-400">
               <span className="font-medium text-gray-300">Popular searches:</span>
               {[
                 "Track Order",
@@ -204,7 +204,7 @@ export function SupportView() {
                   key={tag}
                   type="button"
                   onClick={() => setSearchQuery(tag)}
-                  className="rounded-full border border-gray-700 bg-[#22272e] px-3 py-1 text-[11px] text-gray-300 transition-colors hover:border-[#84cc16] hover:text-white"
+                  className="rounded-full border border-gray-700 bg-[#22272e] px-3 py-1 text-[13px] text-gray-300 transition-colors hover:border-[#84cc16] hover:text-white"
                 >
                   {tag}
                 </button>
@@ -249,7 +249,7 @@ export function SupportView() {
                     <h3 className="text-[14px] font-bold text-graphite group-hover:text-[#65a30d]">
                       {topic.title}
                     </h3>
-                    <p className="mt-0.5 text-[12px] leading-relaxed text-text-muted">
+                    <p className="mt-0.5 text-[14px] leading-relaxed text-text-muted">
                       {topic.desc}
                     </p>
                   </div>
@@ -267,7 +267,7 @@ export function SupportView() {
         <div className="space-y-4 lg:col-span-4">
           <div className="flex items-center justify-between">
             <h3 className="text-[16px] font-bold text-graphite">Recommended Articles</h3>
-            <span className="cursor-pointer text-[12px] font-bold text-text-secondary hover:text-graphite">
+            <span className="cursor-pointer text-[14px] font-bold text-text-secondary hover:text-graphite">
               View all &rarr;
             </span>
           </div>
@@ -288,10 +288,10 @@ export function SupportView() {
                     />
                   </div>
                   <div>
-                    <h4 className="text-[12px] font-bold text-graphite group-hover:text-[#65a30d]">
+                    <h4 className="text-[14px] font-bold text-graphite group-hover:text-[#65a30d]">
                       {article.title}
                     </h4>
-                    <p className="line-clamp-1 text-[11px] text-text-muted">
+                    <p className="line-clamp-1 text-[13px] text-text-muted">
                       {article.description}
                     </p>
                   </div>
@@ -312,7 +312,7 @@ export function SupportView() {
               </div>
               <div>
                 <h3 className="text-[15px] font-bold text-graphite">Track Your Order</h3>
-                <p className="text-[11px] text-text-muted">
+                <p className="text-[13px] text-text-muted">
                   Enter your order number to get real-time updates.
                 </p>
               </div>
@@ -324,11 +324,11 @@ export function SupportView() {
                 placeholder="Enter order number (e.g. #SKY-2026-00124)"
                 value={trackingNumber}
                 onChange={(e) => setTrackingNumber(e.target.value)}
-                className="w-full rounded-md border border-border px-3.5 py-2.5 text-[12px] text-graphite placeholder:text-text-disabled focus:border-graphite focus:outline-none"
+                className="w-full rounded-md border border-border px-3.5 py-2.5 text-[14px] text-graphite placeholder:text-text-disabled focus:border-graphite focus:outline-none"
               />
               <button
                 type="submit"
-                className="flex w-full items-center justify-center gap-2 rounded-md bg-graphite py-2.5 text-[12px] font-bold text-white transition-colors hover:bg-graphite-soft"
+                className="flex w-full items-center justify-center gap-2 rounded-md bg-graphite py-2.5 text-[14px] font-bold text-white transition-colors hover:bg-graphite-soft"
               >
                 <span>Track Order</span>
                 <ArrowRight className="h-3.5 w-3.5" />
@@ -336,13 +336,13 @@ export function SupportView() {
             </form>
 
             {trackingResult && (
-              <div className="mt-3 rounded border border-emerald-200 bg-emerald-50 p-3 text-[12px] text-emerald-800">
+              <div className="mt-3 rounded border border-emerald-200 bg-emerald-50 p-3 text-[14px] text-emerald-800">
                 {trackingResult}
               </div>
             )}
 
             {/* Need help with a recent order callout */}
-            <div className="mt-5 rounded-lg border border-emerald-100 bg-[#f0fdf4] p-4 text-[12px]">
+            <div className="mt-5 rounded-lg border border-emerald-100 bg-[#f0fdf4] p-4 text-[14px]">
               <div className="flex items-start gap-2.5">
                 <CheckCircle2 className="h-4 w-4 shrink-0 text-[#16a34a]" />
                 <div>
@@ -369,17 +369,17 @@ export function SupportView() {
               </div>
               <div>
                 <h3 className="text-[15px] font-bold text-graphite">Contact Support</h3>
-                <p className="text-[11px] text-text-muted">Our team is here to help you.</p>
+                <p className="text-[13px] text-text-muted">Our team is here to help you.</p>
               </div>
             </div>
 
-            <div className="mt-4 space-y-3 text-[12px]">
+            <div className="mt-4 space-y-3 text-[14px]">
               <div className="flex items-center justify-between rounded-lg border border-border p-3 transition-colors hover:bg-surface-soft">
                 <div className="flex items-center gap-3">
                   <MessageSquare className="h-4 w-4 text-graphite" />
                   <div>
                     <p className="font-bold text-graphite">Live Chat</p>
-                    <p className="text-[10px] text-text-muted">Available 9 AM - 6 PM (IST)</p>
+                    <p className="text-[13px] text-text-muted">Available 9 AM - 6 PM (IST)</p>
                   </div>
                 </div>
                 <ChevronRight className="h-4 w-4 text-text-muted" />
@@ -390,7 +390,7 @@ export function SupportView() {
                   <Mail className="h-4 w-4 text-graphite" />
                   <div>
                     <p className="font-bold text-graphite">Email Support</p>
-                    <p className="text-[10px] text-text-muted">support@skyrostore.com • Replies in 24h</p>
+                    <p className="text-[13px] text-text-muted">support@skyrostore.com • Replies in 24h</p>
                   </div>
                 </div>
                 <ChevronRight className="h-4 w-4 text-text-muted" />
@@ -401,7 +401,7 @@ export function SupportView() {
                   <Phone className="h-4 w-4 text-graphite" />
                   <div>
                     <p className="font-bold text-graphite">Phone Support</p>
-                    <p className="text-[10px] text-text-muted">+91 98765 43210 • Mon - Sat, 9 AM - 6 PM</p>
+                    <p className="text-[13px] text-text-muted">+91 98765 43210 • Mon - Sat, 9 AM - 6 PM</p>
                   </div>
                 </div>
                 <ChevronRight className="h-4 w-4 text-text-muted" />
@@ -414,7 +414,7 @@ export function SupportView() {
         <div className="space-y-4 lg:col-span-4">
           <div className="flex items-center justify-between">
             <h3 className="text-[16px] font-bold text-graphite">Frequently Asked Questions</h3>
-            <span className="cursor-pointer text-[12px] font-bold text-text-secondary hover:text-graphite">
+            <span className="cursor-pointer text-[14px] font-bold text-text-secondary hover:text-graphite">
               View all &rarr;
             </span>
           </div>
@@ -440,7 +440,7 @@ export function SupportView() {
                     />
                   </button>
                   {isOpen && (
-                    <div className="border-t border-border bg-surface-soft/30 px-4 py-3 text-[12px] leading-relaxed text-text-secondary">
+                    <div className="border-t border-border bg-surface-soft/30 px-4 py-3 text-[14px] leading-relaxed text-text-secondary">
                       {faq.answer}
                     </div>
                   )}

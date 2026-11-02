@@ -392,7 +392,7 @@ export function BulkOrderRequestForm() {
             </div>
             <div>
               <h3 className="text-[15px] font-bold text-graphite">Bulk Purchase</h3>
-              <p className="mt-0.5 text-[12px] text-text-muted">
+              <p className="mt-0.5 text-[14px] text-text-muted">
                 Multiple units of existing products
               </p>
             </div>
@@ -424,7 +424,7 @@ export function BulkOrderRequestForm() {
             </div>
             <div>
               <h3 className="text-[15px] font-bold text-graphite">Custom UAV Build</h3>
-              <p className="mt-0.5 text-[12px] text-text-muted">
+              <p className="mt-0.5 text-[14px] text-text-muted">
                 Tailored configuration for your needs
               </p>
             </div>
@@ -456,7 +456,7 @@ export function BulkOrderRequestForm() {
             </div>
             <div>
               <h3 className="text-[15px] font-bold text-graphite">Bulk Custom Builds</h3>
-              <p className="mt-0.5 text-[12px] text-text-muted">
+              <p className="mt-0.5 text-[14px] text-text-muted">
                 Multiple custom UAVs
               </p>
             </div>
@@ -497,7 +497,7 @@ export function BulkOrderRequestForm() {
                     className="flex items-center gap-2.5 py-1 text-left transition-opacity hover:opacity-80"
                   >
                     <div
-                      className={`flex h-7 w-7 items-center justify-center rounded-full text-[12px] font-bold ${
+                      className={`flex h-7 w-7 items-center justify-center rounded-full text-[14px] font-bold ${
                         isActive
                           ? "bg-[#84cc16] text-white"
                           : isPassed
@@ -509,7 +509,7 @@ export function BulkOrderRequestForm() {
                     </div>
                     <div className="hidden sm:block">
                       <p
-                        className={`text-[12px] font-bold ${
+                        className={`text-[14px] font-bold ${
                           isActive ? "text-graphite" : "text-text-secondary"
                         }`}
                       >
@@ -606,7 +606,7 @@ export function BulkOrderRequestForm() {
                 {/* Products Table matching mockup */}
                 <div className="overflow-x-auto rounded-lg border border-border">
                   <table className="w-full text-left text-[13px]">
-                    <thead className="border-b border-border bg-surface-soft text-[11px] font-bold uppercase tracking-wider text-text-muted">
+                    <thead className="border-b border-border bg-surface-soft text-[13px] font-bold tracking-wider text-text-muted">
                       <tr>
                         <th className="px-4 py-3">Product</th>
                         <th className="px-4 py-3">Unit Price</th>
@@ -630,7 +630,7 @@ export function BulkOrderRequestForm() {
                               </div>
                               <div>
                                 <p className="font-bold text-graphite">{item.title}</p>
-                                <p className="text-[11px] text-text-muted">{item.subtitle}</p>
+                                <p className="text-[13px] text-text-muted">{item.subtitle}</p>
                               </div>
                             </div>
                           </td>
@@ -677,7 +677,7 @@ export function BulkOrderRequestForm() {
                         <tr>
                           <td colSpan={5} className="py-8 text-center text-text-muted">
                             <p className="font-semibold text-graphite text-[14px]">No components added to request yet</p>
-                            <p className="mt-1 text-[12px] text-text-secondary">Click &quot;Add Another Product&quot; below or define custom requirements in Step 2.</p>
+                            <p className="mt-1 text-[14px] text-text-secondary">Click &quot;Add Another Product&quot; below or define custom requirements in Step 2.</p>
                           </td>
                         </tr>
                       ) : filteredItems.length === 0 ? (
@@ -696,7 +696,7 @@ export function BulkOrderRequestForm() {
                   <button
                     type="button"
                     onClick={() => setShowAddCatalogModal(true)}
-                    className="inline-flex items-center gap-2 rounded border border-border bg-white px-4 py-2 text-[12px] font-bold text-graphite transition-colors hover:bg-surface-soft"
+                    className="inline-flex items-center gap-2 rounded border border-border bg-white px-4 py-2 text-[14px] font-bold text-graphite transition-colors hover:bg-surface-soft"
                   >
                     <Plus className="h-3.5 w-3.5" />
                     Add Another Product
@@ -705,7 +705,7 @@ export function BulkOrderRequestForm() {
                   <button
                     type="button"
                     onClick={handleClearAll}
-                    className="inline-flex items-center gap-1.5 text-[12px] font-medium text-rose-600 transition-colors hover:text-rose-700"
+                    className="inline-flex items-center gap-1.5 text-[14px] font-medium text-rose-600 transition-colors hover:text-rose-700"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                     Clear All
@@ -719,7 +719,7 @@ export function BulkOrderRequestForm() {
                       setRequestType("CUSTOM_BUILD");
                       setCurrentStep(2);
                     }}
-                    className="inline-flex items-center gap-2 rounded border border-border bg-white px-5 py-2.5 text-[12px] font-bold text-graphite transition-colors hover:bg-surface-soft"
+                    className="inline-flex items-center gap-2 rounded border border-border bg-white px-5 py-2.5 text-[14px] font-bold text-graphite transition-colors hover:bg-surface-soft"
                   >
                     Switch to Custom Build
                     <ArrowRight className="h-3.5 w-3.5" />
@@ -742,7 +742,7 @@ export function BulkOrderRequestForm() {
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div>
-                    <label className="text-[12px] font-medium text-text-secondary">
+                    <label className="text-[14px] font-medium text-text-secondary">
                       Intended Application
                     </label>
                     <input
@@ -754,7 +754,7 @@ export function BulkOrderRequestForm() {
                     />
                   </div>
                   <div>
-                    <label className="text-[12px] font-medium text-text-secondary">
+                    <label className="text-[14px] font-medium text-text-secondary">
                       Target Payload (grams)
                     </label>
                     <input
@@ -766,7 +766,7 @@ export function BulkOrderRequestForm() {
                     />
                   </div>
                   <div>
-                    <label className="text-[12px] font-medium text-text-secondary">
+                    <label className="text-[14px] font-medium text-text-secondary">
                       Target Flight Time (minutes)
                     </label>
                     <input
@@ -778,7 +778,7 @@ export function BulkOrderRequestForm() {
                     />
                   </div>
                   <div>
-                    <label className="text-[12px] font-medium text-text-secondary">
+                    <label className="text-[14px] font-medium text-text-secondary">
                       Operating Environment
                     </label>
                     <input
@@ -790,7 +790,7 @@ export function BulkOrderRequestForm() {
                     />
                   </div>
                   <div>
-                    <label className="text-[12px] font-medium text-text-secondary">
+                    <label className="text-[14px] font-medium text-text-secondary">
                       Required Sensors / Gimbal Payload
                     </label>
                     <input
@@ -802,7 +802,7 @@ export function BulkOrderRequestForm() {
                     />
                   </div>
                   <div>
-                    <label className="text-[12px] font-medium text-text-secondary">
+                    <label className="text-[14px] font-medium text-text-secondary">
                       Communication / Telemetry
                     </label>
                     <input
@@ -814,7 +814,7 @@ export function BulkOrderRequestForm() {
                     />
                   </div>
                   <div>
-                    <label className="text-[12px] font-medium text-text-secondary">
+                    <label className="text-[14px] font-medium text-text-secondary">
                       Planned Unit Fleet Count
                     </label>
                     <input
@@ -862,7 +862,7 @@ export function BulkOrderRequestForm() {
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div>
-                    <label className="text-[12px] font-medium text-text-secondary">Contact Name *</label>
+                    <label className="text-[14px] font-medium text-text-secondary">Contact Name *</label>
                     <input
                       type="text"
                       required
@@ -873,7 +873,7 @@ export function BulkOrderRequestForm() {
                     />
                   </div>
                   <div>
-                    <label className="text-[12px] font-medium text-text-secondary">Official Email Address *</label>
+                    <label className="text-[14px] font-medium text-text-secondary">Official Email Address *</label>
                     <input
                       type="email"
                       required
@@ -884,7 +884,7 @@ export function BulkOrderRequestForm() {
                     />
                   </div>
                   <div>
-                    <label className="text-[12px] font-medium text-text-secondary">Phone Number</label>
+                    <label className="text-[14px] font-medium text-text-secondary">Phone Number</label>
                     <input
                       type="tel"
                       value={phone}
@@ -894,7 +894,7 @@ export function BulkOrderRequestForm() {
                     />
                   </div>
                   <div>
-                    <label className="text-[12px] font-medium text-text-secondary">Company / Organization</label>
+                    <label className="text-[14px] font-medium text-text-secondary">Company / Organization</label>
                     <input
                       type="text"
                       value={companyName}
@@ -904,7 +904,7 @@ export function BulkOrderRequestForm() {
                     />
                   </div>
                   <div className="sm:col-span-2">
-                    <label className="text-[12px] font-medium text-text-secondary">GSTIN (for B2B Tax Credit)</label>
+                    <label className="text-[14px] font-medium text-text-secondary">GSTIN (for B2B Tax Credit)</label>
                     <input
                       type="text"
                       value={gstin}
@@ -949,7 +949,7 @@ export function BulkOrderRequestForm() {
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div>
-                    <label className="text-[12px] font-medium text-text-secondary">Delivery City</label>
+                    <label className="text-[14px] font-medium text-text-secondary">Delivery City</label>
                     <input
                       type="text"
                       value={deliveryCity}
@@ -959,7 +959,7 @@ export function BulkOrderRequestForm() {
                     />
                   </div>
                   <div>
-                    <label className="text-[12px] font-medium text-text-secondary">Delivery State</label>
+                    <label className="text-[14px] font-medium text-text-secondary">Delivery State</label>
                     <input
                       type="text"
                       value={deliveryState}
@@ -969,7 +969,7 @@ export function BulkOrderRequestForm() {
                     />
                   </div>
                   <div>
-                    <label className="text-[12px] font-medium text-text-secondary">Pincode</label>
+                    <label className="text-[14px] font-medium text-text-secondary">Pincode</label>
                     <input
                       type="text"
                       value={deliveryPincode}
@@ -979,7 +979,7 @@ export function BulkOrderRequestForm() {
                     />
                   </div>
                   <div>
-                    <label className="text-[12px] font-medium text-text-secondary">Required Lead Time (Weeks)</label>
+                    <label className="text-[14px] font-medium text-text-secondary">Required Lead Time (Weeks)</label>
                     <input
                       type="number"
                       min={1}
@@ -989,7 +989,7 @@ export function BulkOrderRequestForm() {
                     />
                   </div>
                   <div className="sm:col-span-2">
-                    <label className="text-[12px] font-medium text-text-secondary">Estimated Budget Range</label>
+                    <label className="text-[14px] font-medium text-text-secondary">Estimated Budget Range</label>
                     <input
                       type="text"
                       value={budgetRange}
@@ -998,7 +998,7 @@ export function BulkOrderRequestForm() {
                     />
                   </div>
                   <div className="sm:col-span-2">
-                    <label className="text-[12px] font-medium text-text-secondary">Additional Notes &amp; Standards</label>
+                    <label className="text-[14px] font-medium text-text-secondary">Additional Notes &amp; Standards</label>
                     <textarea
                       rows={3}
                       value={additionalSpecifications}
@@ -1103,7 +1103,7 @@ export function BulkOrderRequestForm() {
           <div className="rounded-lg border border-border bg-white p-6 shadow-sm">
             <div className="flex items-center justify-between border-b border-border pb-4">
               <h3 className="text-[16px] font-bold text-graphite">Request Summary</h3>
-              <span className="text-[12px] text-text-muted">{items.length} items</span>
+              <span className="text-[14px] text-text-muted">{items.length} items</span>
             </div>
 
             <div className="mt-4 space-y-3 text-[13px]">
@@ -1128,7 +1128,7 @@ export function BulkOrderRequestForm() {
             </div>
 
             {/* Blue Info Callout Box matching mockup */}
-            <div className="mt-5 flex gap-2.5 rounded-lg border border-sky-100 bg-[#f0f7ff] p-3.5 text-[12px] leading-relaxed text-[#1e40af]">
+            <div className="mt-5 flex gap-2.5 rounded-lg border border-sky-100 bg-[#f0f7ff] p-3.5 text-[14px] leading-relaxed text-[#1e40af]">
               <Info className="h-4 w-4 shrink-0 text-[#2563eb]" />
               <span>
                 This is a request for quotation. Final pricing, tax, shipping and availability will be confirmed by our team.
@@ -1141,7 +1141,7 @@ export function BulkOrderRequestForm() {
             <h3 className="text-[15px] font-bold text-graphite">
               Why Choose Bulk Orders?
             </h3>
-            <ul className="mt-4 space-y-3 text-[12px] text-text-secondary">
+            <ul className="mt-4 space-y-3 text-[14px] text-text-secondary">
               {[
                 "Special volume pricing",
                 "Custom configuration support",
@@ -1212,13 +1212,13 @@ export function BulkOrderRequestForm() {
                     </div>
                     <div>
                       <p className="text-[13px] font-bold text-graphite">{item.title}</p>
-                      <p className="text-[11px] text-text-muted">{item.subtitle}</p>
+                      <p className="text-[13px] text-text-muted">{item.subtitle}</p>
                     </div>
                   </div>
                   <button
                     type="button"
                     onClick={() => handleAddCatalogProduct(item)}
-                    className="rounded bg-graphite px-3 py-1.5 text-[12px] font-bold text-white hover:bg-graphite-soft"
+                    className="rounded bg-graphite px-3 py-1.5 text-[14px] font-bold text-white hover:bg-graphite-soft"
                   >
                     Add
                   </button>

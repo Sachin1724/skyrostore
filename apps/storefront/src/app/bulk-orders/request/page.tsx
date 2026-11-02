@@ -19,7 +19,7 @@ export default function BulkOrderRequestPage() {
         <section className="relative overflow-hidden border-b border-border bg-white">
           <div className="mx-auto flex max-w-[1280px] flex-col justify-between px-8 py-8 md:flex-row md:items-center md:px-10">
             <div className="relative z-10 max-w-xl">
-              <span className="text-[11px] font-bold uppercase tracking-widest text-success">
+              <span className="text-[13px] font-bold tracking-widest text-success">
                 BUSINESS SOLUTIONS
               </span>
               <h1 className="mt-2 text-[32px] font-extrabold tracking-tight text-graphite md:text-[40px]">
@@ -49,8 +49,8 @@ export default function BulkOrderRequestPage() {
                 <ShieldCheck className="h-4 w-4 text-graphite" />
               </div>
               <div>
-                <p className="text-[12px] font-bold text-graphite">Volume Pricing</p>
-                <p className="text-[11px] text-text-muted">Competitive rates for bulk quantities</p>
+                <p className="text-[14px] font-bold text-graphite">Volume Pricing</p>
+                <p className="text-[13px] text-text-muted">Competitive rates for bulk quantities</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -58,8 +58,8 @@ export default function BulkOrderRequestPage() {
                 <Wrench className="h-4 w-4 text-graphite" />
               </div>
               <div>
-                <p className="text-[12px] font-bold text-graphite">Custom Builds</p>
-                <p className="text-[11px] text-text-muted">Tailored to your requirements</p>
+                <p className="text-[14px] font-bold text-graphite">Custom Builds</p>
+                <p className="text-[13px] text-text-muted">Tailored to your requirements</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -67,8 +67,8 @@ export default function BulkOrderRequestPage() {
                 <Users className="h-4 w-4 text-graphite" />
               </div>
               <div>
-                <p className="text-[12px] font-bold text-graphite">Expert Consultation</p>
-                <p className="text-[11px] text-text-muted">Technical guidance from our team</p>
+                <p className="text-[14px] font-bold text-graphite">Expert Consultation</p>
+                <p className="text-[13px] text-text-muted">Technical guidance from our team</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -76,8 +76,8 @@ export default function BulkOrderRequestPage() {
                 <Headphones className="h-4 w-4 text-graphite" />
               </div>
               <div>
-                <p className="text-[12px] font-bold text-graphite">Reliable Support</p>
-                <p className="text-[11px] text-text-muted">From quotation to delivery and beyond</p>
+                <p className="text-[14px] font-bold text-graphite">Reliable Support</p>
+                <p className="text-[13px] text-text-muted">From quotation to delivery and beyond</p>
               </div>
             </div>
           </div>

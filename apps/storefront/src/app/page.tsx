@@ -50,7 +50,7 @@ export default async function HomePage() {
                   </div>
                   <div>
                     <p className="text-[13px] font-bold text-graphite">{item.title}</p>
-                    <p className="text-[12px] text-text-muted">{item.desc}</p>
+                    <p className="text-[14px] text-text-muted">{item.desc}</p>
                   </div>
                 </div>
               );

@@ -31,7 +31,7 @@ export default async function BrandsPage() {
                     </div>
                   )}
                   <div className="mt-3 text-[14px] font-bold text-graphite">{b.title}</div>
-                  <div className="mt-0.5 text-[11px] text-text-muted">{index.byBrand.get(b.id)} products</div>
+                  <div className="mt-0.5 text-[13px] text-text-muted">{index.byBrand.get(b.id)} products</div>
                 </Link>
               ))}
             </div>

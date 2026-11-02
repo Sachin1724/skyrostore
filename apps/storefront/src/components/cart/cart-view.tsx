@@ -200,7 +200,7 @@ export function CartView() {
             <button
               type="button"
               onClick={clearCart}
-              className="flex items-center gap-1.5 text-[12px] font-semibold text-text-muted hover:text-error transition-colors"
+              className="flex items-center gap-1.5 text-[14px] font-semibold text-text-muted hover:text-error transition-colors"
             >
               <Trash2 className="h-3.5 w-3.5" />
               Clear Cart
@@ -209,8 +209,8 @@ export function CartView() {
 
           {/* Table */}
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-[12px]">
-              <thead className="border-b border-border bg-surface-soft text-[11px] font-bold uppercase tracking-wider text-text-muted">
+            <table className="w-full text-left text-[14px]">
+              <thead className="border-b border-border bg-surface-soft text-[13px] font-bold tracking-wider text-text-muted">
                 <tr>
                   <th className="py-3 px-6">Product</th>
                   <th className="py-3 px-4">Price</th>
@@ -242,7 +242,7 @@ export function CartView() {
                               className="object-contain p-1"
                             />
                           ) : (
-                            <div className="flex h-full items-center justify-center font-mono text-[10px] text-text-muted">
+                            <div className="flex h-full items-center justify-center font-mono text-[13px] text-text-muted">
                               UAV
                             </div>
                           )}
@@ -252,13 +252,13 @@ export function CartView() {
                             {item.title?.replace("[DEV] ", "")}
                           </p>
                           {item.variant?.title && item.variant.title !== "Default Variant" && (
-                            <p className="text-[11px] text-text-muted">
+                            <p className="text-[13px] text-text-muted">
                               {item.variant.title}
                             </p>
                           )}
                           <div className="mt-1 flex items-center gap-1">
                             <span className="h-1.5 w-1.5 rounded-full bg-success" />
-                            <span className="text-[10px] font-medium text-success">In Stock</span>
+                            <span className="text-[13px] font-medium text-success">In Stock</span>
                           </div>
                         </div>
                       </div>
@@ -281,7 +281,7 @@ export function CartView() {
                         >
                           &minus;
                         </button>
-                        <span className="flex-1 text-center font-mono text-[12px] font-bold text-graphite">
+                        <span className="flex-1 text-center font-mono text-[14px] font-bold text-graphite">
                           {item.quantity}
                         </span>
                         <button
@@ -319,7 +319,7 @@ export function CartView() {
           </div>
 
           {/* Table Footer Actions */}
-          <div className="flex items-center justify-between border-t border-border px-6 py-3.5 bg-surface-soft text-[12px]">
+          <div className="flex items-center justify-between border-t border-border px-6 py-3.5 bg-surface-soft text-[14px]">
             <label className="flex items-center gap-2 cursor-pointer font-semibold text-graphite">
               <input
                 type="checkbox"
@@ -345,11 +345,11 @@ export function CartView() {
               <h3 className="text-[16px] font-extrabold text-graphite">
                 Frequently Bought Together
               </h3>
-              <p className="text-[12px] text-text-muted mt-0.5">
+              <p className="text-[14px] text-text-muted mt-0.5">
                 Complete your build with these compatible accessories.
               </p>
             </div>
-            <Link href="/parts" className="text-[12px] font-semibold text-graphite hover:underline">
+            <Link href="/parts" className="text-[14px] font-semibold text-graphite hover:underline">
               View All &rarr;
             </Link>
           </div>
@@ -370,19 +370,19 @@ export function CartView() {
                     />
                   </div>
                   <h4 className="font-bold text-[13px] text-graphite line-clamp-1">{acc.title}</h4>
-                  <p className="text-[11px] text-text-muted">{acc.subtitle}</p>
+                  <p className="text-[13px] text-text-muted">{acc.subtitle}</p>
                   <p className="mt-2 font-mono font-bold text-[14px] text-graphite">
                     {formatPrice(acc.price, "INR")}
                   </p>
                   <div className="mt-0.5 flex items-center gap-1">
                     <span className="h-1.5 w-1.5 rounded-full bg-success" />
-                    <span className="text-[10px] font-medium text-success">In Stock</span>
+                    <span className="text-[13px] font-medium text-success">In Stock</span>
                   </div>
                 </div>
 
                 <button
                   type="button"
-                  className="mt-3 flex w-full items-center justify-center gap-1.5 rounded border border-border bg-white py-1.5 text-[11px] font-bold text-graphite hover:bg-surface-soft transition"
+                  className="mt-3 flex w-full items-center justify-center gap-1.5 rounded border border-border bg-white py-1.5 text-[13px] font-bold text-graphite hover:bg-surface-soft transition"
                 >
                   <ShoppingCart className="h-3.5 w-3.5" />
                   Add to Cart
@@ -411,7 +411,7 @@ export function CartView() {
               <div className="flex items-center justify-between text-success font-medium">
                 <div className="flex items-center gap-1.5">
                   <span>Discount</span>
-                  <span className="inline-flex items-center gap-1 rounded bg-success/10 px-1.5 py-0.5 font-mono text-[10px] text-success font-bold">
+                  <span className="inline-flex items-center gap-1 rounded bg-success/10 px-1.5 py-0.5 font-mono text-[13px] text-success font-bold">
                     SKYRO10
                     <button
                       type="button"
@@ -429,7 +429,7 @@ export function CartView() {
             <div className="flex justify-between">
               <div>
                 <span>Shipping</span>
-                <p className="text-[11px] text-text-muted">Standard Delivery (3–7 days)</p>
+                <p className="text-[13px] text-text-muted">Standard Delivery (3–7 days)</p>
               </div>
               <span className="font-mono font-semibold text-graphite">
                 {formatPrice(shippingFee, currency)}
@@ -460,7 +460,7 @@ export function CartView() {
           </Link>
 
           {/* Secure Checkout Note */}
-          <div className="mt-4 flex items-center gap-2 rounded bg-surface-soft p-2.5 text-[11px] text-text-secondary">
+          <div className="mt-4 flex items-center gap-2 rounded bg-surface-soft p-2.5 text-[13px] text-text-secondary">
             <ShieldCheck className="h-4 w-4 text-success shrink-0" />
             <span>Secure Checkout: Your payment information is encrypted and secure.</span>
           </div>
@@ -468,7 +468,7 @@ export function CartView() {
 
         {/* Apply Coupon Code */}
         <div className="rounded-lg border border-border bg-white p-5 shadow-xs">
-          <label className="block text-[12px] font-bold text-graphite">
+          <label className="block text-[14px] font-bold text-graphite">
             Apply Coupon Code
           </label>
           <div className="mt-2 flex gap-2">
@@ -477,7 +477,7 @@ export function CartView() {
               placeholder="Enter coupon code"
               value={couponCode}
               onChange={(e) => setCouponCode(e.target.value)}
-              className="w-full rounded border border-border bg-surface-soft px-3 py-2 text-[12px] uppercase text-graphite placeholder:text-text-muted focus:border-graphite focus:outline-none"
+              className="w-full rounded border border-border bg-surface-soft px-3 py-2 text-[14px] text-graphite placeholder:text-text-muted focus:border-graphite focus:outline-none"
             />
             <button
               type="button"
@@ -487,7 +487,7 @@ export function CartView() {
                   setCouponCode("");
                 }
               }}
-              className="rounded bg-graphite px-4 py-2 text-[12px] font-bold text-white hover:bg-black transition"
+              className="rounded bg-graphite px-4 py-2 text-[14px] font-bold text-white hover:bg-black transition"
             >
               Apply
             </button>
@@ -495,33 +495,33 @@ export function CartView() {
         </div>
 
         {/* 4 Service Trust Badges */}
-        <div className="rounded-lg border border-border bg-white p-5 shadow-xs space-y-3.5 text-[12px]">
+        <div className="rounded-lg border border-border bg-white p-5 shadow-xs space-y-3.5 text-[14px]">
           <div className="flex items-center gap-3">
             <Truck className="h-4 w-4 text-success shrink-0" />
             <div>
               <p className="font-bold text-graphite">Fast Shipping</p>
-              <p className="text-[11px] text-text-muted">Pan India delivery</p>
+              <p className="text-[13px] text-text-muted">Pan India delivery</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
             <ShieldCheck className="h-4 w-4 text-success shrink-0" />
             <div>
               <p className="font-bold text-graphite">Secure Payments</p>
-              <p className="text-[11px] text-text-muted">Razorpay / UPI / Cards</p>
+              <p className="text-[13px] text-text-muted">Razorpay / UPI / Cards</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
             <RotateCcw className="h-4 w-4 text-success shrink-0" />
             <div>
               <p className="font-bold text-graphite">Easy Returns</p>
-              <p className="text-[11px] text-text-muted">7-day return policy</p>
+              <p className="text-[13px] text-text-muted">7-day return policy</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
             <Headphones className="h-4 w-4 text-success shrink-0" />
             <div>
               <p className="font-bold text-graphite">Expert Support</p>
-              <p className="text-[11px] text-text-muted">Pre and post purchase</p>
+              <p className="text-[13px] text-text-muted">Pre and post purchase</p>
             </div>
           </div>
         </div>

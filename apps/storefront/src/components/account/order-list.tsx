@@ -70,7 +70,7 @@ export function OrderList() {
               <p className="text-[14px] font-medium text-graphite">
                 Order #{order.display_id}
               </p>
-              <p className="text-[11px] text-text-muted">
+              <p className="text-[13px] text-text-muted">
                 {new Date(order.created_at).toLocaleDateString("en-IN", {
                   year: "numeric",
                   month: "long",
@@ -83,7 +83,7 @@ export function OrderList() {
                 {formatPrice(order.total, order.currency_code)}
               </p>
               <span
-                className="text-[11px] font-medium text-text-secondary"
+                className="text-[13px] font-medium text-text-secondary"
                 style={{
                   borderRadius: "var(--radius-sm)",
                   background: "var(--color-surface-soft)",
@@ -95,7 +95,7 @@ export function OrderList() {
             </div>
           </div>
           {order.items?.length > 0 && (
-            <p className="mt-1 text-[11px] text-text-muted">
+            <p className="mt-1 text-[13px] text-text-muted">
               {order.items.map((i) => `${i.title?.replace("[DEV] ", "")} x${i.quantity}`).join(", ")}
             </p>
           )}

@@ -89,7 +89,7 @@ export function ProductMediaFallback({
       </div>
 
       {/* Technical Classification Label */}
-      <span className="relative mt-3 font-mono text-[10px] font-medium tracking-[0.12em] text-text-muted">
+      <span className="relative mt-3 font-mono text-[13px] font-medium tracking-[0.12em] text-text-muted">
         {typeLabel}
       </span>
     </div>

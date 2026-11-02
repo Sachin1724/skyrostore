@@ -22,22 +22,22 @@ const PK = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "pk_11e52cb93d15418
 function getStatusBadge(status: string) {
   switch (status) {
     case "SUBMITTED":
-      return <span className="bg-gray-100 text-gray-800 font-mono text-[11px] px-2 py-0.5 rounded">Submitted</span>;
+      return <span className="bg-gray-100 text-gray-800 font-mono text-[13px] px-2 py-0.5 rounded">Submitted</span>;
     case "UNDER_REVIEW":
-      return <span className="bg-blue-50 text-blue-800 font-mono text-[11px] px-2 py-0.5 rounded border border-blue-200">Under Review</span>;
+      return <span className="bg-blue-50 text-blue-800 font-mono text-[13px] px-2 py-0.5 rounded border border-blue-200">Under Review</span>;
     case "NEEDS_INFORMATION":
-      return <span className="bg-amber-50 text-amber-800 font-mono text-[11px] px-2 py-0.5 rounded border border-amber-200">Action Needed</span>;
+      return <span className="bg-amber-50 text-amber-800 font-mono text-[13px] px-2 py-0.5 rounded border border-amber-200">Action Needed</span>;
     case "QUOTED":
-      return <span className="bg-lime-100 text-gray-900 font-mono text-[11px] px-2 py-0.5 rounded border border-lime-300 font-semibold">Quote Ready</span>;
+      return <span className="bg-lime-100 text-gray-900 font-mono text-[13px] px-2 py-0.5 rounded border border-lime-300 font-semibold">Quote Ready</span>;
     case "ACCEPTED":
-      return <span className="bg-emerald-100 text-emerald-800 font-mono text-[11px] px-2 py-0.5 rounded border border-emerald-300 font-semibold">Accepted</span>;
+      return <span className="bg-emerald-100 text-emerald-800 font-mono text-[13px] px-2 py-0.5 rounded border border-emerald-300 font-semibold">Accepted</span>;
     case "CONVERTED_TO_ORDER":
-      return <span className="bg-graphite text-white font-mono text-[11px] px-2 py-0.5 rounded font-semibold">Ordered</span>;
+      return <span className="bg-graphite text-white font-mono text-[13px] px-2 py-0.5 rounded font-semibold">Ordered</span>;
     case "CANCELLED":
     case "REJECTED":
-      return <span className="bg-rose-50 text-rose-800 font-mono text-[11px] px-2 py-0.5 rounded">Closed</span>;
+      return <span className="bg-rose-50 text-rose-800 font-mono text-[13px] px-2 py-0.5 rounded">Closed</span>;
     default:
-      return <span className="bg-gray-100 text-gray-700 font-mono text-[11px] px-2 py-0.5 rounded">{status}</span>;
+      return <span className="bg-gray-100 text-gray-700 font-mono text-[13px] px-2 py-0.5 rounded">{status}</span>;
   }
 }
 
@@ -92,7 +92,7 @@ export default async function CustomerBulkRequestsPage() {
       <main className="mx-auto max-w-[1280px] px-8 py-10 md:px-10">
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-color-border pb-5">
           <div>
-            <nav className="text-[11px] font-mono uppercase tracking-[0.08em] text-text-muted">
+            <nav className="text-[13px] font-mono tracking-[0.08em] text-text-muted">
               <Link href="/account" className="hover:text-text-secondary">Account</Link>
               <span className="mx-2 text-text-disabled">/</span>
               <span className="text-graphite">Bulk & Custom Requests</span>
@@ -130,7 +130,7 @@ export default async function CustomerBulkRequestsPage() {
         ) : (
           <div className="mt-8 overflow-x-auto rounded-md border border-color-border bg-surface">
             <table className="w-full text-left text-[13px]">
-              <thead className="border-b border-color-border bg-surface-soft text-[11px] font-mono uppercase text-text-muted">
+              <thead className="border-b border-color-border bg-surface-soft text-[13px] font-mono text-text-muted">
                 <tr>
                   <th className="py-3 px-4">Reference</th>
                   <th className="py-3 px-4">Date</th>
@@ -149,7 +149,7 @@ export default async function CustomerBulkRequestsPage() {
                         {r.reference_no}
                       </Link>
                     </td>
-                    <td className="py-3.5 px-4 text-text-secondary text-[12px]">
+                    <td className="py-3.5 px-4 text-text-secondary text-[14px]">
                       {new Date(r.created_at).toLocaleDateString()}
                     </td>
                     <td className="py-3.5 px-4">
@@ -157,7 +157,7 @@ export default async function CustomerBulkRequestsPage() {
                         {r.request_type.replace(/_/g, " ")}
                       </span>
                     </td>
-                    <td className="py-3.5 px-4 font-mono text-[12px] text-text-muted">
+                    <td className="py-3.5 px-4 font-mono text-[14px] text-text-muted">
                       {r.items?.length || 1} line item(s) &bull; {r.target_unit_count || 1} unit(s)
                     </td>
                     <td className="py-3.5 px-4 font-mono font-bold text-graphite">
@@ -169,7 +169,7 @@ export default async function CustomerBulkRequestsPage() {
                     <td className="py-3.5 px-4 text-right">
                       <Link
                         href={`/account/bulk-requests/${r.id}`}
-                        className="inline-flex items-center gap-1 font-semibold text-[12px] text-graphite hover:underline"
+                        className="inline-flex items-center gap-1 font-semibold text-[14px] text-graphite hover:underline"
                       >
                         Inspect &rarr;
                       </Link>

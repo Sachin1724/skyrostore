@@ -1,6 +1,14 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
+import { Zilla_Slab } from "next/font/google";
 import "./globals.css";
+
+const zilla = Zilla_Slab({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-zilla",
+  display: "swap",
+});
 import { AnalyticsTracker } from "@/components/analytics/tracker";
 
 export const metadata: Metadata = {
@@ -18,7 +26,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en-IN" className={zilla.variable}>
       <body>
         {children}
         <Suspense fallback={null}>

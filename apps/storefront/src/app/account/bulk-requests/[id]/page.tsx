@@ -53,7 +53,7 @@ export default async function CustomerRequestDetailPage({
     <>
       <Header />
       <main className="mx-auto max-w-[1020px] px-8 py-10 md:px-10">
-        <nav className="text-[11px] font-mono uppercase tracking-[0.08em] text-text-muted">
+        <nav className="text-[13px] font-mono tracking-[0.08em] text-text-muted">
           <Link href="/account" className="hover:text-text-secondary">Account</Link>
           <span className="mx-2 text-text-disabled">/</span>
           <Link href="/account/bulk-requests" className="hover:text-text-secondary">Bulk Requests</Link>
