@@ -22,6 +22,13 @@
   --color-accent-hover: #C5ED43;
   --color-accent-soft: #F2FBD2;
 
+  /* Brand, sampled from the Skyro logo. --color-brand passes 4.5:1 with white text. */
+  --color-brand: #1D6AC2;
+  --color-brand-bright: #2589E1;
+  --color-brand-cyan: #52E1F2;
+  --color-brand-soft: #EAF3FC;
+  --color-navy: #0A1A2F;
+
   --color-success: #158143;
   --color-success-soft: #EAF7EF;
 
@@ -82,5 +89,13 @@
       transition-duration: 0.01ms !important;
       scroll-behavior: auto !important;
     }
+  }
+}
+
+/* Order success: pieces start hidden only when a script will reveal them, so
+   the page is complete without JS and under reduced motion. */
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  .success-playing :is(.quad-arm, .quad-motor, .quad-prop, .quad-body, .quad-check, .success-rise) {
+    opacity: 0;
   }
 }

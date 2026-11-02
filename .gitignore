@@ -18,3 +18,4 @@ coverage/
 # uploaded media (Medusa local file provider)
 apps/backend/static/
 backups/
+.taste-skill/
