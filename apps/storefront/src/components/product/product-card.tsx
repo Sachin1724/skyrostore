@@ -3,15 +3,15 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Heart, ShoppingCart, Check } from "lucide-react";
+import { Heart } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import { ProductMediaFallback } from "./product-media-fallback";
+import { QuickAdd } from "./quick-add";
 import { getProductTechnicalHighlights } from "@/lib/technical-specs";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function ProductCard({ product }: { product: any }) {
   const [saved, setSaved] = useState(false);
-  const [cartState, setCartState] = useState<"idle" | "adding" | "added">("idle");
 
   const variant = product.variants?.[0];
   const price = variant?.calculated_price;
@@ -19,31 +19,6 @@ export function ProductCard({ product }: { product: any }) {
   const brandName = product.collection?.title as string | undefined;
   const inStock = variant?.inventory_quantity != null ? variant.inventory_quantity > 0 : true;
   const technicalHighlights = getProductTechnicalHighlights(product.metadata);
-
-  async function handleQuickAdd(e: React.MouseEvent) {
-    e.preventDefault();
-    if (!variant?.id || !inStock || cartState === "adding") return;
-
-    setCartState("adding");
-    try {
-      const cartId = localStorage.getItem("cart_id");
-      const res = await fetch("/api/cart/add", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cart_id: cartId, variant_id: variant.id }),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        localStorage.setItem("cart_id", data.cart_id);
-        setCartState("added");
-        setTimeout(() => setCartState("idle"), 2000);
-      } else {
-        setCartState("idle");
-      }
-    } catch {
-      setCartState("idle");
-    }
-  }
 
   return (
     <Link
@@ -114,25 +89,13 @@ export function ProductCard({ product }: { product: any }) {
               </p>
             )}
             <div className="mt-0.5 flex items-center gap-1.5">
-              <span className="h-1.5 w-1.5 rounded-full bg-success" />
-              <span className="text-[13px] font-medium text-success">
+              <span className={`h-1.5 w-1.5 rounded-full ${inStock ? "bg-success" : "bg-text-muted"}`} />
+              <span className={`text-[13px] font-medium ${inStock ? "text-success" : "text-text-muted"}`}>
                 {inStock ? "In Stock" : "Out of Stock"}
               </span>
             </div>
           </div>
-          <button
-            type="button"
-            onClick={handleQuickAdd}
-            disabled={!inStock || cartState === "adding"}
-            aria-label="Add to cart"
-            className="flex h-8 w-8 items-center justify-center rounded bg-graphite text-white transition-all hover:bg-black active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            {cartState === "added" ? (
-              <Check className="h-4 w-4 text-accent" strokeWidth={2.5} />
-            ) : (
-              <ShoppingCart className="h-4 w-4" strokeWidth={1.8} />
-            )}
-          </button>
+          <QuickAdd productId={product.id} variantId={variant?.id} inStock={inStock} />
         </div>
       </div>
     </Link>

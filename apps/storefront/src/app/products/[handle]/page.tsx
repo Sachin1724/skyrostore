@@ -33,12 +33,13 @@ export default async function ProductDetailPage({
   const product = await getProductByHandle(handle);
   if (!product) notFound();
 
-  // Fetch 4 related products for the bottom slider
-  const { products: allProducts } = await getProducts({ limit: 6 });
-  const relatedProducts = allProducts.filter((p) => p.id !== product.id).slice(0, 4);
-
   // Real category path and brand, so the page shows where the product belongs.
-  const firstCategory = (product as { categories?: { handle: string }[] }).categories?.[0];
+  const firstCategory = (product as { categories?: { id: string; handle: string }[] }).categories?.[0];
+
+  // Related means the same category; without one there is nothing honest to show.
+  const relatedProducts = firstCategory
+    ? (await getProducts({ limit: 5, category_id: [firstCategory.id] })).products.filter((p) => p.id !== product.id).slice(0, 4)
+    : [];
   const collectionId = (product as { collection_id?: string | null }).collection_id;
   const [tree, brands] = await Promise.all([getCategoryTree(), getBrands()]);
   const trail = (firstCategory ? pathTo(tree, firstCategory.handle) : null)?.map((n) => ({ name: n.name, handle: n.handle })) ?? [];

@@ -18,7 +18,7 @@ export function CardSkeleton() {
             <Bone className="h-[22px] w-20" />
             <Bone className="mt-0.5 h-[18px] w-16" />
           </div>
-          <Bone className="h-8 w-8" />
+          <Bone className="h-10 w-10" />
         </div>
       </div>
     </div>
@@ -32,5 +32,28 @@ export function GridSkeleton({ count = 8, className }: { count?: number; classNa
         <CardSkeleton key={i} />
       ))}
     </div>
+  );
+}
+
+// Mirrors ProductRow: thumbnail, three text lines, price/stock, add button.
+export function ListSkeleton({ count = 8 }: { count?: number }) {
+  return (
+    <ul className="mt-4 divide-y divide-border bg-white px-4 md:px-6" role="status" aria-label="Loading products">
+      {Array.from({ length: count }, (_, i) => (
+        <li key={i} className="flex items-center gap-4 py-4">
+          <div className="h-16 w-16 shrink-0 bg-surface-soft md:h-20 md:w-20" />
+          <div className="min-w-0 flex-1 space-y-1.5">
+            <Bone className="h-5 w-3/5" />
+            <Bone className="h-4 w-2/5" />
+            <Bone className="h-4 w-1/3" />
+          </div>
+          <div className="w-20 shrink-0 space-y-1.5">
+            <Bone className="h-5 w-full" />
+            <Bone className="h-4 w-full" />
+          </div>
+          <Bone className="h-10 w-10 shrink-0" />
+        </li>
+      ))}
+    </ul>
   );
 }

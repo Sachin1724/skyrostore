@@ -174,7 +174,7 @@ export function extractTechnicalSpecs(
   let order = 1;
 
   for (const [key, val] of Object.entries(metadata)) {
-    if (key === "technical_specs" || key === "sku" || key === "id" || key === "thumbnail") continue;
+    if (key === "technical_specs" || key === "component_type" || key === "sku" || key === "id" || key === "thumbnail") continue;
     if (val === undefined || val === null || val === "") continue;
 
     const matched = template?.fields.find((f) => f.key === key);

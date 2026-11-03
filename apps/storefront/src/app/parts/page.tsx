@@ -1,6 +1,6 @@
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
-import { ProductCard } from "@/components/product/product-card";
+import { ProductRow } from "@/components/product/product-row";
 import { getProducts } from "@/lib/data/products";
 import {
   getCategoryTree,
@@ -13,7 +13,6 @@ import {
 } from "@/lib/data/catalog";
 import { applyFacets, buildFacets } from "@/lib/technical-specs";
 import Link from "next/link";
-import Image from "next/image";
 
 export const metadata = { title: "UAV Parts & Components — Skyrostore" };
 
@@ -63,182 +62,163 @@ export default async function PartsPage({
   const siblingsLabel = active ? `Inside ${active.name}` : "Categories";
   const visibleBrands = brands.filter((b) => (index.byBrand.get(b.id) ?? 0) > 0);
 
+  const childNodes = activeBrand ? [] : active ? active.children : tree;
+  const railHeading = "text-[15px] font-semibold text-navy";
+
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-surface-soft">
-        <section className="relative overflow-hidden border-b border-border bg-white">
-          <div className="flex flex-col justify-between px-5 py-8 md:flex-row md:items-center md:px-10">
-            <div className="relative z-10 max-w-lg">
-              <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-1.5 text-[14px] font-medium text-text-muted">
-                <Link href="/" className="hover:text-graphite">Home</Link>
-                <span>&gt;</span>
-                {trail || activeBrand ? (
-                  <Link href="/parts" className="hover:text-graphite">UAV Parts</Link>
+      <main className="min-h-screen bg-surface-soft px-5 pb-24 md:px-10">
+        <section className="pt-10 pb-10 lg:pt-16">
+          <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-1.5 text-[15px] text-text-secondary">
+            <Link href="/" className="hover:text-brand">Home</Link>
+            <span aria-hidden>/</span>
+            {trail || activeBrand ? (
+              <Link href="/parts" className="hover:text-brand">UAV Parts</Link>
+            ) : (
+              <span aria-current="page" className="text-navy">UAV Parts</span>
+            )}
+            {trail?.map((node, i) => (
+              <span key={node.id} className="flex items-center gap-1.5">
+                <span aria-hidden>/</span>
+                {i === trail.length - 1 && !activeBrand ? (
+                  <span aria-current="page" className="text-navy">{node.name}</span>
                 ) : (
-                  <span className="text-graphite">UAV Parts</span>
+                  <Link href={href(node.handle)} className="hover:text-brand">{node.name}</Link>
                 )}
-                {trail?.map((node, i) => (
-                  <span key={node.id} className="flex items-center gap-1.5">
-                    <span>&gt;</span>
-                    {i === trail.length - 1 && !activeBrand ? (
-                      <span className="text-graphite">{node.name}</span>
-                    ) : (
-                      <Link href={href(node.handle)} className="hover:text-graphite">{node.name}</Link>
-                    )}
-                  </span>
-                ))}
-                {activeBrand ? (
-                  <span className="flex items-center gap-1.5">
-                    <span>&gt;</span>
-                    <span className="text-graphite">{activeBrand.title}</span>
-                  </span>
-                ) : null}
-              </nav>
-              <h1 className="mt-3 text-[32px] font-extrabold tracking-[-0.03em] text-graphite md:text-[38px]">
-                {activeBrand ? `${activeBrand.title}${active ? ` ${active.name}` : ""}` : active ? active.name : "UAV Parts"}
-              </h1>
-              <p className="mt-1.5 text-[14px] text-text-secondary">
-                {active ? `Browse ${active.name} by type or brand.` : "High quality components for your next build."}
-              </p>
-            </div>
-            <div className="pointer-events-none relative mt-4 h-24 w-full max-w-[480px] md:mt-0 md:h-28">
-              <Image src="/images/hero/catalog-banner.png" alt="UAV Components Collage" fill className="object-contain object-right" />
-            </div>
-          </div>
+              </span>
+            ))}
+            {activeBrand ? (
+              <span className="flex items-center gap-1.5">
+                <span aria-hidden>/</span>
+                <span aria-current="page" className="text-navy">{activeBrand.title}</span>
+              </span>
+            ) : null}
+          </nav>
+          <h1 className="mt-4 text-[clamp(2.5rem,1.6rem+3.6vw,4.5rem)] font-bold leading-[0.95] tracking-[-0.04em] text-balance text-navy">
+            {activeBrand ? `${activeBrand.title}${active ? ` ${active.name}` : ""}` : active ? active.name : "UAV Parts"}
+          </h1>
+          <p className="mt-4 max-w-[48ch] text-[18px] leading-[1.5] text-navy">
+            {active ? `Browse ${active.name} by type, spec or brand.` : "Motors, props, ESCs, packs, frames and electronics, filtered by the spec you build to."}
+          </p>
         </section>
 
-        <section className="px-8 py-8 md:px-10">
-          <div className="grid gap-8 lg:grid-cols-[240px_1fr]">
-            <aside className="space-y-6">
-              <div className="rounded-lg border border-border bg-white p-4">
-                <div className="text-[13px] font-bold text-graphite">{siblingsLabel}</div>
-                {levelNodes.length === 0 ? (
-                  <p className="mt-3 text-[14px] text-text-muted">No further sub-categories.</p>
-                ) : (
-                  <ul className="mt-3 space-y-2 text-[14px] text-text-secondary">
-                    {levelNodes.map((node) => (
-                      <li key={node.id}>
-                        <Link href={href(node.handle, params.brand)} className="flex items-center justify-between hover:text-graphite">
-                          <span>{node.name}</span>
-                          <span className="text-[13px] text-text-muted">({countForNode(node, index)})</span>
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-                {active ? (
-                  <Link
-                    href={href(trail && trail.length > 1 ? trail[trail.length - 2].handle : undefined, params.brand)}
-                    className="mt-3 block text-[13px] font-semibold text-graphite hover:underline"
-                  >
-                    ← Back to {trail && trail.length > 1 ? trail[trail.length - 2].name : "all categories"}
-                  </Link>
-                ) : null}
-              </div>
-
-              {facets.map((facet) => (
-                <div key={facet.key} className="rounded-lg border border-border bg-white p-4">
-                  <div className="text-[13px] font-bold text-graphite">
-                    Shop by {facet.label}
-                    {facet.unit ? <span className="ml-1 font-normal text-text-muted">({facet.unit})</span> : null}
-                  </div>
-                  <div className="mt-3 flex flex-wrap gap-1.5">
-                    {facet.values.map(({ value, count }) => {
-                      const selected = selectedSpecs[facet.key] === value;
-                      return (
-                        <Link
-                          key={value}
-                          href={toggleSpec(facet.key, value)}
-                          aria-pressed={selected}
-                          className={`rounded border px-2 py-1 font-mono text-[13px] transition-colors ${
-                            selected
-                              ? "border-graphite bg-graphite text-white"
-                              : "border-border text-graphite hover:border-graphite"
-                          }`}
-                        >
-                          {value}
-                          {facet.unit && facet.unit.length <= 3 ? facet.unit : ""}
-                          <span className={selected ? "ml-1 text-white/70" : "ml-1 text-text-muted"}>{count}</span>
-                        </Link>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
-
-              {visibleBrands.length > 0 ? (
-                <div className="rounded-lg border border-border bg-white p-4">
-                  <div className="text-[13px] font-bold text-graphite">Brand</div>
-                  <ul className="mt-3 space-y-2 text-[14px] text-text-secondary">
-                    {visibleBrands.map((b) => {
-                      const selected = activeBrand?.id === b.id;
-                      return (
-                        <li key={b.id}>
-                          <Link
-                            href={href(params.category, selected ? undefined : b.handle)}
-                            className={`flex items-center justify-between hover:text-graphite ${selected ? "font-bold text-graphite" : ""}`}
-                          >
-                            <span>{b.title}</span>
-                            <span className="text-[13px] text-text-muted">({index.byBrand.get(b.id)})</span>
-                          </Link>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </div>
-              ) : null}
-
-              {params.category || params.brand || Object.keys(selectedSpecs).length ? (
-                <Link href="/parts" className="block w-full rounded-md border border-border bg-white py-2 text-center text-[14px] font-bold text-graphite transition-colors hover:bg-surface-soft">
-                  Clear Filters
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[240px_minmax(0,1fr)]">
+          <aside aria-label="Filters" className="space-y-8">
+            {/* Below lg the chip row above the list already offers these. */}
+            <div className={childNodes.length > 0 ? "hidden lg:block" : undefined}>
+              <h2 className={railHeading}>{siblingsLabel}</h2>
+              {levelNodes.length === 0 ? (
+                <p className="mt-3 text-[15px] text-text-secondary">No further sub-categories.</p>
+              ) : (
+                <ul className="mt-3 space-y-1 text-[15px] text-text-secondary">
+                  {levelNodes.map((node) => (
+                    <li key={node.id}>
+                      <Link href={href(node.handle, params.brand)} className="flex items-baseline justify-between gap-3 py-1 hover:text-brand">
+                        <span>{node.name}</span>
+                        <span className="tabular-nums">{countForNode(node, index)}</span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {active ? (
+                <Link
+                  href={href(trail && trail.length > 1 ? trail[trail.length - 2].handle : undefined, params.brand)}
+                  className="mt-3 block text-[15px] font-semibold text-brand hover:text-navy"
+                >
+                  Back to {trail && trail.length > 1 ? trail[trail.length - 2].name : "all categories"}
                 </Link>
               ) : null}
-            </aside>
-
-            <div>
-              {active && active.children.length > 0 && !activeBrand ? (
-                <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
-                  {active.children.map((child) => (
-                    <Link key={child.id} href={href(child.handle)} className="rounded-lg border border-border bg-white p-4 transition-colors hover:border-graphite">
-                      <div className="text-[13px] font-bold text-graphite">{child.name}</div>
-                      <div className="mt-0.5 text-[13px] text-text-muted">{countForNode(child, index)} products</div>
-                    </Link>
-                  ))}
-                </div>
-              ) : null}
-
-              {!active && !activeBrand && tree.length > 0 ? (
-                <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
-                  {tree.map((node) => (
-                    <Link key={node.id} href={href(node.handle)} className="rounded-lg border border-border bg-white p-4 transition-colors hover:border-graphite">
-                      <div className="text-[13px] font-bold text-graphite">{node.name}</div>
-                      <div className="mt-0.5 text-[13px] text-text-muted">{countForNode(node, index)} products</div>
-                    </Link>
-                  ))}
-                </div>
-              ) : null}
-
-              <div className="flex items-center justify-between rounded-lg border border-border bg-white px-4 py-3">
-                <p className="text-[13px] font-semibold text-graphite">
-                  <span className="font-bold">{products.length}</span> products
-                </p>
-              </div>
-
-              {products.length === 0 ? (
-                <p className="mt-6 rounded-lg border border-border bg-white p-8 text-center text-[13px] text-text-secondary">
-                  No products here yet.
-                </p>
-              ) : (
-                <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                  {products.map((product) => (
-                    <ProductCard key={product.id} product={product} />
-                  ))}
-                </div>
-              )}
             </div>
+
+            {facets.map((facet) => (
+              <div key={facet.key}>
+                <h2 className={railHeading}>
+                  {facet.label}
+                  {facet.unit ? <span className="ml-1 font-normal text-text-secondary">({facet.unit})</span> : null}
+                </h2>
+                <div className="mt-3 flex flex-wrap gap-1.5">
+                  {facet.values.map(({ value, count }) => {
+                    const selected = selectedSpecs[facet.key] === value;
+                    return (
+                      <Link
+                        key={value}
+                        href={toggleSpec(facet.key, value)}
+                        aria-pressed={selected}
+                        className={`px-2.5 py-1.5 text-[15px] tabular-nums transition-colors ${
+                          selected ? "bg-navy text-white" : "bg-white text-navy hover:text-brand"
+                        }`}
+                      >
+                        {value}
+                        {facet.unit && facet.unit.length <= 3 ? facet.unit : ""}
+                        <span className={selected ? "ml-1.5 text-white/70" : "ml-1.5 text-text-secondary"}>{count}</span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+
+            {visibleBrands.length > 0 ? (
+              <div>
+                <h2 className={railHeading}>Brand</h2>
+                <ul className="mt-3 space-y-1 text-[15px] text-text-secondary">
+                  {visibleBrands.map((b) => {
+                    const selected = activeBrand?.id === b.id;
+                    return (
+                      <li key={b.id}>
+                        <Link
+                          href={href(params.category, selected ? undefined : b.handle)}
+                          aria-current={selected ? "true" : undefined}
+                          className={`flex items-baseline justify-between gap-3 py-1 hover:text-brand ${selected ? "font-semibold text-navy" : ""}`}
+                        >
+                          <span>{b.title}</span>
+                          <span className="tabular-nums">{index.byBrand.get(b.id)}</span>
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            ) : null}
+
+            {params.category || params.brand || Object.keys(selectedSpecs).length ? (
+              <Link href="/parts" className="inline-flex min-h-11 items-center bg-white px-5 text-[15px] font-semibold text-navy hover:text-brand">
+                Clear filters
+              </Link>
+            ) : null}
+          </aside>
+
+          <div>
+            {childNodes.length > 0 ? (
+              <ul className="mb-8 flex flex-wrap gap-2">
+                {childNodes.map((node) => (
+                  <li key={node.id}>
+                    <Link href={href(node.handle)} className="inline-flex min-h-11 items-baseline gap-2 bg-white px-4 py-2.5 text-[16px] font-semibold text-navy hover:text-brand">
+                      {node.name}
+                      <span className="text-[15px] font-normal tabular-nums text-text-secondary">{countForNode(node, index)}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+
+            <p className="text-[16px] text-text-secondary">
+              <span className="font-semibold tabular-nums text-navy">{products.length}</span> {products.length === 1 ? "product" : "products"}
+            </p>
+
+            {products.length === 0 ? (
+              <p className="mt-4 bg-white px-6 py-10 text-center text-[16px] text-text-secondary">No products here yet.</p>
+            ) : (
+              <ul className="mt-4 divide-y divide-border bg-white px-4 md:px-6">
+                {products.map((product) => (
+                  <ProductRow key={product.id} product={product} />
+                ))}
+              </ul>
+            )}
           </div>
-        </section>
+        </div>
       </main>
       <Footer />
     </>
