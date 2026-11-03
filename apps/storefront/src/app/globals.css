@@ -113,10 +113,8 @@
   animation: tone-pulse 1.8s ease-in-out infinite;
 }
 
-/* Landing: brand band and the stage's spinning props. */
+/* Landing: brand band. */
 @keyframes brand-scroll { to { transform: translateX(-50%); } }
 .brand-bar-track { animation: brand-scroll 40s linear infinite; }
 .brand-bar:hover .brand-bar-track,
 .brand-bar:focus-within .brand-bar-track { animation-play-state: paused; }
-@keyframes prop-spin { to { transform: rotate(360deg); } }
-.stage-prop-spin { animation: prop-spin 0.6s linear infinite; }

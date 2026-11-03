@@ -57,7 +57,7 @@ export function CompatCheck({ options }: { options: Record<string, Option[]> }) 
   }, 0);
 
   return (
-    <div className="bg-white p-6 md:p-8">
+    <div className="rounded-lg border border-border bg-white p-5 md:p-6">
       <p className="text-[22px] font-bold text-navy">Will these fly together?</p>
       <div className="mt-5 grid gap-4 md:grid-cols-3">
         {ROLES.map((r) => (
@@ -66,7 +66,7 @@ export function CompatCheck({ options }: { options: Record<string, Option[]> }) 
             <select
               value={picked[r.key]}
               onChange={(e) => setPicked((p) => ({ ...p, [r.key]: e.target.value }))}
-              className="mt-1.5 h-12 w-full border border-border-strong bg-white px-3 text-[16px] font-normal text-navy"
+              className="mt-1.5 h-12 w-full rounded-md border border-border-strong bg-white px-3 text-[16px] font-normal text-navy"
             >
               {(options[r.key] || []).map((o) => (
                 <option key={o.variant_id} value={o.variant_id}>
@@ -105,7 +105,7 @@ export function CompatCheck({ options }: { options: Record<string, Option[]> }) 
       </div>
 
       <div className="mt-4 flex flex-wrap items-center gap-4">
-        <Link href="/build" className="inline-flex min-h-12 items-center bg-brand px-6 text-[16px] font-semibold text-white hover:bg-navy">
+        <Link href="/build" className="inline-flex min-h-12 items-center rounded-md bg-brand px-6 text-[16px] font-semibold text-white hover:bg-navy">
           Build the full drone
         </Link>
         {total > 0 ? <span className="text-[16px] tabular-nums text-text-secondary">Parts total {formatPrice(total, "INR")}</span> : null}
