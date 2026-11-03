@@ -128,3 +128,4 @@ export function RecentlyViewed({ currentProduct }: { currentProduct?: HttpTypes.
     </section>
   );
 }
+

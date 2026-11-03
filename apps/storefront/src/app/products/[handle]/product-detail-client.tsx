@@ -15,6 +15,7 @@ import { ProductGallery } from "./components/product-gallery";
 import { CompatibleParts } from "./components/compatible-parts";
 import { FrequentlyBoughtTogether } from "./components/frequently-bought-together";
 import { RecentlyViewed } from "./components/recently-viewed";
+import { WishlistButton } from "./components/wishlist-button";
 import type { CompatibleItem } from "@/lib/data/compatible-products";
 
 const LOW_STOCK = 5;
@@ -325,7 +326,12 @@ export function ProductDetailClient({
           <DeliveryCheck />
 
           {/* Institutional / Compatibility Helpers */}
-          <p className="mt-4 flex flex-wrap items-center gap-x-1 gap-y-2 text-[14px] text-text-secondary">
+          <div className="mt-4 flex flex-wrap items-center gap-2 text-[14px] text-text-secondary">
+            <WishlistButton
+              productId={product.id}
+              showLabel
+              className="mr-2 inline-flex h-9 items-center rounded-md border border-border-strong px-3 font-semibold text-navy hover:border-brand hover:text-brand"
+            />
             <ShareButton title={title} />
             <Link href="/build" className="font-semibold text-brand hover:text-navy">
               Check fit in the build checker
@@ -337,7 +343,7 @@ export function ProductDetailClient({
             >
               Request a bulk quote
             </Link>
-          </p>
+          </div>
         </div>
       </section>
 
@@ -374,8 +380,10 @@ export function ProductDetailClient({
       {/* "Works With" Verified Compatible Parts */}
       <CompatibleParts items={compatibleItems} />
 
-      {/* Deep Technical Specifications, Overview, Documents */}
+      {/* Deep Technical Specifications, Overview, Documents, Reviews, Q&A */}
       <ProductSections
+        productId={product.id}
+        productTitle={title}
         description={product.description ?? null}
         specs={specRows}
         listing={listing}

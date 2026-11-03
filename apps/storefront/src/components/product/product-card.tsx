@@ -6,6 +6,7 @@ import { cleanName } from "@/lib/data/catalog";
 import { getProductTechnicalHighlights } from "@/lib/technical-specs";
 import { ProductMediaFallback } from "./product-media-fallback";
 import { QuickAdd } from "./quick-add";
+import { WishlistButton } from "@/app/products/[handle]/components/wishlist-button";
 
 const LOW_STOCK = 5;
 
@@ -71,7 +72,15 @@ function AddButton({ product, s }: { product: HttpTypes.StoreProduct; s: ReturnT
 export function ProductCard({ product, priority = false }: { product: HttpTypes.StoreProduct; priority?: boolean }) {
   const s = productSummary(product);
   return (
-    <article className="group flex flex-col overflow-hidden rounded-lg border border-border bg-white transition-[border-color,box-shadow,translate] duration-200 ease-out hover:-translate-y-0.5 hover:border-accent hover:shadow-[0_8px_24px_rgba(10,26,47,0.09)]">
+    <article className="group relative flex flex-col overflow-hidden rounded-lg border border-border bg-white transition-[border-color,box-shadow,translate] duration-200 ease-out hover:-translate-y-0.5 hover:border-accent hover:shadow-[0_8px_24px_rgba(10,26,47,0.09)]">
+      {/* Wishlist Button on Top-Right */}
+      <div className="absolute right-2.5 top-2.5 z-10">
+        <WishlistButton
+          productId={product.id}
+          className="flex h-8 w-8 items-center justify-center rounded-full bg-white/90 shadow-sm backdrop-blur transition-transform hover:scale-110"
+        />
+      </div>
+
       <Link href={s.href} tabIndex={-1} aria-hidden className="relative block aspect-square bg-surface-soft">
         {product.thumbnail ? (
           <Image

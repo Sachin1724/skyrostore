@@ -253,3 +253,4 @@ export function ProductGallery({
     </div>
   );
 }
+

@@ -1,12 +1,21 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { Check, Copy, FileText, Package } from "lucide-react";
 import type { TechnicalSpecificationField } from "@/lib/technical-specs";
 import { fileSize, type Listing } from "@/lib/listing";
+import { ProductReviews } from "./components/product-reviews";
+import { ProductQuestions } from "./components/product-questions";
 
 const GROUP_ORDER = ["General", "Performance", "Electrical", "Mechanical", "Dimensions", "Compatibility"];
+
+interface ProductSectionsProps {
+  productId: string;
+  productTitle: string;
+  description: string | null;
+  specs: TechnicalSpecificationField[];
+  listing: Listing;
+}
 
 /**
  * The long half of the product page: a sticky row of section tabs and the sections
@@ -14,20 +23,21 @@ const GROUP_ORDER = ["General", "Performance", "Electrical", "Mechanical", "Dime
  * so every section is deep-linkable and works without script.
  */
 export function ProductSections({
+  productId,
+  productTitle,
   description,
   specs,
   listing,
-}: {
-  description: string | null;
-  specs: TechnicalSpecificationField[];
-  listing: Listing;
-}) {
+}: ProductSectionsProps) {
   const sections = [
     { id: "overview", label: "Overview", show: Boolean(description || listing.key_features.length) },
     { id: "specifications", label: "Specifications", show: true },
     { id: "in-the-box", label: "In the Box", show: listing.in_the_box.length > 0 },
     { id: "documents", label: "Documents", show: listing.documents.length > 0 },
+    { id: "reviews", label: "Reviews", show: true },
+    { id: "questions", label: "Q&A", show: true },
   ].filter((s) => s.show);
+
   const [active, setActive] = useState(sections[0]?.id);
 
   // Highlight the tab of the section currently under the sticky bars.
@@ -99,35 +109,30 @@ export function ProductSections({
           {specs.length ? (
             <div className="grid gap-x-8 gap-y-6 lg:grid-cols-2">
               {groups.map((g) => (
-                <table key={g.name} className="w-full self-start text-left text-[14px]">
-                  <caption className="pb-2 text-left text-[13px] font-bold text-text-secondary">{g.name}</caption>
-                  <tbody>
-                    {g.rows.map((row, i) => (
-                      <tr key={row.key} className={i % 2 ? "" : "bg-surface-soft"}>
-                        <th scope="row" className="w-1/2 px-3 py-2.5 font-medium text-text-secondary">{row.label}</th>
-                        <td className="px-3 py-2.5 font-semibold tabular-nums text-navy">
-                          {String(row.value)}
-                          {row.unit ? ` ${row.unit}` : ""}
-                        </td>
-                      </tr>
+                <div key={g.name} className="break-inside-avoid">
+                  <h3 className="border-b border-border pb-1.5 text-[13px] font-bold uppercase tracking-wider text-text-muted">{g.name}</h3>
+                  <dl className="divide-y divide-border text-[14px]">
+                    {g.rows.map((r) => (
+                      <div key={r.key} className="flex justify-between gap-4 py-2">
+                        <dt className="text-text-secondary">{r.label}</dt>
+                        <dd className="font-semibold tabular-nums text-navy">{r.value}{r.unit ? ` ${r.unit}` : ""}</dd>
+                      </div>
                     ))}
-                  </tbody>
-                </table>
+                  </dl>
+                </div>
               ))}
             </div>
           ) : (
-            <p className="text-[15px] text-text-secondary">
-              Not published yet. <Link href="/support" className="font-semibold text-brand">Ask support</Link> for the datasheet.
-            </p>
+            <p className="text-[15px] text-text-muted">No specifications published yet.</p>
           )}
         </Section>
 
         {listing.in_the_box.length ? (
           <Section id="in-the-box" title="In the Box">
-            <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            <ul className="grid gap-3 sm:grid-cols-2">
               {listing.in_the_box.map((item) => (
-                <li key={item} className="flex items-center gap-2.5 rounded-md border border-border px-3 py-2.5 text-[15px] text-navy">
-                  <Package className="h-4 w-4 shrink-0 text-brand" aria-hidden />
+                <li key={item} className="flex items-center gap-3 rounded-md border border-border p-3 text-[14px] font-semibold text-navy">
+                  <Package className="h-4 w-4 text-brand" aria-hidden />
                   {item}
                 </li>
               ))}
@@ -136,17 +141,12 @@ export function ProductSections({
         ) : null}
 
         {listing.documents.length ? (
-          <Section id="documents" title="Documents">
-            <ul className="grid gap-2 sm:grid-cols-2">
+          <Section id="documents" title="Documents & Manuals">
+            <ul className="grid gap-3 sm:grid-cols-2">
               {listing.documents.map((d) => (
                 <li key={d.url}>
-                  <a
-                    href={d.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="flex items-center gap-3 rounded-md border border-border px-3 py-3 transition-colors hover:border-brand"
-                  >
-                    <FileText className="h-5 w-5 shrink-0 text-brand" aria-hidden />
+                  <a href={d.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-md border border-border p-3 hover:border-brand">
+                    <FileText className="h-5 w-5 text-brand" aria-hidden />
                     <span className="min-w-0 flex-1 truncate text-[15px] font-semibold text-navy">{d.name}</span>
                     <span className="shrink-0 text-[13px] tabular-nums text-text-muted">PDF{fileSize(d.size) ? ` · ${fileSize(d.size)}` : ""}</span>
                   </a>
@@ -155,6 +155,12 @@ export function ProductSections({
             </ul>
           </Section>
         ) : null}
+
+        {/* Verified Builder Reviews Section */}
+        <ProductReviews productId={productId} productTitle={productTitle} />
+
+        {/* Technical Questions and Answers Section */}
+        <ProductQuestions productId={productId} productTitle={productTitle} />
       </div>
     </div>
   );
@@ -172,7 +178,6 @@ function Section({ id, title, action, children }: { id: string; title: string; a
   );
 }
 
-/** Copies the spec table as plain "Label: value unit" lines, for BOMs and emails. */
 function CopySpecs({ specs }: { specs: TechnicalSpecificationField[] }) {
   const [copied, setCopied] = useState(false);
   return (
