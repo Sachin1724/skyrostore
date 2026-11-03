@@ -147,10 +147,15 @@ export const cancelOrder = (orderId: string, awb: string) =>
  * order support has to re-route by hand.
  */
 export async function checkServiceable(pin: unknown): Promise<boolean> {
+  return (await serviceability(pin)) ?? true;
+}
+
+/** Strict answer for showing to a shopper: null when Shipmozo cannot tell (unconfigured or unreachable). */
+export async function serviceability(pin: unknown): Promise<boolean | null> {
   const delivery = String(pin ?? "").replace(/\s/g, "");
   if (!/^\d{6}$/.test(delivery)) return false;
   const pickup = process.env.SHIPMOZO_PICKUP_PINCODE;
-  if (!shipmozoConfigured() || !pickup) return true;
+  if (!shipmozoConfigured() || !pickup) return null;
   try {
     const data = await call<{ serviceable: boolean }>("/pincode-serviceability", {
       pickup_pincode: Number(pickup),
@@ -159,7 +164,7 @@ export async function checkServiceable(pin: unknown): Promise<boolean> {
     return data?.serviceable !== false;
   } catch (err) {
     console.warn("shipmozo serviceability:", err instanceof Error ? err.message : err);
-    return true;
+    return null;
   }
 }
 

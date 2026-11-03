@@ -27,6 +27,7 @@ export default defineMiddlewares({
     { matcher: "/store/razorpay/confirm", method: ["POST"], middlewares: [rateLimit("rzp-confirm", 20, 300)] },
     { matcher: "/razorpay/shipping-info", method: ["POST"], middlewares: [rateLimit("rzp-shipping", 120, 60)] },
     { matcher: "/store/bulk-orders", method: ["POST"], middlewares: [rateLimit("bulk-orders", 10, 3600)] },
+    { matcher: "/store/delivery-check", method: ["GET"], middlewares: [rateLimit("delivery-check", 30, 60)] },
     { matcher: "/store/customers", method: ["POST"], middlewares: [rateLimit("customer-create", 10, 3600)] },
     {
       matcher: "/webhooks/razorpay",
