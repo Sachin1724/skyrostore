@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { COMPONENT_SPEC_TEMPLATES } from "@/lib/technical-specs";
-import { UploadButton } from "../image-uploader";
+import { UploadButton, LibraryButton } from "../image-uploader";
 
 type Category = { id: string; name: string };
 
@@ -204,6 +204,7 @@ export function NewProductForm({ categories, brands }: { categories: Category[];
                 label={thumbnail ? "Replace image" : "Upload image"}
                 onUploaded={(urls) => setThumbnail(urls[0] || "")}
               />
+              <LibraryButton onPicked={(urls) => setThumbnail(urls[0] || "")} />
             </div>
             <span className="mt-1 block text-[11px] font-normal text-gray-500">
               More images can be added after the product is created. Without an image the storefront

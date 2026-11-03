@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Trash2, Star } from "lucide-react";
-import { UploadButton } from "../image-uploader";
+import { UploadButton, LibraryButton } from "../image-uploader";
 
 /** Gallery manager. Every change saves immediately; the first image is the main one. */
 export function ProductImages({
@@ -50,7 +50,10 @@ export function ProductImages({
           <h3 className="text-sm font-semibold text-gray-900">Product images</h3>
           <p className="text-xs text-gray-500">PNG, JPEG or WebP, up to 5 MB each. The starred image is the main one customers see first.</p>
         </div>
-        <UploadButton onUploaded={add} />
+        <div className="flex items-start gap-2">
+          <LibraryButton onPicked={add} />
+          <UploadButton onUploaded={add} />
+        </div>
       </div>
       {error ? <p className="mt-3 text-xs text-rose-600">{error}</p> : null}
       {images.length === 0 ? (

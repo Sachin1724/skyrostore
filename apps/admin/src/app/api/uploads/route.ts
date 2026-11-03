@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { getStoreMetadata, setStoreMetadata } from "@/lib/medusa-admin";
+import type { MediaItem } from "../media/route";
 
 const BASE_URL = process.env.NEXT_PUBLIC_MEDUSA_URL || "http://localhost:9000";
 const MAX_BYTES = 5 * 1024 * 1024;
@@ -42,6 +44,18 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const urls = ((data.files ?? []) as { url: string }[]).map((f) => f.url);
-  return NextResponse.json({ ok: true, urls });
+  const uploaded = (data.files ?? []) as { id: string; url: string }[];
+
+  // Every upload joins the media library so it can be reused and later deleted.
+  // The file is already stored, so a failed index write is reported, not fatal.
+  let indexed = true;
+  try {
+    const { metadata } = await getStoreMetadata();
+    const now = new Date().toISOString();
+    const added: MediaItem[] = uploaded.map((f, i) => ({ id: f.id, url: f.url, name: files[i]?.name ?? f.id, alt: "", created_at: now }));
+    await setStoreMetadata({ media: [...added, ...((metadata.media as MediaItem[]) ?? [])] });
+  } catch {
+    indexed = false;
+  }
+  return NextResponse.json({ ok: true, urls: uploaded.map((f) => f.url), indexed });
 }

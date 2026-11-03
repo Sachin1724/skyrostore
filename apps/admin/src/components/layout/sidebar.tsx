@@ -14,6 +14,7 @@ import {
   FolderTree,
   Tag,
   PenLine,
+  Images,
 } from "lucide-react";
 
 const NAV_ITEMS = [
@@ -25,6 +26,7 @@ const NAV_ITEMS = [
   { href: "/categories", label: "Categories", icon: FolderTree },
   { href: "/brands", label: "Brands", icon: Tag },
   { href: "/content", label: "Homepage", icon: PenLine },
+  { href: "/media", label: "Media", icon: Images },
   { href: "/inventory", label: "Inventory", icon: Warehouse },
   { href: "/customers", label: "Customers", icon: Users },
   { href: "/shipments", label: "Shipments", icon: Truck },
