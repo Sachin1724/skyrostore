@@ -4,8 +4,13 @@ import { getStoreMetadata, setStoreMetadata } from "@/lib/medusa-admin";
 import type { MediaItem } from "../media/route";
 
 const BASE_URL = process.env.NEXT_PUBLIC_MEDUSA_URL || "http://localhost:9000";
-const MAX_BYTES = 5 * 1024 * 1024;
-const ALLOWED = new Set(["image/png", "image/jpeg", "image/webp"]);
+// Images for galleries, PDFs for datasheets and manuals.
+const MAX_BYTES: Record<string, number> = {
+  "image/png": 5 * 1024 * 1024,
+  "image/jpeg": 5 * 1024 * 1024,
+  "image/webp": 5 * 1024 * 1024,
+  "application/pdf": 20 * 1024 * 1024,
+};
 
 /** Forwards product images to Medusa's file module and returns their public URLs. */
 export async function POST(request: NextRequest) {
@@ -20,11 +25,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "No files received" }, { status: 400 });
   }
   for (const file of files) {
-    if (!ALLOWED.has(file.type)) {
-      return NextResponse.json({ error: `${file.name}: only PNG, JPEG or WebP images are allowed` }, { status: 400 });
+    const max = MAX_BYTES[file.type];
+    if (!max) {
+      return NextResponse.json({ error: `${file.name}: only PNG, JPEG, WebP images or PDF documents are allowed` }, { status: 400 });
     }
-    if (file.size > MAX_BYTES) {
-      return NextResponse.json({ error: `${file.name}: larger than 5 MB` }, { status: 400 });
+    if (file.size > max) {
+      return NextResponse.json({ error: `${file.name}: larger than ${max / 1024 / 1024} MB` }, { status: 400 });
     }
   }
 
@@ -57,5 +63,10 @@ export async function POST(request: NextRequest) {
   } catch {
     indexed = false;
   }
-  return NextResponse.json({ ok: true, urls: uploaded.map((f) => f.url), indexed });
+  return NextResponse.json({
+    ok: true,
+    urls: uploaded.map((f) => f.url),
+    files: uploaded.map((f, i) => ({ url: f.url, name: files[i]?.name ?? f.id, size: files[i]?.size ?? 0 })),
+    indexed,
+  });
 }

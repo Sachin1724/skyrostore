@@ -5,12 +5,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { HttpTypes } from "@medusajs/types";
-import { ChevronLeft, ChevronRight, CreditCard, FileText, RotateCcw, Truck, X, ZoomIn } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, CreditCard, FileText, RotateCcw, Share2, ShieldCheck, Truck, X, ZoomIn } from "lucide-react";
 import { CART_ADDED } from "@/components/layout/header-bar";
 import { formatPrice } from "@/lib/utils";
 import { ProductMediaFallback } from "@/components/product/product-media-fallback";
 import { extractTechnicalSpecs, getProductTechnicalHighlights } from "@/lib/technical-specs";
 import { track } from "@/lib/analytics";
+import { readListing } from "@/lib/listing";
+import { ProductSections } from "./product-sections";
 
 const LOW_STOCK = 5;
 
@@ -54,7 +56,7 @@ export function ProductDetailClient({
   const metadata = (product.metadata ?? {}) as Record<string, unknown>;
   const specRows = extractTechnicalSpecs(metadata)?.additionalSpecifications ?? [];
   const highlights = getProductTechnicalHighlights(metadata);
-  const inTheBox = typeof metadata.in_the_box === "string" ? metadata.in_the_box.split(/\n|,/).map((s) => s.trim()).filter(Boolean) : [];
+  const listing = readListing(metadata);
   const sku = variant?.sku || (metadata.sku as string | undefined) || null;
 
   // Only the product's own photographs, never stand-ins.
@@ -221,6 +223,28 @@ export function ProductDetailClient({
               {!inStock ? "Out of stock" : stock != null && stock <= LOW_STOCK ? `Only ${stock} left` : "In stock"}
               {sku ? <span className="ml-3 font-normal text-text-secondary">SKU {sku}</span> : null}
             </p>
+            {listing.dispatch_days != null || listing.warranty || listing.gst_rate != null ? (
+              <ul className="mt-3 space-y-1.5 text-[14px] text-navy">
+                {listing.dispatch_days != null && inStock ? (
+                  <li className="flex items-center gap-2">
+                    <Clock className="h-4 w-4 shrink-0 text-brand" aria-hidden />
+                    {listing.dispatch_days === 0 ? "Ships today" : `Ships within ${listing.dispatch_days} ${listing.dispatch_days === 1 ? "day" : "days"}`}
+                  </li>
+                ) : null}
+                {listing.warranty ? (
+                  <li className="flex items-center gap-2">
+                    <ShieldCheck className="h-4 w-4 shrink-0 text-brand" aria-hidden />
+                    {listing.warranty}
+                  </li>
+                ) : null}
+                {listing.gst_rate != null ? (
+                  <li className="flex items-center gap-2 text-text-secondary">
+                    <FileText className="h-4 w-4 shrink-0 text-brand" aria-hidden />
+                    GST {listing.gst_rate}% included{listing.hsn_code ? ` · HSN ${listing.hsn_code}` : ""}
+                  </li>
+                ) : null}
+              </ul>
+            ) : null}
           </div>
 
           {variants.length > 1 ? (
@@ -285,7 +309,8 @@ export function ProductDetailClient({
 
           <DeliveryCheck />
 
-          <p className="mt-4 text-[14px] text-text-secondary">
+          <p className="mt-4 flex flex-wrap items-center gap-x-1 gap-y-2 text-[14px] text-text-secondary">
+            <ShareButton title={title} />
             <Link href="/build" className="font-semibold text-brand hover:text-navy">Check fit in the build checker</Link>
             {" · "}
             <Link href={`/bulk-orders/request?product=${product.id}&title=${encodeURIComponent(title)}`} className="font-semibold text-brand hover:text-navy">
@@ -318,43 +343,7 @@ export function ProductDetailClient({
         })}
       </ul>
 
-      <div className="mt-8 grid items-start gap-4 lg:grid-cols-3">
-        <InfoCard title="Description">
-          {product.description ? (
-            <p className="whitespace-pre-line text-[15px] leading-relaxed text-text-secondary">{product.description}</p>
-          ) : (
-            <p className="text-[15px] text-text-secondary">No description yet.</p>
-          )}
-        </InfoCard>
-        <InfoCard title="Specifications">
-          {specRows.length ? (
-            <table className="w-full text-left text-[14px]">
-              <tbody>
-                {specRows.map((row, i) => (
-                  <tr key={row.key} className={i % 2 ? "" : "bg-surface-soft"}>
-                    <th scope="row" className="px-3 py-2 font-medium text-text-secondary">{row.label}</th>
-                    <td className="px-3 py-2 text-right font-semibold tabular-nums text-navy">
-                      {String(row.value)}
-                      {row.unit ? ` ${row.unit}` : ""}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <p className="text-[15px] text-text-secondary">
-              Not published yet. <Link href="/support" className="font-semibold text-brand">Ask support</Link> for the datasheet.
-            </p>
-          )}
-        </InfoCard>
-        {inTheBox.length ? (
-          <InfoCard title="In the Box">
-            <ul className="list-disc space-y-1 pl-5 text-[15px] text-text-secondary">
-              {inTheBox.map((item) => <li key={item}>{item}</li>)}
-            </ul>
-          </InfoCard>
-        ) : null}
-      </div>
+      <ProductSections description={product.description ?? null} specs={specRows} listing={listing} />
 
       <dialog
         ref={zoomRef}
@@ -403,17 +392,24 @@ export function ProductDetailClient({
   );
 }
 
-/** Card on desktop, collapsible on phones (open by default so nothing is hidden). */
-function InfoCard({ title, children }: { title: string; children: React.ReactNode }) {
+/** Native share sheet where the device has one, otherwise copies the link. */
+function ShareButton({ title }: { title: string }) {
+  const [copied, setCopied] = useState(false);
   return (
-    <details open className="group rounded-lg border border-border bg-white">
-      <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between px-5 text-[16px] font-bold text-navy lg:pointer-events-none">
-        {title}
-        <span aria-hidden className="text-[20px] font-medium text-brand group-open:hidden lg:hidden">+</span>
-        <span aria-hidden className="hidden text-[20px] font-medium text-brand group-open:inline lg:!hidden">&minus;</span>
-      </summary>
-      <div className="px-5 pb-5">{children}</div>
-    </details>
+    <button
+      type="button"
+      onClick={async () => {
+        const url = window.location.href;
+        if (navigator.share) return navigator.share({ title, url }).catch(() => undefined);
+        await navigator.clipboard?.writeText(url).catch(() => undefined);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1800);
+      }}
+      className="mr-3 inline-flex h-9 items-center gap-1.5 rounded-md border border-border-strong px-3 font-semibold text-navy hover:border-brand hover:text-brand"
+    >
+      <Share2 className="h-4 w-4" aria-hidden />
+      <span aria-live="polite">{copied ? "Link Copied" : "Share"}</span>
+    </button>
   );
 }
 

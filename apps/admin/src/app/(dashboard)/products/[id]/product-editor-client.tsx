@@ -24,6 +24,7 @@ import {
 import { VisibilityToggle } from "../visibility-toggle";
 import { ProductImages } from "./product-images";
 import { ProductClassification } from "./product-classification";
+import { ProductListingDetails } from "./product-listing-details";
 
 interface ProductEditorClientProps {
   initialProduct: Record<string, unknown>;
@@ -60,7 +61,7 @@ export function ProductEditorClient({ initialProduct, categories, brands }: Prod
     }
     // Also merge flat metadata if not already present
     for (const [k, v] of Object.entries(metadata)) {
-      if (k === "technical_specs" || k === "sku" || k === "id") continue;
+      if (k === "technical_specs" || k === "listing" || k === "sku" || k === "id") continue;
       if (vals[k] === undefined && v !== undefined && v !== null) {
         vals[k] = v as string | number | boolean;
       }
@@ -77,7 +78,7 @@ export function ProductEditorClient({ initialProduct, categories, brands }: Prod
   const [isSaving, setIsSaving] = useState(false);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<"specs" | "images" | "basic" | "commercial">("images");
+  const [activeTab, setActiveTab] = useState<"specs" | "images" | "page" | "basic" | "commercial">("images");
 
   const currentTemplate = COMPONENT_SPEC_TEMPLATES[componentType] || null;
 
@@ -179,7 +180,6 @@ export function ProductEditorClient({ initialProduct, categories, brands }: Prod
           fields: templateValues,
         },
         customFields: cleanedCustom,
-        existingMetadata: metadata,
       };
 
       const res = await fetch(`/api/products/${initialProduct.id}`, {
@@ -285,6 +285,17 @@ export function ProductEditorClient({ initialProduct, categories, brands }: Prod
         </button>
         <button
           type="button"
+          onClick={() => setActiveTab("page")}
+          className={`pb-3 ${
+            activeTab === "page"
+              ? "border-b-2 border-gray-900 font-semibold text-gray-900"
+              : "text-gray-500 hover:text-gray-700"
+          }`}
+        >
+          Product page
+        </button>
+        <button
+          type="button"
           onClick={() => setActiveTab("basic")}
           className={`pb-3 ${
             activeTab === "basic"
@@ -313,6 +324,10 @@ export function ProductEditorClient({ initialProduct, categories, brands }: Prod
           initialImages={((initialProduct.images as { url: string }[]) || []).map((i) => i.url)}
           initialThumbnail={(initialProduct.thumbnail as string) || null}
         />
+      )}
+
+      {activeTab === "page" && (
+        <ProductListingDetails productId={initialProduct.id as string} metadata={metadata} />
       )}
 
       {/* TAB 1: TECHNICAL SPECIFICATIONS */}

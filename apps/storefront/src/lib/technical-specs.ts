@@ -142,6 +142,21 @@ export const COMPONENT_SPEC_TEMPLATES: Record<string, ComponentSpecificationTemp
   },
 };
 
+// Key suffixes the catalogue uses for units ("max_thrust_g" -> "Max Thrust", g).
+const KEY_UNITS: Record<string, string> = {
+  g: "g", kg: "kg", a: "A", v: "V", w: "W", mm: "mm", cm: "cm", m: "m", in: "in",
+  hz: "Hz", mah: "mAh", min: "min", s: "s", c: "C", rpm: "RPM",
+};
+
+/** Readable label and unit for a metadata key no template describes. */
+export function labelFromKey(key: string): { label: string; unit?: string } {
+  const parts = key.split("_");
+  const unit = parts.length > 1 ? KEY_UNITS[parts[parts.length - 1]] : undefined;
+  const words = unit ? parts.slice(0, -1) : parts;
+  const label = words.join(" ").replace(/\b\w/g, (c) => c.toUpperCase()).replace(/\bKv\b/, "KV");
+  return { label, unit };
+}
+
 export function extractTechnicalSpecs(
   metadata?: Record<string, unknown> | null
 ): ProductTechnicalSpecifications | null {
@@ -174,7 +189,8 @@ export function extractTechnicalSpecs(
   let order = 1;
 
   for (const [key, val] of Object.entries(metadata)) {
-    if (key === "technical_specs" || key === "component_type" || key === "sku" || key === "id" || key === "thumbnail") continue;
+    // `listing` holds page copy (features, box contents, documents), not specs.
+    if (key === "technical_specs" || key === "listing" || key === "component_type" || key === "sku" || key === "id" || key === "thumbnail") continue;
     if (val === undefined || val === null || val === "") continue;
 
     const matched = template?.fields.find((f) => f.key === key);
@@ -193,12 +209,11 @@ export function extractTechnicalSpecs(
       });
     } else {
       fields[key] = val;
-      const label = key
-        .replace(/_/g, " ")
-        .replace(/\b\w/g, (c) => c.toUpperCase());
+      const { label, unit } = labelFromKey(key);
       additionalSpecifications.push({
         key,
         label,
+        unit,
         value: typeof val === "number" || typeof val === "boolean" ? val : String(val),
         group: "General",
         displayOrder: order++,

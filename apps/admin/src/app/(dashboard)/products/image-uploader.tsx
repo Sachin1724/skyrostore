@@ -12,14 +12,31 @@ export async function uploadImages(files: FileList | File[]): Promise<string[]> 
   return data.urls as string[];
 }
 
+export type UploadedFile = { url: string; name: string; size: number };
+
+/** Same upload, keeping each file's name and size (for documents). */
+export async function uploadFiles(files: FileList | File[]): Promise<UploadedFile[]> {
+  const form = new FormData();
+  for (const file of Array.from(files)) form.append("files", file);
+  const res = await fetch("/api/uploads", { method: "POST", body: form });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || "Upload failed");
+  return data.files as UploadedFile[];
+}
+
 export function UploadButton({
   onUploaded,
   multiple = true,
   label = "Upload images",
+  accept = "image/png,image/jpeg,image/webp",
+  uploadWith,
 }: {
-  onUploaded: (urls: string[]) => void | Promise<void>;
+  onUploaded?: (urls: string[]) => void | Promise<void>;
+  /** Replaces the default image upload, e.g. to keep file names and sizes. */
+  uploadWith?: (files: FileList) => Promise<void>;
   multiple?: boolean;
   label?: string;
+  accept?: string;
 }) {
   const input = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
@@ -31,7 +48,8 @@ export function UploadButton({
     setBusy(true);
     setError("");
     try {
-      await onUploaded(await uploadImages(files));
+      if (uploadWith) await uploadWith(files);
+      else await onUploaded?.(await uploadImages(files));
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Upload failed");
     } finally {
@@ -45,7 +63,7 @@ export function UploadButton({
       <input
         ref={input}
         type="file"
-        accept="image/png,image/jpeg,image/webp"
+        accept={accept}
         multiple={multiple}
         onChange={onChange}
         className="hidden"
