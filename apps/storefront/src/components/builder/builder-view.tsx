@@ -214,7 +214,7 @@ export function BuilderView({
   }
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[220px_1fr_340px]">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[220px_minmax(0,1fr)_340px]">
       {/* 1. Left Sidebar: 11 Vertical Steps */}
       <aside className="rounded-lg border border-border bg-white p-3 shadow-xs">
         <div className="space-y-1">

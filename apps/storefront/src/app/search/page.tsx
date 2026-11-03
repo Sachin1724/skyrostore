@@ -38,7 +38,7 @@ export default async function SearchPage({
               type="search"
               name="q"
               placeholder="Search UAVs, components, parts..."
-              className="w-full px-3 py-2.5 text-[14px] text-graphite bg-surface placeholder:text-text-disabled focus:outline-none focus:ring-2 focus:ring-graphite/8 focus:border-graphite"
+              className="w-full px-3 py-2.5 text-[14px] text-graphite bg-surface placeholder:text-text-disabled focus:ring-2 focus:ring-graphite/8 focus:border-graphite"
               style={{
                 borderRadius: "var(--radius-sm)",
                 border: "1px solid var(--color-border-strong)",

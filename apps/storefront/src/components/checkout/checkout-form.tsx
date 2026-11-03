@@ -194,7 +194,7 @@ export function CheckoutForm() {
 
         <div className="rounded-lg border border-border bg-white p-6 shadow-xs">
           <div className="flex items-center justify-between border-b border-border pb-4">
-            <h2 className="text-[17px] font-extrabold text-graphite">Checkout</h2>
+            <h2 className="text-[17px] font-extrabold text-graphite">Your details</h2>
             {!cart?.email ? (
               <p className="text-[14px] text-text-secondary">
                 Have an account?{" "}

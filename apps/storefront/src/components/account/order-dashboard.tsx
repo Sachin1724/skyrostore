@@ -233,7 +233,7 @@ export function OrderDashboard() {
         {/* 3 Metric Cards */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div className="flex items-center gap-3.5 rounded-lg border border-border bg-white p-4 shadow-sm">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[#f0fdf4] text-[#16a34a]">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-success-soft text-success">
               <Package className="h-5 w-5 stroke-[2]" />
             </div>
             <div>
@@ -244,7 +244,7 @@ export function OrderDashboard() {
           </div>
 
           <div className="flex items-center gap-3.5 rounded-lg border border-border bg-white p-4 shadow-sm">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[#f0fdf4] text-[#16a34a]">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-success-soft text-success">
               <ShoppingCart className="h-5 w-5 stroke-[2]" />
             </div>
             <div>
@@ -255,7 +255,7 @@ export function OrderDashboard() {
           </div>
 
           <div className="flex items-center gap-3.5 rounded-lg border border-border bg-white p-4 shadow-sm">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[#f0fdf4] text-[#16a34a]">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-success-soft text-success">
               <Clock className="h-5 w-5 stroke-[2]" />
             </div>
             <div>
@@ -294,7 +294,7 @@ export function OrderDashboard() {
               placeholder="Search by order number..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-md border border-border bg-white py-1.5 pl-8 pr-3 text-[14px] text-graphite placeholder:text-text-disabled focus:border-graphite focus:outline-none"
+              className="w-full rounded-md border border-border bg-white py-1.5 pl-8 pr-3 text-[14px] text-graphite placeholder:text-text-disabled focus:border-graphite"
             />
           </div>
         </div>

@@ -363,7 +363,7 @@ export function BulkOrderRequestForm() {
   }
 
   const inputClass =
-    "w-full px-3 py-2 text-[13px] text-graphite bg-surface placeholder:text-text-disabled focus:outline-none focus:ring-1 focus:ring-graphite focus:border-graphite rounded-sm border border-color-border";
+    "w-full px-3 py-2 text-[13px] text-graphite bg-surface placeholder:text-text-disabled focus:ring-1 focus:ring-graphite focus:border-graphite rounded-sm border border-color-border";
 
   return (
     <div className="space-y-6">
@@ -583,14 +583,14 @@ export function BulkOrderRequestForm() {
                       placeholder="Search products, parts or UAVs..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full rounded-md border border-border bg-white py-2 pl-9 pr-4 text-[13px] text-graphite placeholder:text-text-disabled focus:border-graphite focus:outline-none"
+                      className="w-full rounded-md border border-border bg-white py-2 pl-9 pr-4 text-[13px] text-graphite placeholder:text-text-disabled focus:border-graphite"
                     />
                   </div>
                   <div className="w-full sm:w-48">
                     <select
                       value={categoryFilter}
                       onChange={(e) => setCategoryFilter(e.target.value)}
-                      className="w-full rounded-md border border-border bg-white px-3 py-2 text-[13px] font-medium text-graphite focus:border-graphite focus:outline-none"
+                      className="w-full rounded-md border border-border bg-white px-3 py-2 text-[13px] font-medium text-graphite focus:border-graphite"
                     >
                       <option>All Categories</option>
                       <option>Motors</option>

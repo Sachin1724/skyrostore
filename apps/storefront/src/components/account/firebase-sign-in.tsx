@@ -18,7 +18,7 @@ import {
 } from "@/lib/firebase";
 
 const inputClass =
-  "w-full px-3 py-3 text-[14px] text-graphite bg-surface placeholder:text-text-disabled focus:outline-none focus:ring-2 focus:ring-graphite/8 focus:border-graphite";
+  "w-full px-3 py-3 text-[14px] text-graphite bg-surface placeholder:text-text-disabled focus:ring-2 focus:ring-graphite/8 focus:border-graphite";
 const inputStyle = { borderRadius: "var(--radius-sm)", border: "1px solid var(--color-border-strong)" };
 const primary =
   "w-full bg-graphite px-4 py-3 text-[14px] font-semibold text-white transition-colors hover:bg-black disabled:opacity-50";

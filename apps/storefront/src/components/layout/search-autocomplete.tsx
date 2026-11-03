@@ -153,7 +153,7 @@ export function SearchAutocomplete({ className = "" }: { className?: string }) {
           aria-activedescendant={
             activeIndex >= 0 ? `${listId}-option-${activeIndex}` : undefined
           }
-          className="w-full rounded-md border border-border bg-surface-soft py-1.5 pl-3 pr-8 text-[14px] text-graphite placeholder:text-text-muted focus:border-graphite focus:bg-white focus:outline-none"
+          className="w-full rounded-md border border-border bg-surface-soft py-1.5 pl-3 pr-8 text-[14px] text-graphite placeholder:text-text-muted focus:border-graphite focus:bg-white"
         />
         <button
           type="submit"

@@ -180,7 +180,7 @@ export function SupportView() {
                 placeholder="Search for help articles, guides, or topics..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-transparent px-3 py-2 text-[13px] text-graphite placeholder:text-gray-400 focus:outline-none"
+                className="w-full bg-transparent px-3 py-2 text-[13px] text-graphite placeholder:text-gray-400"
               />
               <button
                 type="button"
@@ -307,7 +307,7 @@ export function SupportView() {
           {/* Track Order Card */}
           <div className="rounded-xl border border-border bg-white p-6 shadow-sm">
             <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#f0fdf4] text-[#16a34a]">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-success-soft text-success">
                 <Truck className="h-5 w-5" />
               </div>
               <div>
@@ -324,7 +324,7 @@ export function SupportView() {
                 placeholder="Enter order number (e.g. #SKY-2026-00124)"
                 value={trackingNumber}
                 onChange={(e) => setTrackingNumber(e.target.value)}
-                className="w-full rounded-md border border-border px-3.5 py-2.5 text-[14px] text-graphite placeholder:text-text-disabled focus:border-graphite focus:outline-none"
+                className="w-full rounded-md border border-border px-3.5 py-2.5 text-[14px] text-graphite placeholder:text-text-disabled focus:border-graphite"
               />
               <button
                 type="submit"
@@ -342,9 +342,9 @@ export function SupportView() {
             )}
 
             {/* Need help with a recent order callout */}
-            <div className="mt-5 rounded-lg border border-emerald-100 bg-[#f0fdf4] p-4 text-[14px]">
+            <div className="mt-5 rounded-lg border border-emerald-100 bg-success-soft p-4 text-[14px]">
               <div className="flex items-start gap-2.5">
-                <CheckCircle2 className="h-4 w-4 shrink-0 text-[#16a34a]" />
+                <CheckCircle2 className="h-4 w-4 shrink-0 text-success" />
                 <div>
                   <p className="font-bold text-graphite">Need help with a recent order?</p>
                   <p className="mt-0.5 text-text-secondary">
@@ -352,7 +352,7 @@ export function SupportView() {
                   </p>
                   <Link
                     href="/account/orders"
-                    className="mt-2 inline-flex items-center gap-1 font-bold text-[#16a34a] hover:underline"
+                    className="mt-2 inline-flex items-center gap-1 font-bold text-success hover:underline"
                   >
                     Go to My Orders &rarr;
                   </Link>
@@ -364,7 +364,7 @@ export function SupportView() {
           {/* Contact Support Card */}
           <div className="rounded-xl border border-border bg-white p-6 shadow-sm">
             <div className="flex items-center gap-3 border-b border-border pb-4">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#f0fdf4] text-[#16a34a]">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-success-soft text-success">
                 <Headphones className="h-5 w-5" />
               </div>
               <div>
