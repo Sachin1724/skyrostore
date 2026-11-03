@@ -3,16 +3,6 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  Trash2,
-  X,
-  ShieldCheck,
-  Truck,
-  RotateCcw,
-  Headphones,
-  Check,
-  ShoppingCart,
-} from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import { track } from "@/lib/analytics";
 
@@ -34,39 +24,9 @@ type Cart = {
   region?: { currency_code: string };
 };
 
-const FREQUENTLY_BOUGHT = [
-  {
-    title: "Holybro Pixhawk 6C",
-    subtitle: "Flight Controller",
-    price: 18999,
-    image: "/images/products/pixhawk-6x.png",
-  },
-  {
-    title: "Hobbywing 60A ESC",
-    subtitle: "6S | BLHeli_32",
-    price: 4299,
-    image: "/images/products/hobbywing-60a-esc.png",
-  },
-  {
-    title: "BN-880 GPS Module",
-    subtitle: "Multi-GNSS",
-    price: 3499,
-    image: "/images/products/bn-880-gps.png",
-  },
-  {
-    title: "SiK Telemetry Radio",
-    subtitle: "915 MHz | 100 mW",
-    price: 6999,
-    image: "/images/products/sik-telemetry-radio.png",
-  },
-];
-
 export function CartView() {
   const [cart, setCart] = useState<Cart | null>(null);
   const [loading, setLoading] = useState(true);
-  const [couponCode, setCouponCode] = useState("");
-  const [discountApplied, setDiscountApplied] = useState(false);
-  const [selectedItems, setSelectedItems] = useState<Record<string, boolean>>({});
   const [pendingItemId, setPendingItemId] = useState<string | null>(null);
   const [cartMessage, setCartMessage] = useState("");
 
@@ -79,14 +39,7 @@ export function CartView() {
     fetch(`/api/cart?id=${cartId}`)
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
-        if (data?.cart) {
-          setCart(data.cart);
-          const initialMap: Record<string, boolean> = {};
-          data.cart.items?.forEach((item: CartItem) => {
-            initialMap[item.id] = true;
-          });
-          setSelectedItems(initialMap);
-        }
+        if (data?.cart) setCart(data.cart);
       })
       .catch(() => null)
       .finally(() => setLoading(false));
@@ -143,388 +96,121 @@ export function CartView() {
     setPendingItemId(null);
   }
 
-  async function clearCart() {
-    if (!cart) return;
-    for (const item of cart.items) {
-      await removeItem(item.id);
-    }
-  }
-
   if (loading) {
-    return <div className="py-12 text-center text-[13px] text-text-muted">Loading your cart...</div>;
+    return (
+      <div role="status" aria-label="Loading your cart" className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_360px]">
+        <div className="skeleton h-64" />
+        <div className="skeleton h-56" />
+      </div>
+    );
   }
 
   const items = cart?.items || [];
-  const isEmpty = items.length === 0;
 
-  if (isEmpty) {
+  if (items.length === 0) {
     return (
-      <div className="rounded-lg border border-border bg-white p-12 text-center">
-        <h2 className="text-[20px] font-bold text-graphite">Your Cart is Empty</h2>
-        <p className="mt-2 text-[14px] text-text-secondary">
-          Explore our UAV parts and components to configure your custom aerial system.
-        </p>
-        <Link
-          href="/parts"
-          className="mt-6 inline-flex rounded-md bg-graphite px-6 py-2.5 text-[13px] font-bold text-white transition hover:bg-black"
-        >
-          Browse UAV Parts &rarr;
+      <div className="bg-white px-6 py-14 text-center">
+        <h2 className="text-[24px] font-bold text-navy">Your cart is empty</h2>
+        <p className="mt-2 text-[17px] text-text-secondary">Pick the parts for your next build and they will wait here.</p>
+        <Link href="/parts" className="mt-8 inline-flex min-h-12 items-center bg-navy px-7 text-[16px] font-semibold text-white hover:bg-brand">
+          Shop parts
         </Link>
       </div>
     );
   }
 
   const currency = cart?.region?.currency_code || cart?.currency_code || "INR";
-  const subtotal = cart?.total ?? items.reduce((s, it) => s + it.total, 0);
-  const discountAmount = discountApplied ? 1000 : 0;
-  const shippingFee = 80;
-  const taxableAmount = Math.max(0, subtotal - discountAmount);
-  const gstAmount = Math.round(taxableAmount * 0.18);
-  const grandTotal = taxableAmount + shippingFee + gstAmount;
+  // Line totals already include GST; shipping is quoted in the Razorpay window, as on checkout.
+  const itemsTotal = items.reduce((s, it) => s + it.total, 0);
+  const units = items.reduce((s, it) => s + it.quantity, 0);
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
+    <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
       {/* Cart changes are visual for sighted users; this announces them for everyone else. */}
       <p aria-live="polite" role="status" className="sr-only">
         {cartMessage}
       </p>
-      {/* Left Column: Items Table & Frequently Bought */}
-      <div className="space-y-8">
-        {/* Cart Table Container */}
-        <div className="rounded-lg border border-border bg-white shadow-xs">
-          {/* Header */}
-          <div className="flex items-center justify-between border-b border-border px-6 py-4">
-            <h2 className="text-[16px] font-extrabold text-graphite">
-              Cart Items ({items.length})
-            </h2>
-            <button
-              type="button"
-              onClick={clearCart}
-              className="flex items-center gap-1.5 text-[14px] font-semibold text-text-muted hover:text-error transition-colors"
-            >
-              <Trash2 className="h-3.5 w-3.5" />
-              Clear Cart
-            </button>
-          </div>
 
-          {/* Table */}
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-[14px]">
-              <thead className="border-b border-border bg-surface-soft text-[13px] font-bold tracking-wider text-text-muted">
-                <tr>
-                  <th className="py-3 px-6">Product</th>
-                  <th className="py-3 px-4">Price</th>
-                  <th className="py-3 px-4">Quantity</th>
-                  <th className="py-3 px-4">Total</th>
-                  <th className="py-3 px-4 text-right"></th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {items.map((item) => (
-                  <tr key={item.id} className="hover:bg-surface-soft/50 transition-colors">
-                    {/* Checkbox & Product Info */}
-                    <td className="py-4 px-6">
-                      <div className="flex items-center gap-3">
-                        <input
-                          type="checkbox"
-                          checked={!!selectedItems[item.id]}
-                          onChange={(e) =>
-                            setSelectedItems((prev) => ({ ...prev, [item.id]: e.target.checked }))
-                          }
-                          className="h-4 w-4 rounded border-border text-graphite focus:ring-0"
-                        />
-                        <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded bg-surface-soft border border-border">
-                          {item.thumbnail ? (
-                            <Image
-                              src={item.thumbnail}
-                              alt={item.title}
-                              fill
-                              className="object-contain p-1"
-                            />
-                          ) : (
-                            <div className="flex h-full items-center justify-center font-mono text-[13px] text-text-muted">
-                              UAV
-                            </div>
-                          )}
-                        </div>
-                        <div className="min-w-0">
-                          <p className="font-bold text-[13px] text-graphite truncate">
-                            {item.title?.replace("[DEV] ", "")}
-                          </p>
-                          {item.variant?.title && item.variant.title !== "Default Variant" && (
-                            <p className="text-[13px] text-text-muted">
-                              {item.variant.title}
-                            </p>
-                          )}
-                          <div className="mt-1 flex items-center gap-1">
-                            <span className="h-1.5 w-1.5 rounded-full bg-success" />
-                            <span className="text-[13px] font-medium text-success">In Stock</span>
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-
-                    {/* Unit Price */}
-                    <td className="py-4 px-4 font-mono font-semibold text-graphite">
-                      {formatPrice(item.unit_price, currency)}
-                    </td>
-
-                    {/* Quantity Stepper */}
-                    <td className="py-4 px-4">
-                      <div className="flex h-8 w-24 items-center rounded border border-border">
-                        <button
-                          type="button"
-                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                          disabled={item.quantity <= 1 || pendingItemId === item.id}
-                          aria-label={`Decrease quantity of ${item.title}`}
-                          className="flex h-full w-8 items-center justify-center text-text-secondary hover:bg-surface-soft disabled:opacity-30"
-                        >
-                          &minus;
-                        </button>
-                        <span className="flex-1 text-center font-mono text-[14px] font-bold text-graphite">
-                          {item.quantity}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                          disabled={pendingItemId === item.id}
-                          aria-label={`Increase quantity of ${item.title}`}
-                          className="flex h-full w-8 items-center justify-center text-text-secondary hover:bg-surface-soft disabled:opacity-30"
-                        >
-                          +
-                        </button>
-                      </div>
-                    </td>
-
-                    {/* Row Total */}
-                    <td className="py-4 px-4 font-mono font-bold text-graphite">
-                      {formatPrice(item.total, currency)}
-                    </td>
-
-                    {/* Remove Action */}
-                    <td className="py-4 px-4 text-right">
-                      <button
-                        type="button"
-                        onClick={() => removeItem(item.id)}
-                        className="text-text-muted hover:text-error transition-colors p-1"
-                        aria-label={`Remove ${item.title} from cart`}
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Table Footer Actions */}
-          <div className="flex items-center justify-between border-t border-border px-6 py-3.5 bg-surface-soft text-[14px]">
-            <label className="flex items-center gap-2 cursor-pointer font-semibold text-graphite">
-              <input
-                type="checkbox"
-                defaultChecked
-                className="h-4 w-4 rounded border-border text-graphite focus:ring-0"
-              />
-              Select all ({items.length} items)
-            </label>
-            <button
-              type="button"
-              className="flex items-center gap-1.5 font-semibold text-text-muted hover:text-graphite transition-colors"
-            >
-              <Trash2 className="h-3.5 w-3.5" />
-              Remove Selected
-            </button>
-          </div>
-        </div>
-
-        {/* Frequently Bought Together */}
-        <div className="rounded-lg border border-border bg-white p-6 shadow-xs">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-[16px] font-extrabold text-graphite">
-                Frequently Bought Together
-              </h3>
-              <p className="text-[14px] text-text-muted mt-0.5">
-                Complete your build with these compatible accessories.
-              </p>
-            </div>
-            <Link href="/parts" className="text-[14px] font-semibold text-graphite hover:underline">
-              View All &rarr;
-            </Link>
-          </div>
-
-          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {FREQUENTLY_BOUGHT.map((acc) => (
-              <div
-                key={acc.title}
-                className="flex flex-col justify-between rounded-lg border border-border p-3.5 hover:border-border-strong hover:shadow-xs transition"
-              >
-                <div>
-                  <div className="relative aspect-square w-full overflow-hidden rounded bg-surface-soft mb-2.5">
-                    <Image
-                      src={acc.image}
-                      alt={acc.title}
-                      fill
-                      className="object-contain p-2"
-                    />
-                  </div>
-                  <h4 className="font-bold text-[13px] text-graphite line-clamp-1">{acc.title}</h4>
-                  <p className="text-[13px] text-text-muted">{acc.subtitle}</p>
-                  <p className="mt-2 font-mono font-bold text-[14px] text-graphite">
-                    {formatPrice(acc.price, "INR")}
-                  </p>
-                  <div className="mt-0.5 flex items-center gap-1">
-                    <span className="h-1.5 w-1.5 rounded-full bg-success" />
-                    <span className="text-[13px] font-medium text-success">In Stock</span>
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  className="mt-3 flex w-full items-center justify-center gap-1.5 rounded border border-border bg-white py-1.5 text-[13px] font-bold text-graphite hover:bg-surface-soft transition"
-                >
-                  <ShoppingCart className="h-3.5 w-3.5" />
-                  Add to Cart
-                </button>
+      <ul className="divide-y divide-border bg-white px-4 md:px-6">
+        {items.map((item) => {
+          const title = item.title?.replace("[DEV] ", "");
+          const busy = pendingItemId === item.id;
+          return (
+            <li key={item.id} className="flex gap-4 py-5">
+              <div className="relative h-20 w-20 shrink-0 bg-surface-soft">
+                {item.thumbnail ? <Image src={item.thumbnail} alt="" fill sizes="80px" className="object-contain p-2" /> : null}
               </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Right Column: Order Summary, Coupon, Trust */}
-      <div className="space-y-6">
-        {/* Order Summary Card */}
-        <div className="rounded-lg border border-border bg-white p-6 shadow-xs">
-          <h3 className="text-[16px] font-extrabold text-graphite">Order Summary</h3>
-
-          <div className="mt-4 space-y-3 text-[13px] text-text-secondary">
-            <div className="flex justify-between">
-              <span>Subtotal ({items.length} items)</span>
-              <span className="font-mono font-semibold text-graphite">
-                {formatPrice(subtotal, currency)}
-              </span>
-            </div>
-
-            {discountApplied && (
-              <div className="flex items-center justify-between text-success font-medium">
-                <div className="flex items-center gap-1.5">
-                  <span>Discount</span>
-                  <span className="inline-flex items-center gap-1 rounded bg-success/10 px-1.5 py-0.5 font-mono text-[13px] text-success font-bold">
-                    SKYRO10
+              <div className="min-w-0 flex-1">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="min-w-0">
+                    <p className="text-[17px] font-semibold leading-snug text-navy">{title}</p>
+                    {item.variant?.title && item.variant.title !== "Default Variant" ? (
+                      <p className="text-[15px] text-text-secondary">{item.variant.title}</p>
+                    ) : null}
+                    <p className="text-[15px] tabular-nums text-text-secondary">{formatPrice(item.unit_price, currency)} each</p>
+                  </div>
+                  <p className="shrink-0 text-[17px] font-semibold tabular-nums text-navy">{formatPrice(item.total, currency)}</p>
+                </div>
+                <div className="mt-3 flex items-center gap-4">
+                  <div className="flex h-11 items-center bg-surface-soft" role="group" aria-label={`Quantity of ${title}`}>
                     <button
                       type="button"
-                      onClick={() => setDiscountApplied(false)}
-                      className="hover:opacity-75"
+                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                      disabled={item.quantity <= 1 || busy}
+                      aria-label={`Decrease quantity of ${title}`}
+                      className="h-full w-11 text-[20px] text-navy hover:text-brand disabled:opacity-30"
                     >
-                      <X className="h-3 w-3" />
+                      &minus;
                     </button>
-                  </span>
+                    <span className="w-8 text-center text-[16px] font-semibold tabular-nums text-navy">{item.quantity}</span>
+                    <button
+                      type="button"
+                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                      disabled={busy}
+                      aria-label={`Increase quantity of ${title}`}
+                      className="h-full w-11 text-[20px] text-navy hover:text-brand disabled:opacity-30"
+                    >
+                      +
+                    </button>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removeItem(item.id)}
+                    disabled={busy}
+                    className="min-h-11 text-[15px] font-semibold text-text-secondary hover:text-error disabled:opacity-30"
+                  >
+                    Remove<span className="sr-only"> {title}</span>
+                  </button>
                 </div>
-                <span className="font-mono font-bold">- {formatPrice(discountAmount, currency)}</span>
               </div>
-            )}
+            </li>
+          );
+        })}
+      </ul>
 
-            <div className="flex justify-between">
-              <div>
-                <span>Shipping</span>
-                <p className="text-[13px] text-text-muted">Standard Delivery (3–7 days)</p>
-              </div>
-              <span className="font-mono font-semibold text-graphite">
-                {formatPrice(shippingFee, currency)}
-              </span>
-            </div>
-
-            <div className="flex justify-between">
-              <span>GST (18%)</span>
-              <span className="font-mono font-semibold text-graphite">
-                {formatPrice(gstAmount, currency)}
-              </span>
-            </div>
-
-            <div className="border-t border-border pt-4 flex justify-between items-baseline">
-              <span className="text-[15px] font-bold text-graphite">Total</span>
-              <span className="font-mono text-[22px] font-extrabold text-graphite">
-                {formatPrice(grandTotal, currency)}
-              </span>
-            </div>
+      <div className="bg-white px-6 py-6 lg:sticky lg:top-24">
+        <h2 className="text-[20px] font-bold text-navy">Summary</h2>
+        <dl className="mt-4 space-y-2 text-[16px] text-text-secondary">
+          <div className="flex justify-between gap-4">
+            <dt>Items ({units})</dt>
+            <dd className="tabular-nums text-navy">{formatPrice(itemsTotal, currency)}</dd>
           </div>
-
-          {/* Primary Proceed CTA */}
-          <Link
-            href="/checkout"
-            className="mt-6 flex w-full items-center justify-center gap-2 rounded-md bg-accent py-3.5 text-[13px] font-extrabold text-graphite transition hover:bg-accent-hover shadow-xs active:scale-[0.99]"
-          >
-            Proceed to Checkout &rarr;
-          </Link>
-
-          {/* Secure Checkout Note */}
-          <div className="mt-4 flex items-center gap-2 rounded bg-surface-soft p-2.5 text-[13px] text-text-secondary">
-            <ShieldCheck className="h-4 w-4 text-success shrink-0" />
-            <span>Secure Checkout: Your payment information is encrypted and secure.</span>
+          <div className="flex justify-between gap-4">
+            <dt>Shipping</dt>
+            <dd className="text-right text-navy">Shown in payment window</dd>
           </div>
-        </div>
-
-        {/* Apply Coupon Code */}
-        <div className="rounded-lg border border-border bg-white p-5 shadow-xs">
-          <label className="block text-[14px] font-bold text-graphite">
-            Apply Coupon Code
-          </label>
-          <div className="mt-2 flex gap-2">
-            <input
-              type="text"
-              placeholder="Enter coupon code"
-              value={couponCode}
-              onChange={(e) => setCouponCode(e.target.value)}
-              className="w-full rounded border border-border bg-surface-soft px-3 py-2 text-[14px] text-graphite placeholder:text-text-muted focus:border-graphite focus:outline-none"
-            />
-            <button
-              type="button"
-              onClick={() => {
-                if (couponCode.toUpperCase() === "SKYRO10") {
-                  setDiscountApplied(true);
-                  setCouponCode("");
-                }
-              }}
-              className="rounded bg-graphite px-4 py-2 text-[14px] font-bold text-white hover:bg-black transition"
-            >
-              Apply
-            </button>
+          <div className="flex items-baseline justify-between gap-4 border-t border-border pt-3">
+            <dt className="font-semibold text-navy">Items total</dt>
+            <dd className="text-[24px] font-bold tabular-nums text-navy">{formatPrice(itemsTotal, currency)}</dd>
           </div>
-        </div>
-
-        {/* 4 Service Trust Badges */}
-        <div className="rounded-lg border border-border bg-white p-5 shadow-xs space-y-3.5 text-[14px]">
-          <div className="flex items-center gap-3">
-            <Truck className="h-4 w-4 text-success shrink-0" />
-            <div>
-              <p className="font-bold text-graphite">Fast Shipping</p>
-              <p className="text-[13px] text-text-muted">Pan India delivery</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <ShieldCheck className="h-4 w-4 text-success shrink-0" />
-            <div>
-              <p className="font-bold text-graphite">Secure Payments</p>
-              <p className="text-[13px] text-text-muted">Razorpay / UPI / Cards</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <RotateCcw className="h-4 w-4 text-success shrink-0" />
-            <div>
-              <p className="font-bold text-graphite">Easy Returns</p>
-              <p className="text-[13px] text-text-muted">7-day return policy</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <Headphones className="h-4 w-4 text-success shrink-0" />
-            <div>
-              <p className="font-bold text-graphite">Expert Support</p>
-              <p className="text-[13px] text-text-muted">Pre and post purchase</p>
-            </div>
-          </div>
-        </div>
+        </dl>
+        <p className="mt-1 text-[14px] text-text-secondary">Prices include GST.</p>
+        <Link href="/checkout" className="mt-6 flex min-h-12 w-full items-center justify-center bg-navy text-[16px] font-semibold text-white hover:bg-brand">
+          Checkout
+        </Link>
+        <Link href="/parts" className="mt-3 block text-center text-[15px] font-semibold text-brand hover:text-navy">
+          Keep shopping
+        </Link>
       </div>
     </div>
   );
