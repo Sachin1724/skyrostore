@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 import {
   Package,
   Layers,
@@ -313,17 +314,19 @@ export function BulkRequestsDashboard({
             key={tab.id}
             type="button"
             onClick={() => setActiveTab(tab.id as any)}
-            className={`flex items-center gap-2 rounded-lg px-3.5 py-1.5 font-bold transition-colors whitespace-nowrap ${
+            className={cn(
+              "flex items-center gap-2 rounded-lg px-3.5 py-1.5 font-bold transition-colors whitespace-nowrap",
               activeTab === tab.id
                 ? "bg-navy text-white shadow-2xs"
                 : "bg-white text-text-secondary border border-border hover:text-navy hover:bg-surface-soft"
-            }`}
+            )}
           >
             <span>{tab.label}</span>
             <span
-              className={`rounded px-1.5 py-0.5 text-[11px] font-mono ${
+              className={cn(
+                "rounded px-1.5 py-0.5 text-[11px] font-mono",
                 activeTab === tab.id ? "bg-white/20 text-white" : "bg-surface-soft text-text-muted"
-              }`}
+              )}
             >
               {tab.count}
             </span>
@@ -494,14 +497,15 @@ export function BulkRequestsDashboard({
                   <div className="pt-2">
                     <Link
                       href={`/account/bulk-requests/${r.id}`}
-                      className={`flex w-full items-center justify-center gap-1.5 rounded-lg py-2 text-[13px] font-extrabold transition-colors ${
+                      className={cn(
+                        "flex w-full items-center justify-center gap-1.5 rounded-lg py-2 text-[13px] font-extrabold transition-colors",
                         isQuoted
                           ? "bg-navy text-white hover:bg-brand"
                           : "border border-border bg-surface-soft text-navy hover:bg-white"
-                      }`}
+                      )}
                     >
                       <span>{isQuoted ? "Review Official Quotation" : "Inspect RFQ Details"}</span>
-                      <ArrowRight className="h-3.5 w-3.5" aria-hidden />
+                      <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
                     </Link>
                   </div>
                 </div>
