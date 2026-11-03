@@ -293,3 +293,4 @@ export async function getCompatibleProducts(
 
   return results.slice(0, 6);
 }
+
