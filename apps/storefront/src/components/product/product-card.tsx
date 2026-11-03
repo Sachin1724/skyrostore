@@ -7,6 +7,8 @@ import { getProductTechnicalHighlights } from "@/lib/technical-specs";
 import { ProductMediaFallback } from "./product-media-fallback";
 import { QuickAdd } from "./quick-add";
 import { WishlistButton } from "@/app/products/[handle]/components/wishlist-button";
+import { QuickViewButton } from "@/components/catalog/quick-view-button";
+import { CompareCheckbox } from "@/components/catalog/compare-drawer";
 
 const LOW_STOCK = 5;
 
@@ -73,12 +75,16 @@ export function ProductCard({ product, priority = false }: { product: HttpTypes.
   const s = productSummary(product);
   return (
     <article className="group relative flex flex-col overflow-hidden rounded-lg border border-border bg-white transition-[border-color,box-shadow,translate] duration-200 ease-out hover:-translate-y-0.5 hover:border-accent hover:shadow-[0_8px_24px_rgba(10,26,47,0.09)]">
-      {/* Wishlist Button on Top-Right */}
-      <div className="absolute right-2.5 top-2.5 z-10">
+      {/* Top action row: Compare Checkbox on left, Wishlist & QuickView on right */}
+      <div className="absolute left-2.5 top-2.5 z-10">
+        <CompareCheckbox product={product} />
+      </div>
+      <div className="absolute right-2.5 top-2.5 z-10 flex flex-col gap-1.5">
         <WishlistButton
           productId={product.id}
           className="flex h-8 w-8 items-center justify-center rounded-full bg-white/90 shadow-sm backdrop-blur transition-transform hover:scale-110"
         />
+        <QuickViewButton product={product} />
       </div>
 
       <Link href={s.href} tabIndex={-1} aria-hidden className="relative block aspect-square bg-surface-soft">
@@ -95,7 +101,7 @@ export function ProductCard({ product, priority = false }: { product: HttpTypes.
           <ProductMediaFallback componentType={product.metadata?.component_type as string | undefined} category={s.category} title={s.title} />
         )}
         {s.original ? (
-          <span className="absolute left-3 top-3 rounded bg-error px-2 py-0.5 text-[12px] font-bold text-white">
+          <span className="absolute left-3 bottom-3 rounded bg-error px-2 py-0.5 text-[12px] font-bold text-white">
             -{Math.round((1 - s.amount! / s.original) * 100)}%
           </span>
         ) : null}
@@ -125,6 +131,13 @@ export function ProductListRow({ product }: { product: HttpTypes.StoreProduct })
   const s = productSummary(product);
   return (
     <li className="flex items-center gap-4 py-4">
+      <div className="flex flex-col items-center gap-1.5">
+        <CompareCheckbox product={product} />
+        <WishlistButton
+          productId={product.id}
+          className="flex h-7 w-7 items-center justify-center rounded-full bg-surface-soft text-navy hover:text-brand"
+        />
+      </div>
       <Link href={s.href} tabIndex={-1} aria-hidden className="relative h-20 w-20 shrink-0 rounded-md bg-surface-soft">
         {product.thumbnail ? (
           <Image src={product.thumbnail} alt="" fill sizes="80px" className="object-contain p-2" />
@@ -141,7 +154,10 @@ export function ProductListRow({ product }: { product: HttpTypes.StoreProduct })
         <PriceLine s={s} />
         <StockLine inStock={s.inStock} lowStock={s.lowStock} />
       </div>
-      <AddButton product={product} s={s} />
+      <div className="flex items-center gap-2">
+        <QuickViewButton product={product} variant="pill" />
+        <AddButton product={product} s={s} />
+      </div>
     </li>
   );
 }

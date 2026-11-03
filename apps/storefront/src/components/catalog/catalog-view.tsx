@@ -13,15 +13,18 @@ import {
 } from "@/lib/data/catalog";
 import { applyFacets, buildFacets } from "@/lib/technical-specs";
 import { FilterPanel, SortSelect } from "./catalog-controls";
+import { BrandHeader } from "./brand-header";
+import { SearchSuggestions } from "./search-suggestions";
+import { QuickViewModal } from "./quick-view-modal";
+import { CompareDrawer } from "./compare-drawer";
 
 export type CatalogParams = Record<string, string | undefined>;
 
 const PAGE_SIZE = 24;
-// ponytail: filtering, sorting and paging happen in memory over at most this many products.
-// Fine for a catalogue in the hundreds; move price/stock/sort into the Medusa query when it outgrows this.
 const FETCH_LIMIT = 500;
 
 const SORTS = [
+  { value: "best_selling", label: "Best Selling" },
   { value: "newest", label: "Newest" },
   { value: "price_asc", label: "Price: low to high" },
   { value: "price_desc", label: "Price: high to low" },
@@ -32,7 +35,6 @@ const inStock = (p: HttpTypes.StoreProduct) => {
   const v = p.variants?.[0];
   return v?.manage_inventory === false || v?.inventory_quantity == null || v.inventory_quantity > 0;
 };
-// Prices are stored in paise (see formatPrice); the price filter is typed in rupees.
 const toRupees = (paise: number) => Math.round(paise / 100);
 const rupeesParam = (v?: string) => (v && /^\d+$/.test(v) ? Number(v) : null);
 
@@ -78,7 +80,7 @@ export async function CatalogView({
   const min = rupeesParam(params.min);
   const max = rupeesParam(params.max);
   const stockOnly = params.stock === "1";
-  const sort = SORTS.some((s) => s.value === params.sort) ? params.sort! : "newest";
+  const sort = SORTS.some((s) => s.value === params.sort) ? params.sort! : "best_selling";
   const view = params.view === "list" ? "list" : "grid";
 
   const facets = buildFacets(fetched);
@@ -88,7 +90,16 @@ export async function CatalogView({
     if (max != null && (a == null || toRupees(a) > max)) return false;
     return !stockOnly || inStock(p);
   });
-  if (sort === "newest") {
+
+  if (sort === "best_selling") {
+    list = [...list].sort((a, b) => {
+      const invA = a.variants?.[0]?.inventory_quantity ?? 0;
+      const invB = b.variants?.[0]?.inventory_quantity ?? 0;
+      const countA = (a.variants?.length ?? 1) * 10 + invA;
+      const countB = (b.variants?.length ?? 1) * 10 + invB;
+      return countB - countA;
+    });
+  } else if (sort === "newest") {
     list = [...list].sort((a, b) => String(b.created_at ?? "").localeCompare(String(a.created_at ?? "")));
   } else {
     const dir = sort === "price_asc" ? 1 : -1;
@@ -131,9 +142,13 @@ export async function CatalogView({
   const title = heading ?? (activeBrand && !fixed.brand ? `${activeBrand.title}${active ? ` ${active.name}` : ""}` : active?.name ?? "All Parts");
   const railHeading = "text-[14px] font-bold text-navy";
 
+  const isBrandPage = Boolean(fixed.brand && activeBrand);
+  const isSearchPage = basePath === "/search" || Boolean(q);
+
   return (
     <main id="main" className="min-h-screen bg-page pb-20">
       <div className="mx-auto max-w-[1376px] px-4 md:px-8">
+        {/* Breadcrumb Navigation */}
         <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-1.5 pt-5 text-[13px] text-text-secondary">
           <Link href="/" className="hover:text-brand">Home</Link>
           {crumbs.map((c) => (
@@ -150,12 +165,28 @@ export async function CatalogView({
               </span>
             ))}
         </nav>
-        <div className="mt-2 flex flex-wrap items-baseline gap-x-3">
-          <h1 className="text-[clamp(1.6rem,1.2rem+1.4vw,2.1rem)] font-extrabold tracking-[-0.03em] text-navy">{title}</h1>
-          <p className="text-[14px] tabular-nums text-text-secondary">
-            {list.length} {list.length === 1 ? "result" : "results"}
-          </p>
-        </div>
+
+        {/* Brand Header on /brands/[handle] */}
+        {isBrandPage && activeBrand ? (
+          <div className="mt-4">
+            <BrandHeader brandTitle={activeBrand.title} count={list.length} />
+          </div>
+        ) : (
+          <div className="mt-2 flex flex-wrap items-baseline gap-x-3">
+            <h1 className="text-[clamp(1.6rem,1.2rem+1.4vw,2.1rem)] font-extrabold tracking-[-0.03em] text-navy">{title}</h1>
+            <p className="text-[14px] tabular-nums text-text-secondary">
+              {list.length} {list.length === 1 ? "result" : "results"}
+            </p>
+          </div>
+        )}
+
+        {/* Search Popular Suggestions on /search */}
+        {isSearchPage ? (
+          <div className="mt-4">
+            <SearchSuggestions currentQuery={q} />
+          </div>
+        ) : null}
+
         {intro ? <p className="mt-1 max-w-[60ch] text-[15px] text-text-secondary">{intro}</p> : null}
 
         <div className="mt-5 grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[264px_minmax(0,1fr)] lg:gap-8">
@@ -279,7 +310,7 @@ export async function CatalogView({
             ) : null}
 
             <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-white px-3 py-2.5">
-              <SortSelect value={sort} options={SORTS.map((s) => ({ ...s, href: href({ sort: s.value === "newest" ? undefined : s.value }) }))} />
+              <SortSelect value={sort} options={SORTS.map((s) => ({ ...s, href: href({ sort: s.value === "best_selling" ? undefined : s.value }) }))} />
               <div className="flex items-center gap-2">
                 <div role="group" aria-label="View" className="flex gap-1.5">
                   {(["grid", "list"] as const).map((v) => (
@@ -353,6 +384,12 @@ export async function CatalogView({
           </section>
         </div>
       </div>
+
+      {/* Global Quick View Dialog */}
+      <QuickViewModal />
+
+      {/* Floating Compare Drawer and Side-by-Side Modal */}
+      <CompareDrawer />
     </main>
   );
 }
