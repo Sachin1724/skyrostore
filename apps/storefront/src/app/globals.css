@@ -105,6 +105,14 @@
   .font-mono, .tabular-nums { font-variant-numeric: tabular-nums; }
 }
 
+/* Route skeletons: one slow tone pulse. Reduced motion stops it via the rule above. */
+@keyframes tone-pulse { 50% { opacity: 0.55; } }
+.skeleton {
+  background: var(--color-surface-muted);
+  border-radius: var(--radius-sm);
+  animation: tone-pulse 1.8s ease-in-out infinite;
+}
+
 /* Landing: brand band and the stage's spinning props. */
 @keyframes brand-scroll { to { transform: translateX(-50%); } }
 .brand-bar-track { animation: brand-scroll 40s linear infinite; }
