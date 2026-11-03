@@ -8,11 +8,11 @@ export default function CartPage() {
   return (
     <>
       <Header />
-      <main id="main" className="min-h-screen bg-surface-soft px-5 pb-24 md:px-10">
-        <h1 className="pt-10 pb-10 text-[clamp(2.5rem,1.6rem+3.6vw,4.5rem)] font-bold leading-[0.95] tracking-[-0.04em] text-navy lg:pt-16">
-          Your cart
-        </h1>
-        <CartView />
+      <main id="main" className="min-h-screen bg-page pb-20">
+        <div className="mx-auto max-w-[1376px] px-4 md:px-8">
+          <h1 className="pb-5 pt-6 text-[clamp(1.6rem,1.2rem+1.4vw,2.1rem)] font-extrabold tracking-[-0.03em] text-navy">Your Cart</h1>
+          <CartView />
+        </div>
       </main>
       <Footer />
     </>

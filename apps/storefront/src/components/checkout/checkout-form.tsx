@@ -163,16 +163,16 @@ export function CheckoutForm() {
 
   if (!loading && items.length === 0) {
     return (
-      <div className="bg-white p-12 text-center">
-        <h2 className="text-[20px] font-bold text-graphite">Your Cart is Empty</h2>
+      <div className="rounded-lg border border-border bg-white p-12 text-center">
+        <h2 className="text-[20px] font-bold text-navy">Your Cart is Empty</h2>
         <p className="mt-2 text-[14px] text-text-secondary">
           Add UAV parts or systems from our catalog before checking out.
         </p>
         <Link
           href="/parts"
-          className="mt-6 inline-flex rounded-md bg-graphite px-6 py-2.5 text-[13px] font-bold text-white transition hover:bg-black"
+          className="mt-6 inline-flex h-11 items-center rounded-md bg-brand px-6 text-[15px] font-bold text-white transition-colors hover:bg-navy"
         >
-          Browse UAV Catalog &rarr;
+          Shop Parts
         </Link>
       </div>
     );
@@ -192,13 +192,13 @@ export function CheckoutForm() {
           </div>
         )}
 
-        <div className="bg-white p-6">
+        <div className="rounded-lg border border-border bg-white p-6">
           <div className="flex items-center justify-between border-b border-border pb-4">
-            <h2 className="text-[17px] font-extrabold text-graphite">Your details</h2>
+            <h2 className="text-[17px] font-extrabold text-navy">Your details</h2>
             {!cart?.email ? (
               <p className="text-[14px] text-text-secondary">
                 Have an account?{" "}
-                <Link href="/account" className="font-semibold text-graphite hover:underline">
+                <Link href="/account" className="font-semibold text-navy hover:underline">
                   Sign in
                 </Link>
               </p>
@@ -209,23 +209,23 @@ export function CheckoutForm() {
 
           <ol className="mt-5 space-y-4 text-[13px]">
             <li className="flex gap-3">
-              <Smartphone className="mt-0.5 h-4 w-4 shrink-0 text-graphite" />
+              <Smartphone className="mt-0.5 h-4 w-4 shrink-0 text-navy" />
               <div>
-                <p className="font-bold text-graphite">Enter your mobile number</p>
+                <p className="font-bold text-navy">Enter your mobile number</p>
                 <p className="text-text-muted">Razorpay remembers your saved addresses across stores.</p>
               </div>
             </li>
             <li className="flex gap-3">
-              <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-graphite" />
+              <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-navy" />
               <div>
-                <p className="font-bold text-graphite">Pick or add a delivery address</p>
+                <p className="font-bold text-navy">Pick or add a delivery address</p>
                 <p className="text-text-muted">We confirm courier delivery to your PIN code instantly.</p>
               </div>
             </li>
             <li className="flex gap-3">
-              <Lock className="mt-0.5 h-4 w-4 shrink-0 text-graphite" />
+              <Lock className="mt-0.5 h-4 w-4 shrink-0 text-navy" />
               <div>
-                <p className="font-bold text-graphite">Pay with UPI, card, net banking or wallet</p>
+                <p className="font-bold text-navy">Pay with UPI, card, net banking or wallet</p>
                 <p className="text-text-muted">Your order is confirmed the moment payment succeeds.</p>
               </div>
             </li>
@@ -235,9 +235,9 @@ export function CheckoutForm() {
             type="button"
             onClick={handlePay}
             disabled={submitting || loading || !items.length}
-            className="mt-6 flex w-full items-center justify-center gap-2 rounded-md bg-graphite px-8 py-3.5 text-[14px] font-bold text-white transition hover:bg-black active:scale-[0.99] disabled:opacity-50"
+            className="mt-6 flex h-12 w-full items-center justify-center gap-2 rounded-md bg-brand px-8 text-[16px] font-bold text-white transition-colors hover:bg-navy disabled:opacity-50"
           >
-            {submitting ? "Processing…" : "Buy Now"}
+            {submitting ? "Opening Razorpay…" : loading ? "Loading your cart…" : "Buy Now"}
           </button>
           <p className="mt-2 flex items-center justify-center gap-1 text-[13px] text-text-muted">
             <Lock className="h-3 w-3" />
@@ -249,34 +249,41 @@ export function CheckoutForm() {
       {/* Right Column: Order Summary & Why Shop */}
       <div className="space-y-6">
         {/* Order Summary */}
-        <div className="bg-white p-6">
+        <div className="rounded-lg border border-border bg-white p-6">
           <div className="flex items-center justify-between border-b border-border pb-3">
-            <h3 className="text-[16px] font-extrabold text-graphite">
-              Order Summary ({items.length} items)
+            <h3 className="text-[16px] font-extrabold text-navy">
+              Order Summary{loading ? "" : ` (${items.reduce((n, i) => n + i.quantity, 0)} ${items.length === 1 && items[0].quantity === 1 ? "item" : "items"})`}
             </h3>
-            <Link href="/cart" className="text-[14px] font-semibold text-graphite hover:underline">
+            <Link href="/cart" className="text-[14px] font-semibold text-navy hover:underline">
               Edit Cart
             </Link>
           </div>
 
           {/* Items list */}
+          {loading ? (
+            <div role="status" aria-label="Loading your order" className="mt-4 space-y-3">
+              <div className="skeleton h-12" />
+              <div className="skeleton h-24" />
+            </div>
+          ) : (
+          <>
           <div className="mt-4 space-y-3.5 divide-y divide-border">
             {items.map((item) => (
               <div key={item.id} className="flex gap-3 pt-3 first:pt-0">
                 <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded bg-surface-soft border border-border">
                   {item.thumbnail ? (
-                    <Image src={item.thumbnail} alt={item.title} fill className="object-contain p-1" />
+                    <Image src={item.thumbnail} alt="" fill sizes="48px" className="object-contain p-1" />
                   ) : (
-                    <div className="flex h-full items-center justify-center font-mono text-[13px] text-text-muted">
+                    <div className="flex h-full items-center justify-center text-[13px] text-text-muted">
                       UAV
                     </div>
                   )}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="font-bold text-[14px] text-graphite truncate">{item.title}</p>
+                  <p className="font-bold text-[14px] text-navy truncate">{item.title}</p>
                   <p className="text-[13px] text-text-muted">Qty: {item.quantity}</p>
                 </div>
-                <span className="font-mono font-bold text-[13px] text-graphite">
+                <span className="font-bold tabular-nums text-[13px] text-navy">
                   {formatPrice(item.total, "INR")}
                 </span>
               </div>
@@ -286,57 +293,42 @@ export function CheckoutForm() {
           <div className="mt-5 space-y-2.5 border-t border-border pt-4 text-[14px] text-text-secondary">
             <div className="flex justify-between">
               <span>Items</span>
-              <span className="font-mono font-semibold text-graphite">{formatPrice(itemsTotal, "INR")}</span>
+              <span className="font-semibold tabular-nums text-navy">{formatPrice(itemsTotal, "INR")}</span>
             </div>
             <div className="flex justify-between">
               <span>Shipping</span>
-              <span className="text-graphite">Shown in payment window</span>
+              <span className="text-navy">Shown in payment window</span>
             </div>
-            <div className="border-t border-border pt-3 flex justify-between items-baseline font-bold text-graphite">
+            <div className="border-t border-border pt-3 flex justify-between items-baseline font-bold text-navy">
               <span className="text-[14px]">Items total</span>
-              <span className="font-mono text-[20px] font-extrabold">{formatPrice(itemsTotal, "INR")}</span>
+              <span className="text-[20px] font-extrabold tabular-nums">{formatPrice(itemsTotal, "INR")}</span>
             </div>
           </div>
+          </>
+          )}
 
           {/* Secure Checkout Note */}
-          <div className="mt-5 flex items-center gap-2 rounded bg-surface-soft p-2.5 text-[13px] text-text-secondary">
-            <ShieldCheck className="h-4 w-4 text-success shrink-0" />
-            <span>Secure Checkout: Your payment information is encrypted and secure.</span>
+          <div className="mt-5 flex items-center gap-2 rounded-md bg-surface-soft p-2.5 text-[13px] text-text-secondary">
+            <ShieldCheck className="h-4 w-4 shrink-0 text-success" aria-hidden />
+            <span>Card and UPI details are entered in Razorpay's window, never on this site.</span>
           </div>
         </div>
 
-        {/* Why Shop with Skyrostore */}
-        <div className="bg-white p-5 space-y-3.5 text-[14px]">
-          <h4 className="font-extrabold text-[13px] text-graphite">Why Shop with Skyrostore?</h4>
-          <div className="flex items-center gap-3">
-            <ShieldCheck className="h-4 w-4 text-success shrink-0" />
-            <div>
-              <p className="font-bold text-graphite">Genuine Products</p>
-              <p className="text-[13px] text-text-muted">Sourced from trusted brands</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <Truck className="h-4 w-4 text-success shrink-0" />
-            <div>
-              <p className="font-bold text-graphite">Fast Shipping</p>
-              <p className="text-[13px] text-text-muted">Pan India delivery</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <FileText className="h-4 w-4 text-success shrink-0" />
-            <div>
-              <p className="font-bold text-graphite">GST Invoicing</p>
-              <p className="text-[13px] text-text-muted">For businesses and organizations</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <Headphones className="h-4 w-4 text-success shrink-0" />
-            <div>
-              <p className="font-bold text-graphite">Expert Support</p>
-              <p className="text-[13px] text-text-muted">Pre and post purchase assistance</p>
-            </div>
-          </div>
-        </div>
+        <ul className="space-y-3 rounded-lg border border-border bg-white p-5 text-[14px]">
+          {[
+            { icon: Truck, title: "Tracked delivery", text: "Courier tracking number by email once booked" },
+            { icon: FileText, title: "GST invoice", text: "With every order; prices include GST" },
+            { icon: Headphones, title: "Help with your order", text: "Contact support from your order page" },
+          ].map(({ icon: Icon, title, text }) => (
+            <li key={title} className="flex items-center gap-3">
+              <Icon className="h-5 w-5 shrink-0 text-brand" aria-hidden />
+              <span>
+                <span className="block font-bold text-navy">{title}</span>
+                <span className="block text-[13px] text-text-secondary">{text}</span>
+              </span>
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );

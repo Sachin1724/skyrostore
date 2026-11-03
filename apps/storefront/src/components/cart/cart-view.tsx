@@ -9,6 +9,8 @@ import { track } from "@/lib/analytics";
 type CartItem = {
   id: string;
   title: string;
+  product_title?: string | null;
+  product_handle?: string | null;
   quantity: number;
   unit_price: number;
   total: number;
@@ -109,11 +111,11 @@ export function CartView() {
 
   if (items.length === 0) {
     return (
-      <div className="bg-white px-6 py-14 text-center">
+      <div className="rounded-lg border border-border bg-white px-6 py-14 text-center">
         <h2 className="text-[24px] font-bold text-navy">Your cart is empty</h2>
         <p className="mt-2 text-[17px] text-text-secondary">Pick the parts for your next build and they will wait here.</p>
-        <Link href="/parts" className="mt-8 inline-flex min-h-12 items-center bg-navy px-7 text-[16px] font-semibold text-white hover:bg-brand">
-          Shop parts
+        <Link href="/parts" className="mt-8 inline-flex min-h-12 items-center rounded-md bg-brand px-7 text-[16px] font-semibold text-white hover:bg-navy">
+          Shop Parts
         </Link>
       </div>
     );
@@ -131,19 +133,23 @@ export function CartView() {
         {cartMessage}
       </p>
 
-      <ul className="divide-y divide-border bg-white px-4 md:px-6">
+      <ul className="divide-y divide-border rounded-lg border border-border bg-white px-4 md:px-6">
         {items.map((item) => {
-          const title = item.title?.replace("[DEV] ", "");
+          const title = (item.product_title ?? item.title)?.replace("[DEV] ", "");
           const busy = pendingItemId === item.id;
           return (
             <li key={item.id} className="flex gap-4 py-5">
-              <div className="relative h-20 w-20 shrink-0 bg-surface-soft">
+              <div className="relative h-20 w-20 shrink-0 rounded-md bg-surface-soft">
                 {item.thumbnail ? <Image src={item.thumbnail} alt="" fill sizes="80px" className="object-contain p-2" /> : null}
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0">
-                    <p className="text-[17px] font-semibold leading-snug text-navy">{title}</p>
+                    {item.product_handle ? (
+                      <Link href={`/products/${item.product_handle}`} className="text-[17px] font-semibold leading-snug text-navy hover:text-brand">{title}</Link>
+                    ) : (
+                      <p className="text-[17px] font-semibold leading-snug text-navy">{title}</p>
+                    )}
                     {item.variant?.title && item.variant.title !== "Default Variant" ? (
                       <p className="text-[15px] text-text-secondary">{item.variant.title}</p>
                     ) : null}
@@ -152,7 +158,7 @@ export function CartView() {
                   <p className="shrink-0 text-[17px] font-semibold tabular-nums text-navy">{formatPrice(item.total, currency)}</p>
                 </div>
                 <div className="mt-3 flex items-center gap-4">
-                  <div className="flex h-11 items-center bg-surface-soft" role="group" aria-label={`Quantity of ${title}`}>
+                  <div className="flex h-11 items-center rounded-md border border-border-strong" role="group" aria-label={`Quantity of ${title}`}>
                     <button
                       type="button"
                       onClick={() => updateQuantity(item.id, item.quantity - 1)}
@@ -188,7 +194,7 @@ export function CartView() {
         })}
       </ul>
 
-      <div className="bg-white px-6 py-6 lg:sticky lg:top-24">
+      <div className="rounded-lg border border-border bg-white px-6 py-6 lg:sticky lg:top-[150px]">
         <h2 className="text-[20px] font-bold text-navy">Summary</h2>
         <dl className="mt-4 space-y-2 text-[16px] text-text-secondary">
           <div className="flex justify-between gap-4">
@@ -205,11 +211,12 @@ export function CartView() {
           </div>
         </dl>
         <p className="mt-1 text-[14px] text-text-secondary">Prices include GST.</p>
-        <Link href="/checkout" className="mt-6 flex min-h-12 w-full items-center justify-center bg-navy text-[16px] font-semibold text-white hover:bg-brand">
-          Checkout
+        <Link href="/checkout" className="mt-6 flex min-h-12 w-full items-center justify-center rounded-md bg-brand text-[16px] font-semibold text-white hover:bg-navy">
+          Buy Now
         </Link>
+        <p className="mt-2 text-center text-[13px] text-text-secondary">Secured by Razorpay · UPI, cards, netbanking</p>
         <Link href="/parts" className="mt-3 block text-center text-[15px] font-semibold text-brand hover:text-navy">
-          Keep shopping
+          Keep Shopping
         </Link>
       </div>
     </div>
