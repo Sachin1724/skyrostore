@@ -1,9 +1,8 @@
 import Link from "next/link";
-import { cookies } from "next/headers";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { AccountNav } from "@/components/account/account-nav";
-import { BulkRequestsDashboard, type BulkRequestItem } from "@/components/account/bulk-requests-dashboard";
+import { BulkRequestsDashboard } from "@/components/account/bulk-requests-dashboard";
 import { Plus } from "lucide-react";
 
 export const metadata = {
@@ -11,35 +10,7 @@ export const metadata = {
   description: "Track enterprise purchase requests, review formal engineering quotations, and manage institutional build orders.",
 };
 
-const BASE = process.env.NEXT_PUBLIC_MEDUSA_URL || "http://localhost:9000";
-const PK = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "pk_11e52cb93d15418c56289d434fee7c53a391460b6a393b72ad48192afe3c4816";
-
-export default async function CustomerBulkRequestsPage() {
-  const cookieStore = await cookies();
-  const token =
-    cookieStore.get("customer_token")?.value ||
-    cookieStore.get("medusa_auth_token")?.value;
-
-  let requests: BulkRequestItem[] = [];
-
-  if (token) {
-    try {
-      const res = await fetch(`${BASE}/store/bulk-orders`, {
-        headers: {
-          "x-publishable-api-key": PK,
-          Authorization: `Bearer ${token}`,
-        },
-        cache: "no-store",
-      });
-      if (res.ok) {
-        const data = await res.json();
-        requests = data.requests || [];
-      }
-    } catch (err) {
-      console.warn("Server-side bulk requests fetch error, falling back to client hydration:", err);
-    }
-  }
-
+export default function CustomerBulkRequestsPage() {
   return (
     <>
       <Header />
@@ -48,9 +19,9 @@ export default async function CustomerBulkRequestsPage() {
           {/* Breadcrumbs */}
           <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 pt-5 text-[13px] text-text-secondary">
             <Link href="/" className="hover:text-brand">Home</Link>
-            <span aria-hidden>/</span>
+            <span aria-hidden="true">/</span>
             <Link href="/account" className="hover:text-brand">Account</Link>
-            <span aria-hidden>/</span>
+            <span aria-hidden="true">/</span>
             <span className="font-semibold text-navy">Bulk Quotations</span>
           </nav>
 
@@ -69,7 +40,7 @@ export default async function CustomerBulkRequestsPage() {
               href="/bulk-orders/request"
               className="inline-flex h-10 items-center gap-2 rounded-lg bg-navy px-5 text-[13px] font-extrabold text-white hover:bg-brand transition-colors shadow-2xs"
             >
-              <Plus className="h-4 w-4" aria-hidden />
+              <Plus className="h-4 w-4" aria-hidden="true" />
               <span>Submit New RFQ</span>
             </Link>
           </div>
@@ -79,10 +50,7 @@ export default async function CustomerBulkRequestsPage() {
             <AccountNav />
 
             <div className="flex-1 min-w-0 w-full">
-              <BulkRequestsDashboard
-                initialRequests={requests}
-                isAuthenticated={Boolean(token)}
-              />
+              <BulkRequestsDashboard />
             </div>
           </div>
         </div>

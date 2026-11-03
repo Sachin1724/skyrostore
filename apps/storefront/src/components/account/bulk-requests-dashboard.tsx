@@ -321,7 +321,7 @@ export function BulkRequestsDashboard({
           >
             <span>{tab.label}</span>
             <span
-              className={`rounded px-1.5 py-0.2 text-[11px] font-mono ${
+              className={`rounded px-1.5 py-0.5 text-[11px] font-mono ${
                 activeTab === tab.id ? "bg-white/20 text-white" : "bg-surface-soft text-text-muted"
               }`}
             >
