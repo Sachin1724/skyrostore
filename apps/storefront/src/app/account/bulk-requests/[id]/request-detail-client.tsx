@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { formatPrice } from "@/lib/utils";
 import {
   Package,
   Layers,
@@ -17,6 +16,15 @@ import {
   ArrowRight,
   XCircle,
 } from "lucide-react";
+
+function formatINR(val: number | string | null | undefined): string {
+  if (val === null || val === undefined || isNaN(Number(val))) return "—";
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    maximumFractionDigits: 0,
+  }).format(Number(val));
+}
 
 interface RequestDetailClientProps {
   initialRequest: any;
@@ -167,10 +175,10 @@ export function RequestDetailClient({ initialRequest }: RequestDetailClientProps
                       <td className="py-2.5 px-4 font-medium text-graphite">{item.title}</td>
                       <td className="py-2.5 px-4 text-center font-mono">{item.requested_quantity}</td>
                       <td className="py-2.5 px-4 text-right font-mono text-text-muted">
-                        {item.quoted_unit_price ? formatPrice(Number(item.quoted_unit_price), "inr") : "Pending"}
+                        {item.quoted_unit_price ? formatINR(item.quoted_unit_price) : "Pending"}
                       </td>
                       <td className="py-2.5 px-4 text-right font-mono font-bold text-graphite">
-                        {item.quoted_total ? formatPrice(Number(item.quoted_total), "inr") : "—"}
+                        {item.quoted_total ? formatINR(item.quoted_total) : "—"}
                       </td>
                     </tr>
                   ))}
@@ -182,19 +190,19 @@ export function RequestDetailClient({ initialRequest }: RequestDetailClientProps
             <div className="ml-auto max-w-xs space-y-1.5 pt-3 text-[13px]">
               <div className="flex justify-between text-text-secondary">
                 <span>Subtotal (Net):</span>
-                <span className="font-mono">{formatPrice(Number(request.quote_subtotal || 0), "inr")}</span>
+                <span className="font-mono">{formatINR(request.quote_subtotal)}</span>
               </div>
               <div className="flex justify-between text-text-secondary">
                 <span>Shipping & Express Freight:</span>
-                <span className="font-mono">{formatPrice(Number(request.quote_shipping || 0), "inr")}</span>
+                <span className="font-mono">{formatINR(request.quote_shipping)}</span>
               </div>
               <div className="flex justify-between text-text-secondary">
                 <span>Applicable GST / Tax:</span>
-                <span className="font-mono">{formatPrice(Number(request.quote_tax || 0), "inr")}</span>
+                <span className="font-mono">{formatINR(request.quote_tax)}</span>
               </div>
               <div className="flex justify-between text-[16px] font-bold text-graphite border-t border-color-border pt-2">
                 <span>Total Payable:</span>
-                <span className="font-mono text-graphite">{formatPrice(Number(request.quote_total || 0), "inr")}</span>
+                <span className="font-mono text-graphite">{formatINR(request.quote_total)}</span>
               </div>
             </div>
 
