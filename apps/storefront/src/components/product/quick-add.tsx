@@ -3,9 +3,10 @@
 import { useState } from "react";
 import { ShoppingCart, Check } from "lucide-react";
 import { track } from "@/lib/analytics";
+import { CART_ADDED } from "@/components/layout/header-bar";
 
-/** Adds one unit to the cart without leaving the list. preventDefault keeps it safe inside a product link. */
-export function QuickAdd({ productId, variantId, inStock, className = "" }: { productId: string; variantId?: string; inStock: boolean; className?: string }) {
+/** Adds one unit to the cart without leaving the list; the header then opens the cart drawer. */
+export function QuickAdd({ productId, variantId, inStock, title = "item", className = "" }: { productId: string; variantId?: string; inStock: boolean; title?: string; className?: string }) {
   const [state, setState] = useState<"idle" | "adding" | "added">("idle");
 
   async function add(e: React.MouseEvent) {
@@ -22,7 +23,7 @@ export function QuickAdd({ productId, variantId, inStock, className = "" }: { pr
       if (!res.ok) return setState("idle");
       const data = await res.json();
       localStorage.setItem("cart_id", data.cart_id);
-      window.dispatchEvent(new Event("storage"));
+      window.dispatchEvent(new Event(CART_ADDED));
       track("product_added_to_cart", { cart_id: data.cart_id, product_id: productId, variant_id: variantId, quantity: 1 });
       setState("added");
       setTimeout(() => setState("idle"), 2000);
@@ -36,8 +37,8 @@ export function QuickAdd({ productId, variantId, inStock, className = "" }: { pr
       type="button"
       onClick={add}
       disabled={!inStock || state === "adding"}
-      aria-label={state === "added" ? "Added to cart" : "Add to cart"}
-      className={`flex h-10 w-10 shrink-0 items-center justify-center bg-navy text-white transition-colors hover:bg-brand disabled:cursor-not-allowed disabled:opacity-40 ${className}`}
+      aria-label={!inStock ? `${title} is out of stock` : state === "added" ? `${title} added to cart` : `Add ${title} to cart`}
+      className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-md border-[1.5px] border-brand bg-white text-brand transition-colors hover:bg-brand hover:text-white disabled:cursor-not-allowed disabled:border-border-strong disabled:text-text-muted disabled:hover:bg-white ${className}`}
     >
       {state === "added" ? <Check className="h-4 w-4" strokeWidth={2.5} aria-hidden /> : <ShoppingCart className="h-4 w-4" strokeWidth={1.8} aria-hidden />}
     </button>

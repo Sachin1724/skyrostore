@@ -12,7 +12,7 @@ export default async function BrandsPage() {
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-surface-soft">
+      <main id="main" className="min-h-screen bg-surface-soft">
         <div className="px-8 py-10 md:px-10">
           <h1 className="text-[clamp(2.5rem,1.6rem+3.6vw,4.5rem)] font-bold leading-[0.95] tracking-[-0.04em] text-balance text-graphite">Brands</h1>
           <p className="mt-1.5 text-[14px] text-text-secondary">Shop by manufacturer.</p>

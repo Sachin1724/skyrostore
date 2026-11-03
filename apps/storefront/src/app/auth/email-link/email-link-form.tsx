@@ -3,8 +3,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { isSignInWithEmailLink, signInWithEmailLink } from "firebase/auth";
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
 import {
   EMAIL_FOR_SIGN_IN_KEY,
   firebaseAuth,
@@ -14,7 +12,7 @@ import {
 } from "@/lib/firebase";
 
 /** Where the emailed sign-in link lands. Finishes the sign-in on our own page. */
-export default function EmailLinkPage() {
+export function EmailLinkForm() {
   const router = useRouter();
   const [status, setStatus] = useState<"working" | "need_email" | "error">("working");
   const [email, setEmail] = useState("");
@@ -58,9 +56,7 @@ export default function EmailLinkPage() {
   }, []);
 
   return (
-    <>
-      <Header />
-      <main className="mx-auto min-h-[60vh] max-w-md px-6 py-16">
+      <main id="main" className="mx-auto min-h-[60vh] max-w-md px-6 py-16">
         <h1 className="text-[24px] font-bold text-graphite">Signing you in</h1>
         {status === "working" && <p className="mt-4 text-[14px] text-text-secondary" role="status">Checking your link…</p>}
         {status === "need_email" && (
@@ -93,7 +89,5 @@ export default function EmailLinkPage() {
           </div>
         )}
       </main>
-      <Footer />
-    </>
   );
 }

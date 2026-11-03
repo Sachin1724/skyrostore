@@ -1,58 +1,75 @@
 import Link from "next/link";
-import { SkyroMark } from "@/components/brand/logo";
+import { SkyroLogo } from "@/components/brand/logo";
 
-const LINKS = [
-  { href: "/parts", label: "Parts" },
-  { href: "/uavs", label: "Drones" },
-  { href: "/build", label: "Build a drone" },
-  { href: "/bulk-orders", label: "Bulk orders" },
-  { href: "/support", label: "Support" },
-  { href: "/account/orders", label: "Track an order" },
+const COLUMNS = [
+  {
+    title: "Help",
+    links: [
+      { href: "/account/orders", label: "Track an order" },
+      { href: "/policies/shipping", label: "Shipping" },
+      { href: "/policies/refunds", label: "Returns and refunds" },
+      { href: "/support", label: "Contact support" },
+    ],
+  },
+  {
+    title: "Shop",
+    links: [
+      { href: "/parts", label: "All parts" },
+      { href: "/uavs", label: "Drones" },
+      { href: "/brands", label: "Brands" },
+      { href: "/build", label: "Build checker" },
+    ],
+  },
+  {
+    title: "Business",
+    links: [
+      { href: "/bulk-orders", label: "Bulk orders" },
+      { href: "/bulk-orders/request", label: "Request a quote" },
+      { href: "/account/bulk-requests", label: "My quotations" },
+    ],
+  },
 ];
 
-const POLICIES = [
-  { href: "/policies/shipping", label: "Shipping" },
-  { href: "/policies/refunds", label: "Returns and refunds" },
-  { href: "/policies/terms", label: "Terms" },
-  { href: "/policies/privacy", label: "Privacy" },
-];
+const PAYMENT_METHODS = ["UPI", "Cards", "Netbanking", "Razorpay"];
 
-/** The close of every page: the name at full width, then the few links that matter. */
 export function Footer() {
   return (
-    <footer className="bg-navy text-white">
-      <div className="px-5 pb-10 pt-20 md:px-10">
-        <div className="grid gap-12 md:grid-cols-[1.2fr_1fr_1fr]">
-          <p className="max-w-[34ch] text-[18px] leading-[1.5] text-[#C9D6E6]">
+    <footer className="bg-navy text-[#DCE7F3]">
+      <div className="mx-auto grid max-w-[1376px] gap-10 px-4 pb-10 pt-14 sm:grid-cols-2 md:px-8 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+        <div className="space-y-3">
+          <SkyroLogo light />
+          <p className="max-w-[34ch] text-[14px] leading-relaxed text-[#C9D6E6]">
             Drone parts and complete UAVs, checked for compatibility before they ship from Odisha.
           </p>
-          <ul className="space-y-3 text-[16px]">
-            {LINKS.map((l) => (
-              <li key={l.href}>
-                <Link href={l.href} className="text-white transition-colors hover:text-brand-cyan">
-                  {l.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-          <ul className="space-y-3 text-[16px]">
-            {POLICIES.map((l) => (
-              <li key={l.href}>
-                <Link href={l.href} className="text-white transition-colors hover:text-brand-cyan">
-                  {l.label}
-                </Link>
-              </li>
+        </div>
+        {COLUMNS.map((col) => (
+          <div key={col.title}>
+            <h2 className="text-[14px] font-bold text-white">{col.title}</h2>
+            <ul className="mt-3 space-y-2.5 text-[14px]">
+              {col.links.map((l) => (
+                <li key={l.href}>
+                  <Link href={l.href} className="text-[#C9D6E6] transition-colors hover:text-white">
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+      <div className="border-t border-graphite-soft">
+        <div className="mx-auto flex max-w-[1376px] flex-wrap items-center justify-between gap-4 px-4 py-5 text-[13px] text-[#9FB3CB] md:px-8">
+          <p>
+            &copy; {new Date().getFullYear()} Skyrostore ·{" "}
+            <Link href="/policies/terms" className="hover:text-white">Terms</Link> ·{" "}
+            <Link href="/policies/privacy" className="hover:text-white">Privacy</Link>
+          </p>
+          <ul aria-label="Payment methods" className="flex flex-wrap gap-2">
+            {PAYMENT_METHODS.map((m) => (
+              <li key={m} className="rounded border border-graphite-soft px-2.5 py-1 text-[#DCE7F3]">{m}</li>
             ))}
           </ul>
         </div>
-
-        <div className="mt-20 flex items-end gap-3 md:gap-5" aria-hidden="true">
-          <SkyroMark size={96} className="h-[clamp(3.5rem,9vw,8.5rem)] w-auto shrink-0" />
-          <span className="text-[clamp(3.5rem,13vw,12rem)] font-bold leading-[0.8] tracking-[-0.05em]">
-            skyrostore
-          </span>
-        </div>
-        <p className="mt-8 text-[14px] text-[#9FB3CB]">&copy; {new Date().getFullYear()} Skyrostore. Payments by Razorpay.</p>
       </div>
     </footer>
   );

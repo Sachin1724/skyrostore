@@ -9,7 +9,7 @@ export default function AccountPage() {
   return (
     <>
       <Header />
-      <main className="mx-auto max-w-[640px] px-8 py-8 md:px-10">
+      <main id="main" className="mx-auto max-w-[640px] px-8 py-8 md:px-10">
         <Suspense fallback={<p className="text-[13px] text-text-muted">Loading…</p>}>
           <AccountView />
         </Suspense>

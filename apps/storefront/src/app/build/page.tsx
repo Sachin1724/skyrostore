@@ -12,7 +12,7 @@ export default async function BuildPage() {
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-surface-soft">
+      <main id="main" className="min-h-screen bg-surface-soft">
         {/* Hero Banner */}
         <section className="relative overflow-hidden border-b border-border bg-white">
           <div className="flex flex-col justify-between px-5 py-8 md:flex-row md:items-center md:px-10">

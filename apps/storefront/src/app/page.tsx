@@ -48,7 +48,7 @@ export default async function HomePage() {
   return (
     <>
       <Header />
-      <main className="bg-[#F4F8FC]">
+      <main id="main" className="bg-[#F4F8FC]">
         <div className="lg:grid lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
           {/* The fixed half: the quad assembles as the column scrolls. */}
           <div className="h-[30svh] lg:sticky lg:top-16 lg:h-[calc(100svh-4rem)]">

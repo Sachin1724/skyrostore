@@ -22,7 +22,8 @@ type Suggestion = {
 const DEBOUNCE_MS = 180;
 const MIN_QUERY = 2;
 
-export function SearchAutocomplete({ className = "" }: { className?: string }) {
+/** `category` scopes "see all results" to a category handle; suggestions stay catalogue-wide. */
+export function SearchAutocomplete({ className = "", category = "" }: { className?: string; category?: string }) {
   const router = useRouter();
   const listId = useId();
 
@@ -80,7 +81,7 @@ export function SearchAutocomplete({ className = "" }: { className?: string }) {
     if (!trimmed) return;
     track("search_performed", { search_query: trimmed, metadata: { source: "header" } });
     setOpen(false);
-    router.push(`/search?q=${encodeURIComponent(trimmed)}`);
+    router.push(`/search?q=${encodeURIComponent(trimmed)}${category ? `&category=${encodeURIComponent(category)}` : ""}`);
   }
 
   function goToProduct(suggestion: Suggestion, position: number) {
@@ -122,9 +123,9 @@ export function SearchAutocomplete({ className = "" }: { className?: string }) {
   const showPanel = open && query.trim().length >= MIN_QUERY;
 
   return (
-    <div ref={containerRef} className={`relative ${className}`}>
+    <div ref={containerRef} className={`relative h-full ${className}`}>
       <form
-        role="search"
+        className="flex h-full"
         onSubmit={(event) => {
           event.preventDefault();
           goToResults(query);
@@ -144,7 +145,7 @@ export function SearchAutocomplete({ className = "" }: { className?: string }) {
           }}
           onFocus={() => setOpen(true)}
           onKeyDown={onKeyDown}
-          placeholder="Search products, parts..."
+          placeholder="Search motors, flight controllers, frames…"
           autoComplete="off"
           role="combobox"
           aria-expanded={showPanel}
@@ -153,17 +154,17 @@ export function SearchAutocomplete({ className = "" }: { className?: string }) {
           aria-activedescendant={
             activeIndex >= 0 ? `${listId}-option-${activeIndex}` : undefined
           }
-          className="w-full rounded-md border border-border bg-surface-soft py-1.5 pl-3 pr-8 text-[14px] text-graphite placeholder:text-text-muted focus:border-graphite focus:bg-white"
+          className="h-full min-w-0 flex-1 bg-white pl-4 pr-2 text-[15px] font-medium text-navy placeholder:text-text-muted focus:outline-none"
         />
         <button
           type="submit"
           aria-label="Search"
-          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-text-muted hover:text-graphite"
+          className="flex w-12 shrink-0 items-center justify-center rounded-r-[4px] bg-brand text-white transition-colors hover:bg-navy md:w-14"
         >
           {loading ? (
-            <Loader2 className="h-3.5 w-3.5 animate-spin" strokeWidth={1.8} />
+            <Loader2 className="h-5 w-5 animate-spin" strokeWidth={2} aria-hidden />
           ) : (
-            <Search className="h-3.5 w-3.5" strokeWidth={1.8} />
+            <Search className="h-5 w-5" strokeWidth={2.2} aria-hidden />
           )}
         </button>
       </form>
@@ -227,7 +228,7 @@ export function SearchAutocomplete({ className = "" }: { className?: string }) {
                     </span>
 
                     {suggestion.price !== null && (
-                      <span className="shrink-0 font-mono text-[14px] font-bold text-graphite">
+                      <span className="shrink-0 tabular-nums text-[14px] font-bold text-graphite">
                         {formatPrice(suggestion.price, suggestion.currency_code || "INR")}
                       </span>
                     )}

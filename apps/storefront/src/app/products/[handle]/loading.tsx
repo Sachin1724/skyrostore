@@ -7,7 +7,7 @@ export default function Loading() {
   return (
     <>
       <Header />
-      <main>
+      <main id="main">
         <div className="min-h-screen bg-surface-soft px-5 pb-28 md:px-10 lg:pb-24" role="status" aria-label="Loading product">
           <Bone className="mt-8 h-5 w-64" />
           <section className="mt-6 grid gap-10 lg:grid-cols-[minmax(0,6fr)_minmax(0,5fr)]">

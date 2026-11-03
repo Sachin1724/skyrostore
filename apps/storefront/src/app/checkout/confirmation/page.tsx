@@ -42,7 +42,7 @@ export default async function ConfirmationPage({
   return (
     <>
       <Header />
-      <main className="bg-[#F4F8FC]">
+      <main id="main" className="bg-[#F4F8FC]">
         <div className="mx-auto max-w-[1120px] px-5 py-16 md:px-10 md:py-24">
           <OrderSuccess orderId={order_id} summary={summary} />
         </div>

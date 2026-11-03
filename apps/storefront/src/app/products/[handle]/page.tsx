@@ -48,7 +48,7 @@ export default async function ProductDetailPage({
   return (
     <>
       <Header />
-      <main>
+      <main id="main">
         <ProductDetailClient product={product} relatedProducts={relatedProducts} trail={trail} brand={brand} />
       </main>
       <Footer />

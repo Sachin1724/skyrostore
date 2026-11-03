@@ -1,11 +1,12 @@
 "use client";
 
+import { CART_ADDED } from "@/components/layout/header-bar";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { formatPrice } from "@/lib/utils";
-import { ProductRow } from "@/components/product/product-row";
+import { ProductListRow } from "@/components/product/product-card";
 import { ProductMediaFallback } from "@/components/product/product-media-fallback";
 import { extractTechnicalSpecs } from "@/lib/technical-specs";
 import { track } from "@/lib/analytics";
@@ -58,7 +59,7 @@ export function ProductDetailClient({
     });
   }, [product?.id, variant?.id, price?.calculated_amount, price?.currency_code]);
 
-  async function handleAddToCart(): Promise<boolean> {
+  async function handleAddToCart(openCart = true): Promise<boolean> {
     if (!variant?.id || !inStock || cartState === "adding") return false;
     setCartState("adding");
     try {
@@ -73,7 +74,7 @@ export function ProductDetailClient({
       }
       const data = await res.json();
       localStorage.setItem("cart_id", data.cart_id);
-      window.dispatchEvent(new Event("storage"));
+      window.dispatchEvent(new Event(openCart ? CART_ADDED : "storage"));
       track("product_added_to_cart", {
         cart_id: data.cart_id,
         product_id: product.id,
@@ -92,7 +93,7 @@ export function ProductDetailClient({
   }
 
   async function handleBuyNow() {
-    if (await handleAddToCart()) router.push("/cart");
+    if (await handleAddToCart(false)) router.push("/checkout");
   }
 
   const addLabel = cartState === "adding" ? "Adding…" : cartState === "added" ? "Added to cart" : "Add to cart";
@@ -175,7 +176,7 @@ export function ProductDetailClient({
             </div>
             <button
               type="button"
-              onClick={handleAddToCart}
+              onClick={() => handleAddToCart()}
               disabled={!inStock || cartState === "adding"}
               className="inline-flex min-h-12 items-center bg-white px-7 text-[16px] font-semibold text-navy hover:text-brand disabled:opacity-40"
             >
@@ -237,7 +238,7 @@ export function ProductDetailClient({
           </h2>
           <ul className="mt-6 divide-y divide-border bg-white px-4 md:px-6">
             {relatedProducts.map((p) => (
-              <ProductRow key={p.id} product={p} />
+              <ProductListRow key={p.id} product={p} />
             ))}
           </ul>
         </section>
@@ -248,7 +249,7 @@ export function ProductDetailClient({
         <p className="min-w-0 flex-1 truncate text-[17px] font-bold tabular-nums text-navy">{priceText ?? "Price on request"}</p>
         <button
           type="button"
-          onClick={handleAddToCart}
+          onClick={() => handleAddToCart()}
           disabled={!inStock || cartState === "adding"}
           aria-label={addLabel}
           className="min-h-11 bg-surface-soft px-4 text-[15px] font-semibold text-navy disabled:opacity-40"

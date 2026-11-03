@@ -12,7 +12,7 @@ export default function SupportPage() {
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-surface-soft py-10">
+      <main id="main" className="min-h-screen bg-surface-soft py-10">
         <div className="px-8 md:px-10">
           <SupportView />
         </div>

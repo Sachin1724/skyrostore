@@ -49,7 +49,7 @@ export default async function CustomerBulkRequestsPage() {
     return (
       <>
         <Header />
-        <main className="mx-auto max-w-[640px] px-8 py-16 text-center">
+        <main id="main" className="mx-auto max-w-[640px] px-8 py-16 text-center">
           <Package className="mx-auto h-12 w-12 text-text-muted" strokeWidth={1.5} />
           <h1 className="mt-4 text-[28px] font-bold text-graphite">Sign in to see your bulk requests</h1>
           <p className="mt-2 text-[14px] text-text-secondary">
@@ -89,7 +89,7 @@ export default async function CustomerBulkRequestsPage() {
   return (
     <>
       <Header />
-      <main className="px-8 py-10 md:px-10">
+      <main id="main" className="px-8 py-10 md:px-10">
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-color-border pb-5">
           <div>
             <nav className="text-[13px] font-mono tracking-[0.08em] text-text-muted">

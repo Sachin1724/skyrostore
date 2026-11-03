@@ -73,7 +73,7 @@ export default async function PolicyPage({ params }: { params: Promise<{ slug: s
   return (
     <>
       <Header />
-      <main className="bg-[#F4F8FC]">
+      <main id="main" className="bg-[#F4F8FC]">
         <article className="mx-auto max-w-[760px] px-5 py-16 md:py-24">
           <h1 className="text-[clamp(2.5rem,1.6rem+4vw,4.5rem)] font-bold leading-[1] tracking-[-0.035em] text-navy">
             {policy.title}
