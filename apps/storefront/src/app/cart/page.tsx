@@ -1,17 +1,36 @@
+import Link from "next/link";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { CartView } from "@/components/cart/cart-view";
+import { RecentlyViewed } from "@/components/product/recently-viewed";
 
-export const metadata = { title: "Your cart — Skyrostore" };
+export const metadata = {
+  title: "Shopping Cart — Skyrostore",
+  description: "Review UAV components in your shopping cart, calculate shipping, and proceed to secure checkout.",
+};
 
 export default function CartPage() {
   return (
     <>
       <Header />
-      <main id="main" className="min-h-screen bg-page pb-20">
+      <main id="main" className="min-h-screen bg-surface-soft pb-20">
         <div className="mx-auto max-w-[1376px] px-4 md:px-8">
-          <h1 className="pb-5 pt-6 text-[clamp(1.6rem,1.2rem+1.4vw,2.1rem)] font-extrabold tracking-[-0.03em] text-navy">Your Cart</h1>
+          {/* Breadcrumbs */}
+          <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 pt-5 text-[13px] text-text-secondary">
+            <Link href="/" className="hover:text-brand">Home</Link>
+            <span aria-hidden>/</span>
+            <span className="font-semibold text-navy">Shopping Cart</span>
+          </nav>
+
+          <h1 className="pb-5 pt-4 text-[clamp(1.6rem,1.2rem+1.4vw,2.1rem)] font-extrabold tracking-[-0.03em] text-navy">
+            Shopping Cart
+          </h1>
+
           <CartView />
+
+          <div className="mt-14">
+            <RecentlyViewed title="You Might Also Need (Recently Viewed)" />
+          </div>
         </div>
       </main>
       <Footer />
