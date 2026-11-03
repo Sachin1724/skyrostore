@@ -13,6 +13,7 @@ import {
   FileText,
   FolderTree,
   Tag,
+  PenLine,
 } from "lucide-react";
 
 const NAV_ITEMS = [
@@ -23,6 +24,7 @@ const NAV_ITEMS = [
   { href: "/products", label: "Products", icon: Package },
   { href: "/categories", label: "Categories", icon: FolderTree },
   { href: "/brands", label: "Brands", icon: Tag },
+  { href: "/content", label: "Homepage", icon: PenLine },
   { href: "/inventory", label: "Inventory", icon: Warehouse },
   { href: "/customers", label: "Customers", icon: Users },
   { href: "/shipments", label: "Shipments", icon: Truck },

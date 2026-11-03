@@ -10,6 +10,7 @@ import { getProducts } from "@/lib/data/products";
 import { getUAVComponents, type UAVComponent } from "@/lib/data/uav-components";
 import { getBrands, getCatalogIndex, getCategoryTree, countForNode, cleanName } from "@/lib/data/catalog";
 import { formatPrice } from "@/lib/utils";
+import { getSiteContent } from "@/lib/data/site-content";
 
 /** A one-line spec a builder recognises, from the product's own metadata. */
 function summary(c: UAVComponent): string {
@@ -21,24 +22,14 @@ function summary(c: UAVComponent): string {
   return name;
 }
 
-const FAQ: Array<[string, string]> = [
-  ["How does the compatibility check work?", "It compares the published specifications of the parts you pick: motor voltage range against the pack, recommended prop size against the prop, current against the ESC. It flags a mismatch before you pay."],
-  ["Where do orders ship from?", "From our workshop in Odisha, by tracked courier (Delhivery and partners), to most PIN codes in India. Checkout tells you before payment if we cannot reach yours."],
-  ["How do I pay?", "Through Razorpay: UPI, cards, net banking or wallets. Your address is filled from Razorpay, so there is no long form."],
-  ["Do I get a GST invoice?", "Yes, with every order. Prices include GST."],
-  ["Can I track my parcel?", "Yes. The tracking number arrives by email when the courier is booked, and live status sits under My orders."],
-  ["What if a part arrives damaged?", "Tell us with photos and we replace or refund it. The returns page has the details."],
-  ["Do you supply teams and institutions?", "Yes. Send a bulk request with quantities and we reply with a quotation; accepted quotes become normal orders."],
-  ["Do I need permission to fly?", "Drone flying in India follows the Drone Rules, 2021. Registration and permissions are the operator's responsibility."],
-];
-
 export default async function HomePage() {
-  const [tree, brands, index, { products }, components] = await Promise.all([
+  const [tree, brands, index, { products }, components, content] = await Promise.all([
     getCategoryTree(),
     getBrands(),
     getCatalogIndex(),
     getProducts({ limit: 12 }),
     getUAVComponents(),
+    getSiteContent(),
   ]);
 
   const options = Object.fromEntries(
@@ -67,10 +58,10 @@ export default async function HomePage() {
           <div className="px-5 md:px-10">
             <section data-stage="1" className="pb-24 pt-10 lg:pt-24">
               <h1 className="text-[clamp(3rem,1.6rem+5vw,6.5rem)] font-bold leading-[0.95] tracking-[-0.04em] text-balance text-navy">
-                Parts that fly together.
+                {content.heroTitle}
               </h1>
               <p className="mt-6 max-w-[40ch] text-[clamp(1.125rem,1rem+0.5vw,1.375rem)] leading-[1.5] text-navy">
-                Motors, props, ESCs, packs and frames, each checked against the others before it ships from Odisha.
+                {content.heroSentence}
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link href="/parts" className="inline-flex min-h-12 items-center bg-navy px-7 text-[16px] font-semibold text-white hover:bg-brand">
@@ -173,7 +164,7 @@ export default async function HomePage() {
                 Questions, answered
               </h2>
               <div className="mt-8 gap-12 text-[17px] leading-[1.6] text-navy md:columns-2">
-                {FAQ.map(([q, a]) => (
+                {content.faq.map(({ q, a }) => (
                   <p key={q} className="mb-5 break-inside-avoid">
                     <strong className="font-semibold">{q}</strong> {a}
                   </p>
@@ -187,10 +178,10 @@ export default async function HomePage() {
           <div className="flex flex-col gap-6 px-5 py-20 md:flex-row md:items-end md:justify-between md:px-10">
             <div>
               <h2 className="text-[clamp(2rem,1.4rem+2.4vw,3.25rem)] font-bold leading-[1] tracking-[-0.03em] text-balance text-navy">
-                Equipping a team?
+                {content.closingTitle}
               </h2>
               <p className="mt-4 max-w-[46ch] text-[18px] text-navy">
-                Send quantities for a fleet, a lab or a course. We reply with a quotation and a GST invoice.
+                {content.closingSentence}
               </p>
             </div>
             <Link href="/bulk-orders/request" className="inline-flex min-h-12 items-center self-start bg-navy px-7 text-[16px] font-semibold text-white hover:bg-brand md:self-auto">
