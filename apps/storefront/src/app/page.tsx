@@ -123,9 +123,9 @@ export default async function HomePage() {
                     <li key={node.id}>
                       <Link
                         href={`/parts?category=${node.handle}`}
-                        className="flex h-full flex-col items-center gap-2.5 rounded-lg border border-border bg-white px-2 py-4 text-center transition-colors hover:border-brand"
+                        className="group flex h-full flex-col items-center gap-2.5 rounded-lg border border-border bg-white px-2 py-4 text-center transition-[border-color,translate] duration-200 ease-out hover:-translate-y-0.5 hover:border-brand"
                       >
-                        <span className="flex h-16 w-16 items-center justify-center rounded-full bg-brand-soft">
+                        <span className="flex h-16 w-16 items-center justify-center rounded-full bg-brand-soft transition-transform duration-200 ease-out group-hover:scale-105">
                           {art ? <Image src={`/images/products/${art}.png`} alt="" width={36} height={36} /> : null}
                         </span>
                         <span className="text-[14px] font-semibold leading-tight text-navy">{node.name}</span>

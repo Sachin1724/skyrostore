@@ -48,6 +48,11 @@
   --radius-sm: 4px;
   --radius-md: 6px;
   --radius-lg: 8px;
+
+  /* Motion. Overrides Tailwind's weak built-in ease-out / ease-in-out. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 @layer base {
@@ -118,3 +123,86 @@
 .brand-bar-track { animation: brand-scroll 40s linear infinite; }
 .brand-bar:hover .brand-bar-track,
 .brand-bar:focus-within .brand-bar-track { animation-play-state: paused; }
+
+/* ---------- Micro-interactions ----------
+   CSS only: transitions retarget when interrupted, @starting-style gives entry
+   motion to elements that mount or open. The reduced-motion rule above shortens
+   every duration to ~0, so state changes stay and movement goes. */
+
+/* Press feedback on every enabled button. Unlayered on purpose: it must beat
+   transition-colors utilities, so it lists every property those animate too. */
+button:not(:disabled) {
+  transition-property: transform, translate, scale, color, background-color, border-color, box-shadow, opacity;
+  transition-duration: 160ms;
+  transition-timing-function: var(--ease-out);
+}
+button:not(:disabled):active { transform: scale(0.97); }
+
+/* Slide-over dialogs: cart from the right, menu from the left. */
+dialog.sheet-right,
+dialog.sheet-left {
+  transition: transform 320ms var(--ease-drawer), overlay 320ms allow-discrete, display 320ms allow-discrete;
+}
+dialog.sheet-right { transform: translateX(100%); }
+dialog.sheet-left { transform: translateX(-100%); }
+dialog.sheet-right[open],
+dialog.sheet-left[open] { transform: translateX(0); }
+@starting-style {
+  dialog.sheet-right[open] { transform: translateX(100%); }
+  dialog.sheet-left[open] { transform: translateX(-100%); }
+}
+
+/* Centred dialog (photo zoom): a small scale-up, never from zero. */
+dialog.pop {
+  opacity: 0;
+  transform: scale(0.96);
+  transition: opacity 200ms var(--ease-out), transform 200ms var(--ease-out), overlay 200ms allow-discrete, display 200ms allow-discrete;
+}
+dialog.pop[open] { opacity: 1; transform: scale(1); }
+@starting-style {
+  dialog.pop[open] { opacity: 0; transform: scale(0.96); }
+}
+
+/* Backdrops fade with their dialog. */
+dialog::backdrop {
+  opacity: 0;
+  transition: opacity 320ms var(--ease-out), overlay 320ms allow-discrete, display 320ms allow-discrete;
+}
+dialog[open]::backdrop { opacity: 1; }
+@starting-style {
+  dialog[open]::backdrop { opacity: 0; }
+}
+
+/* Dropdown panels (All categories, search suggestions): grow from their trigger. */
+.pop-in {
+  transform-origin: top left;
+  transition: opacity 180ms var(--ease-out), transform 180ms var(--ease-out);
+}
+@starting-style {
+  .pop-in { opacity: 0; transform: translateY(-4px) scale(0.98); }
+}
+
+/* Phone filter sheet rises into place. */
+.rise-in { transition: opacity 240ms var(--ease-out), transform 240ms var(--ease-out); }
+@starting-style {
+  .rise-in { opacity: 0; transform: translateY(16px); }
+}
+
+/* Content swapped in place (gallery photo, added-to-cart tick). */
+.fade-in { transition: opacity 200ms var(--ease-out), transform 200ms var(--ease-out); }
+@starting-style {
+  .fade-in { opacity: 0; transform: scale(0.98); }
+}
+
+/* Cart count: one small bump each time it changes (keyed remount). */
+@keyframes count-bump { 0% { transform: scale(0.6); } 60% { transform: scale(1.15); } 100% { transform: scale(1); } }
+.count-bump { animation: count-bump 320ms var(--ease-out); }
+
+/* Accordions open and close with height where the browser supports it. */
+:root { interpolate-size: allow-keywords; }
+details::details-content {
+  block-size: 0;
+  overflow: clip;
+  transition: block-size 240ms var(--ease-out), content-visibility 240ms allow-discrete;
+}
+details[open]::details-content { block-size: auto; }

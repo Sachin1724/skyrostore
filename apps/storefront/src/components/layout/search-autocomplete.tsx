@@ -178,7 +178,7 @@ export function SearchAutocomplete({ className = "", category = "" }: { classNam
 
       {showPanel && (
         <div
-          className="absolute left-0 right-0 top-[calc(100%+6px)] z-50 overflow-hidden rounded-md border border-border bg-white shadow-lg"
+          className="pop-in absolute left-0 right-0 top-[calc(100%+6px)] z-50 overflow-hidden rounded-md border border-border bg-white shadow-lg"
           style={{ minWidth: "320px" }}
         >
           {suggestions.length === 0 ? (

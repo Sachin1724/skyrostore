@@ -40,7 +40,7 @@ export function CategoryMenu({ tree }: { tree: CategoryNode[] }) {
           id="category-panel"
           // A followed link closes the panel (same-path links do not change the route).
           onClick={(e) => (e.target as HTMLElement).closest("a") && setOpen(false)}
-          className="absolute left-0 top-[calc(100%+7px)] z-50 grid w-[min(880px,calc(100vw-4rem))] grid-cols-3 gap-x-8 gap-y-6 rounded-lg border border-border bg-white p-6 shadow-[0_12px_32px_rgba(10,26,47,0.12)]"
+          className="pop-in absolute left-0 top-[calc(100%+7px)] z-50 grid w-[min(880px,calc(100vw-4rem))] grid-cols-3 gap-x-8 gap-y-6 rounded-lg border border-border bg-white p-6 shadow-[0_12px_32px_rgba(10,26,47,0.12)]"
         >
           {tree.map((root) => (
             <div key={root.id}>

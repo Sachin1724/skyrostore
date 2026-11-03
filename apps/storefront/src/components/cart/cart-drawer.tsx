@@ -84,7 +84,7 @@ export function CartDrawer({
       onClose={onClose}
       onClick={(e) => e.target === ref.current && onClose()}
       aria-labelledby="cart-drawer-title"
-      className="m-0 ml-auto h-dvh max-h-dvh w-full max-w-[420px] overscroll-contain bg-white p-0 text-navy backdrop:bg-navy/40"
+      className="sheet-right m-0 ml-auto h-dvh max-h-dvh w-full max-w-[420px] overscroll-contain bg-white p-0 text-navy backdrop:bg-navy/40"
     >
       <div className="flex h-full flex-col">
         <div className="flex h-16 shrink-0 items-center justify-between border-b border-border px-5">

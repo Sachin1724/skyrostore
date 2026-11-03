@@ -20,6 +20,7 @@ export function HeaderBar({ categories }: { categories: Cat[] }) {
   const [cartOpen, setCartOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [scope, setScope] = useState("");
+  const [bump, setBump] = useState(0);
   const menuRef = useRef<HTMLDialogElement>(null);
 
   const refresh = useCallback(async () => {
@@ -31,7 +32,11 @@ export function HeaderBar({ categories }: { categories: Cat[] }) {
 
   useEffect(() => {
     void refresh();
-    const onAdded = () => void refresh().then(() => setCartOpen(true));
+    const onAdded = () =>
+      void refresh().then(() => {
+        setBump((n) => n + 1);
+        setCartOpen(true);
+      });
     const onStorage = () => void refresh();
     window.addEventListener("storage", onStorage);
     window.addEventListener(CART_ADDED, onAdded);
@@ -109,7 +114,7 @@ export function HeaderBar({ categories }: { categories: Cat[] }) {
             <span className="relative">
               <ShoppingCart className="h-[22px] w-[22px]" strokeWidth={1.8} aria-hidden />
               {count > 0 ? (
-                <span className="absolute -right-2.5 -top-2 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-brand px-1 text-[11px] font-bold tabular-nums text-white">
+                <span key={bump} className={`absolute -right-2.5 -top-2 ${bump ? "count-bump" : ""} flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-brand px-1 text-[11px] font-bold tabular-nums text-white`}>
                   {count}
                 </span>
               ) : null}
@@ -135,7 +140,7 @@ export function HeaderBar({ categories }: { categories: Cat[] }) {
         onClose={() => setMenuOpen(false)}
         onClick={(e) => e.target === menuRef.current && setMenuOpen(false)}
         aria-label="Menu"
-        className="m-0 mr-auto h-dvh max-h-dvh w-[86vw] max-w-[360px] overscroll-contain bg-white p-0 text-navy backdrop:bg-navy/40"
+        className="sheet-left m-0 mr-auto h-dvh max-h-dvh w-[86vw] max-w-[360px] overscroll-contain bg-white p-0 text-navy backdrop:bg-navy/40"
       >
         <div className="flex h-16 items-center justify-between border-b border-border px-4">
           <SkyroLogo />

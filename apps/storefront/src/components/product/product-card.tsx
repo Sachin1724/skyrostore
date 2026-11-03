@@ -71,7 +71,7 @@ function AddButton({ product, s }: { product: HttpTypes.StoreProduct; s: ReturnT
 export function ProductCard({ product, priority = false }: { product: HttpTypes.StoreProduct; priority?: boolean }) {
   const s = productSummary(product);
   return (
-    <article className="group flex flex-col overflow-hidden rounded-lg border border-border bg-white transition-[border-color,box-shadow] hover:border-accent hover:shadow-[0_6px_20px_rgba(10,26,47,0.08)]">
+    <article className="group flex flex-col overflow-hidden rounded-lg border border-border bg-white transition-[border-color,box-shadow,translate] duration-200 ease-out hover:-translate-y-0.5 hover:border-accent hover:shadow-[0_8px_24px_rgba(10,26,47,0.09)]">
       <Link href={s.href} tabIndex={-1} aria-hidden className="relative block aspect-square bg-surface-soft">
         {product.thumbnail ? (
           <Image
@@ -80,7 +80,7 @@ export function ProductCard({ product, priority = false }: { product: HttpTypes.
             fill
             priority={priority}
             sizes="(min-width: 1280px) 25vw, (min-width: 640px) 33vw, 50vw"
-            className="object-contain p-5 transition-transform duration-300 group-hover:scale-[1.03]"
+            className="object-contain p-5 transition-transform duration-300 ease-out group-hover:scale-[1.04]"
           />
         ) : (
           <ProductMediaFallback componentType={product.metadata?.component_type as string | undefined} category={s.category} title={s.title} />

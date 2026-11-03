@@ -150,7 +150,9 @@ export function ProductDetailClient({
           <div className="relative aspect-square overflow-hidden rounded-lg border border-border bg-white">
             {image ? (
               <>
-                <Image src={image} alt={title} fill priority sizes="(min-width:1024px) 55vw, 100vw" className="object-contain p-8" />
+                <div key={image} className={imageIdx ? "fade-in absolute inset-0" : "absolute inset-0"}>
+                  <Image src={image} alt={title} fill priority sizes="(min-width:1024px) 55vw, 100vw" className="object-contain p-8" />
+                </div>
                 <button
                   type="button"
                   onClick={() => setZoomed(true)}
@@ -363,7 +365,7 @@ export function ProductDetailClient({
           if (e.key === "ArrowLeft") step(-1);
         }}
         aria-label={`${title} photo`}
-        className="m-auto h-[min(92vh,900px)] w-[min(94vw,900px)] max-w-none overscroll-contain rounded-lg bg-white p-0 backdrop:bg-navy/70"
+        className="pop m-auto h-[min(92vh,900px)] w-[min(94vw,900px)] max-w-none overscroll-contain rounded-lg bg-white p-0 backdrop:bg-navy/70"
       >
         {image ? <Image src={image} alt={title} fill sizes="900px" className="object-contain p-6" /> : null}
         <button type="button" onClick={() => setZoomed(false)} aria-label="Close photo" className="absolute right-3 top-3 flex h-11 w-11 items-center justify-center rounded-md bg-white text-navy shadow">
@@ -383,7 +385,7 @@ export function ProductDetailClient({
 
       {/* Phones: price and the two actions stay in reach once the main buttons scroll away. */}
       <div
-        className={`fixed inset-x-0 bottom-0 z-30 flex items-center gap-2 border-t border-border bg-white px-4 py-2.5 pb-[max(0.625rem,env(safe-area-inset-bottom))] transition-transform lg:hidden ${
+        className={`fixed inset-x-0 bottom-0 z-30 flex items-center gap-2 border-t border-border bg-white px-4 py-2.5 pb-[max(0.625rem,env(safe-area-inset-bottom))] transition-transform duration-300 ease-drawer lg:hidden ${
           buyBoxVisible ? "translate-y-full" : "translate-y-0"
         }`}
         aria-hidden={buyBoxVisible}

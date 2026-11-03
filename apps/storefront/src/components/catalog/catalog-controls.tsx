@@ -50,7 +50,7 @@ export function FilterPanel({ activeCount, resultCount, children }: { activeCoun
         aria-label="Filters"
         onClick={close}
         onSubmit={close}
-        className={`${open ? "fixed inset-0 z-[60] flex flex-col overscroll-contain bg-white" : "hidden"} lg:static lg:z-auto lg:block lg:rounded-lg lg:border lg:border-border lg:bg-white`}
+        className={`${open ? "rise-in fixed inset-0 z-[60] flex flex-col overscroll-contain bg-white" : "hidden"} lg:static lg:z-auto lg:block lg:rounded-lg lg:border lg:border-border lg:bg-white`}
       >
         <div className="flex h-14 shrink-0 items-center justify-between border-b border-border px-4 lg:hidden">
           <h2 className="text-[17px] font-bold">Filters</h2>
