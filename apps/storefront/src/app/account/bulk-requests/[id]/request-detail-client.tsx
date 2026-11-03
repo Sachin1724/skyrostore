@@ -88,10 +88,10 @@ export function RequestDetailClient({ initialRequest }: RequestDetailClientProps
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-color-border pb-5">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-[26px] font-bold text-graphite tracking-tight">
+            <h1 className="text-[clamp(2.5rem,1.6rem+3.6vw,4.5rem)] font-bold leading-[0.95] tracking-[-0.04em] text-balance text-graphite">
               {request.reference_no}
             </h1>
-            <span className="font-mono text-[13px] font-bold tracking-wider bg-surface-soft px-2.5 py-1 rounded border border-color-border text-graphite">
+            <span className="font-mono text-[13px] font-bold bg-surface-soft px-2.5 py-1 rounded border border-color-border text-graphite">
               {request.request_type.replace(/_/g, " ")}
             </span>
           </div>
@@ -222,7 +222,7 @@ export function RequestDetailClient({ initialRequest }: RequestDetailClientProps
                 type="button"
                 onClick={handleAccept}
                 disabled={isProcessing}
-                className="inline-flex items-center gap-2 bg-graphite px-6 py-2.5 text-[13px] font-semibold text-white rounded-sm hover:bg-graphite-soft shadow-xs"
+                className="inline-flex items-center gap-2 bg-graphite px-6 py-2.5 text-[13px] font-semibold text-white rounded-sm hover:bg-graphite-soft"
               >
                 <CheckCircle2 className="h-4 w-4 text-accent" />
                 {isProcessing ? "Processing..." : "Accept Quotation"}

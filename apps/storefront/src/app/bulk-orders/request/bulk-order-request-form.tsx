@@ -325,9 +325,9 @@ export function BulkOrderRequestForm() {
   if (submittedData) {
     return (
       <div
-        className="rounded-md border border-border bg-white p-8 text-center shadow-sm"
+        className="rounded-md border border-border bg-white p-8 text-center"
       >
-        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-accent/20 text-graphite">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-brand-soft text-brand">
           <CheckCircle2 className="h-8 w-8 stroke-[2.2] text-graphite" />
         </div>
         <h2 className="mt-4 text-[24px] font-bold text-graphite">
@@ -336,7 +336,7 @@ export function BulkOrderRequestForm() {
         <p className="mt-2 text-[14px] text-text-secondary">
           Your formal request has been recorded under reference number:
         </p>
-        <div className="mt-3 inline-block rounded border border-border bg-surface-soft px-5 py-2.5 font-mono text-[18px] font-bold tracking-wider text-graphite">
+        <div className="mt-3 inline-block rounded border border-border bg-surface-soft px-5 py-2.5 font-mono text-[18px] font-bold text-graphite">
           {submittedData.reference_no}
         </div>
         <p className="mx-auto mt-4 max-w-lg text-[13px] leading-relaxed text-text-muted">
@@ -382,7 +382,7 @@ export function BulkOrderRequestForm() {
           onClick={() => setRequestType("BULK_PURCHASE")}
           className={`relative flex items-center justify-between rounded-lg border p-5 text-left transition-all ${
             requestType === "BULK_PURCHASE"
-              ? "border-[#84cc16] bg-[#f7fee7] ring-1 ring-[#84cc16]"
+              ? "border-brand bg-brand-soft ring-1 ring-brand"
               : "border-border bg-white hover:border-gray-300"
           }`}
         >
@@ -399,7 +399,7 @@ export function BulkOrderRequestForm() {
           </div>
           <div className="shrink-0 pl-3">
             {requestType === "BULK_PURCHASE" ? (
-              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#84cc16] text-white">
+              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-brand text-white">
                 <Check className="h-3.5 w-3.5 stroke-[3]" />
               </div>
             ) : (
@@ -414,7 +414,7 @@ export function BulkOrderRequestForm() {
           onClick={() => setRequestType("CUSTOM_BUILD")}
           className={`relative flex items-center justify-between rounded-lg border p-5 text-left transition-all ${
             requestType === "CUSTOM_BUILD"
-              ? "border-[#84cc16] bg-[#f7fee7] ring-1 ring-[#84cc16]"
+              ? "border-brand bg-brand-soft ring-1 ring-brand"
               : "border-border bg-white hover:border-gray-300"
           }`}
         >
@@ -431,7 +431,7 @@ export function BulkOrderRequestForm() {
           </div>
           <div className="shrink-0 pl-3">
             {requestType === "CUSTOM_BUILD" ? (
-              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#84cc16] text-white">
+              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-brand text-white">
                 <Check className="h-3.5 w-3.5 stroke-[3]" />
               </div>
             ) : (
@@ -446,7 +446,7 @@ export function BulkOrderRequestForm() {
           onClick={() => setRequestType("BULK_CUSTOM_BUILD")}
           className={`relative flex items-center justify-between rounded-lg border p-5 text-left transition-all ${
             requestType === "BULK_CUSTOM_BUILD"
-              ? "border-[#84cc16] bg-[#f7fee7] ring-1 ring-[#84cc16]"
+              ? "border-brand bg-brand-soft ring-1 ring-brand"
               : "border-border bg-white hover:border-gray-300"
           }`}
         >
@@ -463,7 +463,7 @@ export function BulkOrderRequestForm() {
           </div>
           <div className="shrink-0 pl-3">
             {requestType === "BULK_CUSTOM_BUILD" ? (
-              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#84cc16] text-white">
+              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-brand text-white">
                 <Check className="h-3.5 w-3.5 stroke-[3]" />
               </div>
             ) : (
@@ -477,7 +477,7 @@ export function BulkOrderRequestForm() {
       <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
         {/* LEFT COLUMN: Stepper + Active Step Content (8 cols) */}
         <div className="space-y-6 lg:col-span-8">
-          <div className="rounded-lg border border-border bg-white p-6 shadow-sm">
+          <div className="bg-white p-6">
             {/* Horizontal or Sub-step progress indicators */}
             <div className="flex flex-wrap items-center justify-between border-b border-border pb-5">
               {[
@@ -499,7 +499,7 @@ export function BulkOrderRequestForm() {
                     <div
                       className={`flex h-7 w-7 items-center justify-center rounded-full text-[14px] font-bold ${
                         isActive
-                          ? "bg-[#84cc16] text-white"
+                          ? "bg-brand text-white"
                           : isPassed
                           ? "bg-graphite text-white"
                           : "bg-surface-soft text-text-muted"
@@ -540,7 +540,7 @@ export function BulkOrderRequestForm() {
                     onClick={() => setActiveTab("add")}
                     className={`pb-2.5 text-[13px] font-bold transition-all ${
                       activeTab === "add"
-                        ? "border-b-2 border-[#84cc16] text-graphite"
+                        ? "border-b-2 border-brand text-graphite"
                         : "text-text-muted hover:text-graphite"
                     }`}
                   >
@@ -551,7 +551,7 @@ export function BulkOrderRequestForm() {
                     onClick={() => setActiveTab("saved")}
                     className={`pb-2.5 text-[13px] font-bold transition-all ${
                       activeTab === "saved"
-                        ? "border-b-2 border-[#84cc16] text-graphite"
+                        ? "border-b-2 border-brand text-graphite"
                         : "text-text-muted hover:text-graphite"
                     }`}
                   >
@@ -566,7 +566,7 @@ export function BulkOrderRequestForm() {
                     }}
                     className={`pb-2.5 text-[13px] font-bold transition-all ${
                       activeTab === "custom"
-                        ? "border-b-2 border-[#84cc16] text-graphite"
+                        ? "border-b-2 border-brand text-graphite"
                         : "text-text-muted hover:text-graphite"
                     }`}
                   >
@@ -587,7 +587,7 @@ export function BulkOrderRequestForm() {
                     />
                   </div>
                   <div className="w-full sm:w-48">
-                    <select
+                    <select aria-label="Filter by category"
                       value={categoryFilter}
                       onChange={(e) => setCategoryFilter(e.target.value)}
                       className="w-full rounded-md border border-border bg-white px-3 py-2 text-[13px] font-medium text-graphite focus:border-graphite"
@@ -606,7 +606,7 @@ export function BulkOrderRequestForm() {
                 {/* Products Table matching mockup */}
                 <div className="overflow-x-auto rounded-lg border border-border">
                   <table className="w-full text-left text-[13px]">
-                    <thead className="border-b border-border bg-surface-soft text-[13px] font-bold tracking-wider text-text-muted">
+                    <thead className="border-b border-border bg-surface-soft text-[13px] font-bold text-text-muted">
                       <tr>
                         <th className="px-4 py-3">Product</th>
                         <th className="px-4 py-3">Unit Price</th>
@@ -1100,7 +1100,7 @@ export function BulkOrderRequestForm() {
         {/* RIGHT COLUMN: REQUEST SUMMARY & WHY CHOOSE BULK (4 cols) */}
         <div className="space-y-6 lg:col-span-4">
           {/* Card 1: Request Summary */}
-          <div className="rounded-lg border border-border bg-white p-6 shadow-sm">
+          <div className="bg-white p-6">
             <div className="flex items-center justify-between border-b border-border pb-4">
               <h3 className="text-[16px] font-bold text-graphite">Request Summary</h3>
               <span className="text-[14px] text-text-muted">{items.length} items</span>
@@ -1137,7 +1137,7 @@ export function BulkOrderRequestForm() {
           </div>
 
           {/* Card 2: Why Choose Bulk Orders? */}
-          <div className="rounded-lg border border-border bg-white p-6 shadow-sm">
+          <div className="bg-white p-6">
             <h3 className="text-[15px] font-bold text-graphite">
               Why Choose Bulk Orders?
             </h3>
@@ -1151,7 +1151,7 @@ export function BulkOrderRequestForm() {
                 "After-sales support for fleet orders",
               ].map((benefit, i) => (
                 <li key={i} className="flex items-center gap-2.5">
-                  <div className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-[#84cc16] text-white">
+                  <div className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-brand text-white">
                     <Check className="h-2.5 w-2.5 stroke-[3]" />
                   </div>
                   <span>{benefit}</span>
@@ -1184,7 +1184,7 @@ export function BulkOrderRequestForm() {
       {/* Quick Add Catalog Modal */}
       {showAddCatalogModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-lg rounded-lg border border-border bg-white p-6 shadow-xl">
+          <div className="w-full max-w-lg bg-white p-6 shadow-xl">
             <div className="flex items-center justify-between border-b border-border pb-3">
               <h3 className="text-[16px] font-bold text-graphite">Add Catalog Component</h3>
               <button

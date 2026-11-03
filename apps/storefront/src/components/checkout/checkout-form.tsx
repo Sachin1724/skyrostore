@@ -57,7 +57,7 @@ function openMagicCheckout(options: { key_id: string; order_id: string; email?: 
       prefill: options.email ? { email: options.email } : {},
       handler: (response: RazorpayResponse) => resolve(response),
       modal: { ondismiss: () => reject(new Error("Payment cancelled")) },
-      theme: { color: "#181B20" },
+      theme: { color: "#0A1A2F" },
     });
     rzp.on("payment.failed", (response: any) => {
       reject(new Error(response.error?.description || "Payment failed"));
@@ -163,7 +163,7 @@ export function CheckoutForm() {
 
   if (!loading && items.length === 0) {
     return (
-      <div className="rounded-lg border border-border bg-white p-12 text-center shadow-xs">
+      <div className="bg-white p-12 text-center">
         <h2 className="text-[20px] font-bold text-graphite">Your Cart is Empty</h2>
         <p className="mt-2 text-[14px] text-text-secondary">
           Add UAV parts or systems from our catalog before checking out.
@@ -192,7 +192,7 @@ export function CheckoutForm() {
           </div>
         )}
 
-        <div className="rounded-lg border border-border bg-white p-6 shadow-xs">
+        <div className="bg-white p-6">
           <div className="flex items-center justify-between border-b border-border pb-4">
             <h2 className="text-[17px] font-extrabold text-graphite">Your details</h2>
             {!cart?.email ? (
@@ -235,7 +235,7 @@ export function CheckoutForm() {
             type="button"
             onClick={handlePay}
             disabled={submitting || loading || !items.length}
-            className="mt-6 flex w-full items-center justify-center gap-2 rounded-md bg-graphite px-8 py-3.5 text-[14px] font-bold text-white transition hover:bg-black shadow-xs active:scale-[0.99] disabled:opacity-50"
+            className="mt-6 flex w-full items-center justify-center gap-2 rounded-md bg-graphite px-8 py-3.5 text-[14px] font-bold text-white transition hover:bg-black active:scale-[0.99] disabled:opacity-50"
           >
             {submitting ? "Processing…" : "Buy Now"}
           </button>
@@ -249,7 +249,7 @@ export function CheckoutForm() {
       {/* Right Column: Order Summary & Why Shop */}
       <div className="space-y-6">
         {/* Order Summary */}
-        <div className="rounded-lg border border-border bg-white p-6 shadow-xs">
+        <div className="bg-white p-6">
           <div className="flex items-center justify-between border-b border-border pb-3">
             <h3 className="text-[16px] font-extrabold text-graphite">
               Order Summary ({items.length} items)
@@ -306,7 +306,7 @@ export function CheckoutForm() {
         </div>
 
         {/* Why Shop with Skyrostore */}
-        <div className="rounded-lg border border-border bg-white p-5 shadow-xs space-y-3.5 text-[14px]">
+        <div className="bg-white p-5 space-y-3.5 text-[14px]">
           <h4 className="font-extrabold text-[13px] text-graphite">Why Shop with Skyrostore?</h4>
           <div className="flex items-center gap-3">
             <ShieldCheck className="h-4 w-4 text-success shrink-0" />

@@ -14,14 +14,14 @@ export default async function BrandsPage() {
       <Header />
       <main className="min-h-screen bg-surface-soft">
         <div className="px-8 py-10 md:px-10">
-          <h1 className="text-[32px] font-extrabold tracking-[-0.03em] text-graphite">Brands</h1>
+          <h1 className="text-[clamp(2.5rem,1.6rem+3.6vw,4.5rem)] font-bold leading-[0.95] tracking-[-0.04em] text-balance text-graphite">Brands</h1>
           <p className="mt-1.5 text-[14px] text-text-secondary">Shop by manufacturer.</p>
           {listed.length === 0 ? (
             <p className="mt-8 text-[13px] text-text-secondary">No brands listed yet.</p>
           ) : (
             <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-5">
               {listed.map((b) => (
-                <Link key={b.id} href={`/brands/${b.handle}`} className="rounded-lg border border-border bg-white p-5 text-center transition-colors hover:border-graphite">
+                <Link key={b.id} href={`/brands/${b.handle}`} className="bg-white p-5 text-center transition-colors hover:border-graphite">
                   {b.logo ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={b.logo} alt="" className="mx-auto h-14 w-14 object-contain" />

@@ -42,7 +42,7 @@ export default function BulkOrdersLandingPage() {
               <Cpu className="h-3.5 w-3.5 text-accent" />
               INSTITUTIONAL & CUSTOM UAV ENGINEERING
             </div>
-            <h1 className="mt-4 text-[34px] font-bold leading-[1.08] tracking-[-0.03em] text-graphite sm:text-[42px]">
+            <h1 className="text-[clamp(2.5rem,1.6rem+3.6vw,4.5rem)] font-bold leading-[0.95] tracking-[-0.04em] text-balance mt-4 text-graphite">
               Bulk Component Supply & Custom Aerial Systems
             </h1>
             <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-text-secondary">
@@ -231,8 +231,7 @@ export default function BulkOrdersLandingPage() {
           <div className="mt-6 flex justify-center gap-4">
             <Link
               href="/bulk-orders/request"
-              className="inline-flex bg-accent px-6 py-3 text-[13px] font-semibold text-graphite transition-colors hover:bg-accent-hover"
-              style={{ borderRadius: "var(--radius-sm)" }}
+              className="inline-flex min-h-12 items-center bg-navy px-7 text-[16px] font-semibold text-white transition-colors hover:bg-brand"
             >
               Request Bulk Quotation
             </Link>

@@ -167,7 +167,7 @@ export function FirebaseSignIn({ onSignedIn, onError }: { onSignedIn: () => void
         type="button"
         onClick={google}
         disabled={busy}
-        className="flex w-full items-center justify-center gap-2.5 px-4 py-3 text-[14px] font-semibold text-graphite transition-colors hover:bg-accent-hover disabled:opacity-50"
+        className="flex w-full items-center justify-center gap-2.5 px-4 py-3 text-[14px] font-semibold text-graphite transition-colors hover:bg-surface-soft disabled:opacity-50"
         style={{ borderRadius: "var(--radius-sm)", border: "1px solid var(--color-border-strong)", background: "var(--color-surface)" }}
       >
         <svg className="h-[18px] w-[18px]" viewBox="0 0 18 18" aria-hidden="true">

@@ -94,7 +94,7 @@ export function OrderDetail({ orderId }: { orderId: string }) {
   return (
     <div>
       <div className="flex items-center justify-between">
-        <h1 className="text-[28px] font-bold tracking-[-0.025em] text-graphite">
+        <h1 className="text-[clamp(2.5rem,1.6rem+3.6vw,4.5rem)] font-bold leading-[0.95] tracking-[-0.04em] text-balance text-graphite">
           Order #{order.display_id}
         </h1>
         <span

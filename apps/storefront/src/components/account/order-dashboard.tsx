@@ -133,17 +133,17 @@ export function OrderDashboard() {
   return (
     <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
       {/* 1. LEFT SIDEBAR: ACCOUNT NAVIGATION (3 cols) */}
-      <aside className="rounded-xl border border-gray-800 bg-[#181B20] p-6 text-white shadow-sm lg:col-span-3">
+      <aside className="rounded-xl border border-white/15 bg-navy p-6 text-white lg:col-span-3">
         {/* User Card */}
-        <div className="flex items-center gap-3.5 border-b border-gray-800 pb-6">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#2a2f38] text-[15px] font-bold text-white">
+        <div className="flex items-center gap-3.5 border-b border-white/15 pb-6">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-[15px] font-bold text-white">
             UAV
           </div>
           <div className="overflow-hidden">
             <h3 className="truncate text-[14px] font-bold text-white">
               {unauthenticated ? "Guest Account" : "Enterprise Customer"}
             </h3>
-            <p className="truncate text-[13px] text-gray-400">
+            <p className="truncate text-[13px] text-white/80">
               {unauthenticated ? "Sign in to access orders" : "Verified Customer"}
             </p>
           </div>
@@ -153,62 +153,62 @@ export function OrderDashboard() {
         <nav className="mt-6 space-y-1 text-[13px]">
           <Link
             href="/account"
-            className="flex items-center justify-between rounded-md px-3 py-2.5 text-gray-400 transition-colors hover:bg-[#22272e] hover:text-white"
+            className="flex items-center justify-between rounded-md px-3 py-2.5 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
           >
             <span>Dashboard</span>
           </Link>
           <Link
             href="/account/orders"
-            className="flex items-center justify-between rounded-md bg-[#22272e] px-3 py-2.5 font-bold text-[#84cc16]"
+            className="flex items-center justify-between rounded-md bg-white/10 px-3 py-2.5 font-bold text-white"
           >
             <span>My Orders</span>
           </Link>
           <Link
             href="/account/bulk-requests"
-            className="flex items-center justify-between rounded-md px-3 py-2.5 text-gray-400 transition-colors hover:bg-[#22272e] hover:text-white"
+            className="flex items-center justify-between rounded-md px-3 py-2.5 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
           >
             <span>Bulk Requests</span>
           </Link>
           <Link
             href="/build"
-            className="flex items-center justify-between rounded-md px-3 py-2.5 text-gray-400 transition-colors hover:bg-[#22272e] hover:text-white"
+            className="flex items-center justify-between rounded-md px-3 py-2.5 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
           >
             <span>Saved Configurations</span>
           </Link>
           <Link
             href="/parts"
-            className="flex items-center justify-between rounded-md px-3 py-2.5 text-gray-400 transition-colors hover:bg-[#22272e] hover:text-white"
+            className="flex items-center justify-between rounded-md px-3 py-2.5 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
           >
             <span>Wishlist</span>
           </Link>
           <Link
             href="/account"
-            className="flex items-center justify-between rounded-md px-3 py-2.5 text-gray-400 transition-colors hover:bg-[#22272e] hover:text-white"
+            className="flex items-center justify-between rounded-md px-3 py-2.5 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
           >
             <span>Addresses</span>
           </Link>
           <Link
             href="/account"
-            className="flex items-center justify-between rounded-md px-3 py-2.5 text-gray-400 transition-colors hover:bg-[#22272e] hover:text-white"
+            className="flex items-center justify-between rounded-md px-3 py-2.5 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
           >
             <span>Profile &amp; Security</span>
           </Link>
           <Link
             href="/account"
-            className="flex items-center justify-between rounded-md px-3 py-2.5 text-gray-400 transition-colors hover:bg-[#22272e] hover:text-white"
+            className="flex items-center justify-between rounded-md px-3 py-2.5 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
           >
             <span>Notifications</span>
           </Link>
           <Link
             href="/support"
-            className="flex items-center justify-between rounded-md px-3 py-2.5 text-gray-400 transition-colors hover:bg-[#22272e] hover:text-white"
+            className="flex items-center justify-between rounded-md px-3 py-2.5 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
           >
             <span>Support</span>
           </Link>
-          <div className="pt-4 border-t border-gray-800">
+          <div className="pt-4 border-t border-white/15">
             <Link
               href="/account"
-              className="flex items-center justify-between rounded-md px-3 py-2.5 text-rose-400 transition-colors hover:bg-[#22272e]"
+              className="flex items-center justify-between rounded-md px-3 py-2.5 text-[#ffb4b4] transition-colors hover:bg-white/10"
             >
               <span>Log Out</span>
             </Link>
@@ -219,49 +219,49 @@ export function OrderDashboard() {
       {/* 2. CENTER: MY ORDERS WORKSPACE (6 cols) */}
       <section className="space-y-6 lg:col-span-6">
         <div>
-          <span className="text-[13px] font-bold tracking-wider text-[#84cc16]">
-            MY ACCOUNT
+          <span className="text-[15px] font-semibold text-brand">
+            My account
           </span>
-          <h1 className="mt-1 text-[28px] font-extrabold tracking-tight text-graphite">
+          <h1 className="text-[clamp(2.5rem,1.6rem+3.6vw,4.5rem)] font-bold leading-[0.95] tracking-[-0.04em] text-balance mt-1 text-graphite">
             My Orders
           </h1>
-          <p className="mt-1 text-[13px] text-text-muted">
+          <p className="mt-4 text-[16px] text-text-secondary">
             Track your orders, view details, download invoices and manage returns.
           </p>
         </div>
 
         {/* 3 Metric Cards */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <div className="flex items-center gap-3.5 rounded-lg border border-border bg-white p-4 shadow-sm">
+          <div className="flex items-center gap-3.5 bg-white p-4">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-success-soft text-success">
               <Package className="h-5 w-5 stroke-[2]" />
             </div>
             <div>
               <p className="text-[13px] font-medium text-text-muted">Total Orders</p>
               <p className="text-[20px] font-extrabold text-graphite">{totalOrdersCount}</p>
-              <p className="text-[13px] text-text-disabled">Across all time</p>
+              <p className="text-[13px] text-text-muted">Across all time</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3.5 rounded-lg border border-border bg-white p-4 shadow-sm">
+          <div className="flex items-center gap-3.5 bg-white p-4">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-success-soft text-success">
               <ShoppingCart className="h-5 w-5 stroke-[2]" />
             </div>
             <div>
               <p className="text-[13px] font-medium text-text-muted">Total Spend</p>
               <p className="text-[20px] font-extrabold text-graphite">{formatINR(totalSpendAmount)}</p>
-              <p className="text-[13px] text-text-disabled">Including taxes</p>
+              <p className="text-[13px] text-text-muted">Including taxes</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3.5 rounded-lg border border-border bg-white p-4 shadow-sm">
+          <div className="flex items-center gap-3.5 bg-white p-4">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-success-soft text-success">
               <Clock className="h-5 w-5 stroke-[2]" />
             </div>
             <div>
               <p className="text-[13px] font-medium text-text-muted">Pending Deliveries</p>
               <p className="text-[20px] font-extrabold text-graphite">{pendingDeliveriesCount}</p>
-              <p className="text-[13px] text-text-disabled">Orders in transit</p>
+              <p className="text-[13px] text-text-muted">Orders in transit</p>
             </div>
           </div>
         </div>
@@ -278,7 +278,7 @@ export function OrderDashboard() {
                 onClick={() => setActiveTab(tab)}
                 className={`whitespace-nowrap pb-2 text-[13px] font-bold transition-all ${
                   activeTab === tab
-                    ? "border-b-2 border-[#84cc16] text-graphite"
+                    ? "border-b-2 border-brand text-graphite"
                     : "text-text-muted hover:text-graphite"
                 }`}
               >
@@ -294,7 +294,7 @@ export function OrderDashboard() {
               placeholder="Search by order number..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-md border border-border bg-white py-1.5 pl-8 pr-3 text-[14px] text-graphite placeholder:text-text-disabled focus:border-graphite"
+              className="w-full rounded-md border border-border bg-white py-1.5 pl-8 pr-3 text-[14px] text-graphite placeholder:text-text-muted focus:border-graphite"
             />
           </div>
         </div>
@@ -319,7 +319,7 @@ export function OrderDashboard() {
           {filteredOrders.map((order) => (
             <div
               key={order.id}
-              className="rounded-lg border border-border bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
+              className="bg-white p-5 transition-shadow hover:shadow-md"
             >
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border pb-4">
                 <div>
@@ -439,7 +439,7 @@ export function OrderDashboard() {
           ))}
 
           {filteredOrders.length === 0 && (
-            <div className="rounded-lg border border-border bg-white p-8 text-center text-[13px] text-text-muted">
+            <div className="bg-white p-8 text-center text-[13px] text-text-muted">
               {loading ? (
                 "Loading orders from account..."
               ) : unauthenticated ? (
@@ -473,12 +473,12 @@ export function OrderDashboard() {
       {/* 3. RIGHT SIDEBAR: ACCOUNT OVERVIEW & QUICK ACTIONS (3 cols) */}
       <aside className="space-y-6 lg:col-span-3">
         {/* Card 1: Account Overview */}
-        <div className="rounded-lg border border-border bg-white p-5 shadow-sm">
+        <div className="bg-white p-5">
           <div className="flex items-center justify-between border-b border-border pb-3">
             <h3 className="text-[14px] font-bold text-graphite">Account Overview</h3>
             <Link
               href="/account"
-              className="text-[13px] font-bold text-[#84cc16] hover:underline"
+              className="text-[13px] font-bold text-brand hover:underline"
             >
               {unauthenticated ? "Sign In" : "Manage"}
             </Link>
@@ -512,7 +512,7 @@ export function OrderDashboard() {
             <div className="pt-1">
               <div className="flex justify-between">
                 <span className="text-text-muted">Procurement Tier</span>
-                <Link href="/account" className="text-[13px] font-medium text-[#84cc16] hover:underline">
+                <Link href="/account" className="text-[13px] font-medium text-brand hover:underline">
                   {unauthenticated ? "Sign In" : "Manage"}
                 </Link>
               </div>
@@ -522,7 +522,7 @@ export function OrderDashboard() {
         </div>
 
         {/* Card 2: Quick Actions */}
-        <div className="rounded-lg border border-border bg-white p-5 shadow-sm">
+        <div className="bg-white p-5">
           <h3 className="text-[14px] font-bold text-graphite">Quick Actions</h3>
           <div className="mt-3 space-y-2.5">
             <Link
@@ -580,7 +580,7 @@ export function OrderDashboard() {
         </div>
 
         {/* Card 3: Need Help? */}
-        <div className="rounded-lg border border-border bg-white p-5 shadow-sm">
+        <div className="bg-white p-5">
           <h3 className="text-[14px] font-bold text-graphite">Need Help?</h3>
           <div className="mt-3 space-y-2.5">
             <Link
@@ -615,7 +615,7 @@ export function OrderDashboard() {
       {/* Order Detail Modal */}
       {selectedOrder && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-          <div className="w-full max-w-xl rounded-lg border border-border bg-white p-6 shadow-2xl">
+          <div className="w-full max-w-xl bg-white p-6 shadow-2xl">
             <div className="flex items-center justify-between border-b border-border pb-3">
               <div>
                 <h3 className="text-[16px] font-bold text-graphite">

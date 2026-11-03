@@ -51,7 +51,7 @@ export default async function CustomerBulkRequestsPage() {
         <Header />
         <main className="mx-auto max-w-[640px] px-8 py-16 text-center">
           <Package className="mx-auto h-12 w-12 text-text-muted" strokeWidth={1.5} />
-          <h1 className="mt-4 text-[24px] font-bold text-graphite">Account Authentication Required</h1>
+          <h1 className="mt-4 text-[28px] font-bold text-graphite">Sign in to see your bulk requests</h1>
           <p className="mt-2 text-[14px] text-text-secondary">
             Sign in to inspect your bulk procurement requests, formal quotations, and custom UAV specifications.
           </p>
@@ -97,7 +97,7 @@ export default async function CustomerBulkRequestsPage() {
               <span className="mx-2 text-text-disabled">/</span>
               <span className="text-graphite">Bulk & Custom Requests</span>
             </nav>
-            <h1 className="mt-2 text-[26px] font-bold text-graphite tracking-tight">
+            <h1 className="text-[clamp(2.5rem,1.6rem+3.6vw,4.5rem)] font-bold leading-[0.95] tracking-[-0.04em] text-balance mt-2 text-graphite">
               My Bulk & Custom UAV Requests
             </h1>
           </div>
@@ -121,7 +121,7 @@ export default async function CustomerBulkRequestsPage() {
             <div className="mt-6 flex justify-center gap-3">
               <Link
                 href="/bulk-orders/request"
-                className="bg-accent px-5 py-2.5 text-[13px] font-semibold text-graphite rounded-sm hover:bg-accent-hover"
+                className="bg-accent px-5 py-2.5 text-[13px] font-semibold text-graphite rounded-sm hover:bg-surface-soft"
               >
                 Submit a Request
               </Link>

@@ -1,7 +1,6 @@
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { BulkOrderRequestForm } from "./bulk-order-request-form";
-import Image from "next/image";
 import { ShieldCheck, Wrench, Users, Headphones } from "lucide-react";
 import { Suspense } from "react";
 
@@ -19,24 +18,15 @@ export default function BulkOrderRequestPage() {
         <section className="relative overflow-hidden border-b border-border bg-white">
           <div className="flex flex-col justify-between px-5 py-8 md:flex-row md:items-center md:px-10">
             <div className="relative z-10 max-w-xl">
-              <span className="text-[13px] font-bold tracking-widest text-success">
-                BUSINESS SOLUTIONS
+              <span className="text-[15px] font-semibold text-brand">
+                Bulk orders
               </span>
-              <h1 className="mt-2 text-[32px] font-extrabold tracking-tight text-graphite md:text-[40px]">
-                Bulk Orders &amp; Custom UAV Builds
+              <h1 className="text-[clamp(2.5rem,1.6rem+3.6vw,4.5rem)] font-bold leading-[0.95] tracking-[-0.04em] text-balance mt-2 text-graphite">
+                Fleets, labs and custom builds
               </h1>
-              <p className="mt-2 text-[14px] leading-relaxed text-text-secondary">
+              <p className="mt-4 max-w-[52ch] text-[18px] leading-[1.5] text-navy">
                 Get tailored solutions for your projects. Request multiple units, custom configurations, or specialized UAVs for agriculture, mapping, inspection and industrial applications.
               </p>
-            </div>
-            {/* Banner Industrial Drone Asset */}
-            <div className="pointer-events-none relative mt-4 h-28 w-full max-w-[500px] md:mt-0 md:h-32">
-              <Image
-                src="/images/hero/bulk-hero-drone.png"
-                alt="Industrial Inspection Hexacopter"
-                fill
-                className="object-contain object-right"
-              />
             </div>
           </div>
         </section>
@@ -45,7 +35,7 @@ export default function BulkOrderRequestPage() {
         <section className="border-b border-border bg-white">
           <div className="grid grid-cols-2 gap-4 px-5 py-4 lg:grid-cols-4 md:px-10">
             <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent/20 text-graphite">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-soft text-brand">
                 <ShieldCheck className="h-4 w-4 text-graphite" />
               </div>
               <div>
@@ -54,7 +44,7 @@ export default function BulkOrderRequestPage() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent/20 text-graphite">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-soft text-brand">
                 <Wrench className="h-4 w-4 text-graphite" />
               </div>
               <div>
@@ -63,7 +53,7 @@ export default function BulkOrderRequestPage() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent/20 text-graphite">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-soft text-brand">
                 <Users className="h-4 w-4 text-graphite" />
               </div>
               <div>
@@ -72,7 +62,7 @@ export default function BulkOrderRequestPage() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent/20 text-graphite">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-soft text-brand">
                 <Headphones className="h-4 w-4 text-graphite" />
               </div>
               <div>

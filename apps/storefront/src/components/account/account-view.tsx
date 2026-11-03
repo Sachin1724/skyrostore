@@ -124,7 +124,7 @@ export function AccountView() {
 
   return (
     <div>
-      <h1 className="text-[28px] font-bold tracking-[-0.025em] text-graphite">
+      <h1 className="text-[clamp(2.5rem,1.6rem+3.6vw,4.5rem)] font-bold leading-[0.95] tracking-[-0.04em] text-balance text-graphite">
         {mode === "login" ? "Sign In" : "Create Account"}
       </h1>
 
@@ -153,7 +153,7 @@ export function AccountView() {
           />
           <div className="mt-6 flex items-center gap-3">
             <span className="h-px flex-1" style={{ background: "var(--color-border)" }} />
-            <span className="text-[13px] font-medium tracking-wider text-text-muted">
+            <span className="text-[13px] font-medium text-text-muted">
               or use email and password
             </span>
             <span className="h-px flex-1" style={{ background: "var(--color-border)" }} />
@@ -167,7 +167,7 @@ export function AccountView() {
             type="button"
             onClick={handleGoogle}
             disabled={googleStarting}
-            className="flex w-full items-center justify-center gap-2.5 px-4 py-3 text-[14px] font-semibold text-graphite transition-colors hover:bg-accent-hover disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-2.5 px-4 py-3 text-[14px] font-semibold text-graphite transition-colors hover:bg-surface-soft disabled:opacity-50"
             style={{
               borderRadius: "var(--radius-sm)",
               border: "1px solid var(--color-border-strong)",
@@ -185,7 +185,7 @@ export function AccountView() {
 
           <div className="mt-5 flex items-center gap-3">
             <span className="h-px flex-1" style={{ background: "var(--color-border)" }} />
-            <span className="text-[13px] font-medium tracking-wider text-text-muted">
+            <span className="text-[13px] font-medium text-text-muted">
               or use email
             </span>
             <span className="h-px flex-1" style={{ background: "var(--color-border)" }} />

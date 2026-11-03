@@ -158,41 +158,41 @@ export function SupportView() {
   return (
     <div className="space-y-12">
       {/* 1. HERO TOP BANNER WITH GLOWING DRONE GRAPHIC */}
-      <section className="relative overflow-hidden rounded-2xl bg-[#181B20] text-white">
+      <section className="relative overflow-hidden bg-navy text-white">
         <div className="flex flex-col justify-between px-5 py-10 md:flex-row md:items-center md:px-12">
           {/* Left Text & Search */}
           <div className="relative z-10 max-w-xl">
-            <span className="text-[13px] font-bold tracking-widest text-[#84cc16]">
-              SUPPORT CENTER
+            <span className="text-[13px] font-bold text-white">
+              Support
             </span>
-            <h1 className="mt-2 text-[36px] font-extrabold tracking-tight text-white md:text-[44px]">
+            <h1 className="text-[clamp(2.5rem,1.6rem+3.6vw,4.5rem)] font-bold leading-[0.95] tracking-[-0.04em] text-balance mt-2 text-white">
               How can we help you?
             </h1>
-            <p className="mt-2 text-[14px] leading-relaxed text-gray-300">
+            <p className="mt-2 text-[14px] leading-relaxed text-white/80">
               Find answers, track your order, get technical support or contact our team.
             </p>
 
             {/* Large Integrated Search Bar */}
-            <div className="mt-6 flex items-center overflow-hidden rounded-lg bg-white p-1 shadow-lg">
-              <Search className="ml-3 h-5 w-5 text-gray-400" />
+            <div className="mt-6 flex items-center overflow-hidden bg-white p-1">
+              <Search className="ml-3 h-5 w-5 text-text-muted" aria-hidden />
               <input
                 type="text"
                 placeholder="Search for help articles, guides, or topics..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-transparent px-3 py-2 text-[13px] text-graphite placeholder:text-gray-400"
+                className="w-full bg-transparent px-3 py-2 text-[15px] text-graphite placeholder:text-text-muted"
               />
               <button
                 type="button"
-                className="rounded-md bg-[#84cc16] px-6 py-2.5 text-[13px] font-bold text-graphite transition-colors hover:bg-[#a3e635]"
+                className="rounded-md bg-brand px-6 py-2.5 text-[15px] font-semibold text-white transition-colors hover:bg-brand-bright"
               >
                 Search
               </button>
             </div>
 
             {/* Popular Searches Tag Strip */}
-            <div className="mt-4 flex flex-wrap items-center gap-2 text-[14px] text-gray-400">
-              <span className="font-medium text-gray-300">Popular searches:</span>
+            <div className="mt-4 flex flex-wrap items-center gap-2 text-[14px] text-white/80">
+              <span className="font-medium text-white/80">Popular searches:</span>
               {[
                 "Track Order",
                 "Firmware Update",
@@ -204,7 +204,7 @@ export function SupportView() {
                   key={tag}
                   type="button"
                   onClick={() => setSearchQuery(tag)}
-                  className="rounded-full border border-gray-700 bg-[#22272e] px-3 py-1 text-[13px] text-gray-300 transition-colors hover:border-[#84cc16] hover:text-white"
+                  className="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[13px] text-white/80 transition-colors hover:border-brand hover:text-white"
                 >
                   {tag}
                 </button>
@@ -212,15 +212,6 @@ export function SupportView() {
             </div>
           </div>
 
-          {/* Right Floating Drone Asset */}
-          <div className="pointer-events-none relative mt-6 h-48 w-full max-w-[500px] md:mt-0 md:h-64">
-            <Image
-              src="/images/hero/support-hero-drone.png"
-              alt="High-Tech Surveillance UAV"
-              fill
-              className="object-contain object-right"
-            />
-          </div>
         </div>
       </section>
 
@@ -239,14 +230,14 @@ export function SupportView() {
             return (
               <div
                 key={idx}
-                className="group flex cursor-pointer items-center justify-between rounded-xl border border-border bg-white p-5 shadow-sm transition-all hover:border-gray-400 hover:shadow-md"
+                className="group flex cursor-pointer items-center justify-between border border-border bg-white p-5 transition-all hover:border-gray-400 hover:shadow-md"
               >
                 <div className="flex items-start gap-4">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-surface-soft text-graphite transition-colors group-hover:bg-[#84cc16]/10 group-hover:text-[#65a30d]">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-surface-soft text-graphite transition-colors group-hover:bg-brand-soft group-hover:text-brand">
                     <Icon className="h-5 w-5 stroke-[1.8]" />
                   </div>
                   <div>
-                    <h3 className="text-[14px] font-bold text-graphite group-hover:text-[#65a30d]">
+                    <h3 className="text-[14px] font-bold text-graphite group-hover:text-brand">
                       {topic.title}
                     </h3>
                     <p className="mt-0.5 text-[14px] leading-relaxed text-text-muted">
@@ -276,7 +267,7 @@ export function SupportView() {
             {ARTICLES.map((article) => (
               <div
                 key={article.id}
-                className="group flex cursor-pointer items-center justify-between gap-3 rounded-lg border border-border bg-white p-3 shadow-sm transition-all hover:border-gray-400 hover:shadow-md"
+                className="group flex cursor-pointer items-center justify-between gap-3 bg-white p-3 transition-all hover:border-gray-400 hover:shadow-md"
               >
                 <div className="flex items-center gap-3">
                   <div className="relative h-12 w-16 shrink-0 overflow-hidden rounded border border-border bg-surface-soft">
@@ -288,7 +279,7 @@ export function SupportView() {
                     />
                   </div>
                   <div>
-                    <h4 className="text-[14px] font-bold text-graphite group-hover:text-[#65a30d]">
+                    <h4 className="text-[14px] font-bold text-graphite group-hover:text-brand">
                       {article.title}
                     </h4>
                     <p className="line-clamp-1 text-[13px] text-text-muted">
@@ -305,7 +296,7 @@ export function SupportView() {
         {/* CENTER COLUMN: TRACK ORDER & CONTACT SUPPORT (4 cols) */}
         <div className="space-y-6 lg:col-span-4">
           {/* Track Order Card */}
-          <div className="rounded-xl border border-border bg-white p-6 shadow-sm">
+          <div className="rounded-xl border border-border bg-white p-6">
             <div className="flex items-center gap-3">
               <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-success-soft text-success">
                 <Truck className="h-5 w-5" />
@@ -362,7 +353,7 @@ export function SupportView() {
           </div>
 
           {/* Contact Support Card */}
-          <div className="rounded-xl border border-border bg-white p-6 shadow-sm">
+          <div className="rounded-xl border border-border bg-white p-6">
             <div className="flex items-center gap-3 border-b border-border pb-4">
               <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-success-soft text-success">
                 <Headphones className="h-5 w-5" />
@@ -425,7 +416,7 @@ export function SupportView() {
               return (
                 <div
                   key={faq.id}
-                  className="rounded-lg border border-border bg-white shadow-sm overflow-hidden"
+                  className="bg-white overflow-hidden"
                 >
                   <button
                     type="button"

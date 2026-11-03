@@ -216,7 +216,7 @@ export function BuilderView({
   return (
     <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[220px_minmax(0,1fr)_340px]">
       {/* 1. Left Sidebar: 11 Vertical Steps */}
-      <aside className="rounded-lg border border-border bg-white p-3 shadow-xs">
+      <aside className="bg-white p-3">
         <div className="space-y-1">
           {BUILDER_STEPS.map((step, idx) => {
             const isCurrent = activeStepIdx === idx;
@@ -235,7 +235,7 @@ export function BuilderView({
                 <div
                   className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[13px] font-bold ${
                     isCurrent
-                      ? "bg-accent text-graphite"
+                      ? "bg-brand text-white"
                       : isCompleted
                       ? "bg-success text-white"
                       : "bg-surface-muted text-text-muted"
@@ -258,11 +258,11 @@ export function BuilderView({
       </aside>
 
       {/* 2. Center Column: Component Selector */}
-      <div className="rounded-lg border border-border bg-white p-6 shadow-xs">
+      <div className="bg-white p-6">
         {/* Step Header */}
         <div className="flex flex-col justify-between gap-2 border-b border-border pb-4 sm:flex-row sm:items-center">
           <div>
-            <span className="text-[13px] font-bold text-text-muted tracking-wider">
+            <span className="text-[13px] font-bold text-text-muted">
               Step {currentStep.stepNum} of 11
             </span>
             <h2 className="text-[20px] font-extrabold text-graphite">
@@ -320,12 +320,12 @@ export function BuilderView({
                     className={`relative flex flex-col justify-between rounded-lg border p-4 transition-all ${
                       isSelected
                         ? "border-accent ring-1 ring-accent bg-surface-soft"
-                        : "border-border bg-white hover:border-border-strong hover:shadow-xs"
+                        : "border-border bg-white hover:border-border-strong hover:"
                     }`}
                   >
                     {/* Selected Badge */}
                     {isSelected && (
-                      <div className="absolute right-3 top-3 flex h-5 w-5 items-center justify-center rounded-full bg-accent text-graphite shadow-xs">
+                      <div className="absolute right-3 top-3 flex h-5 w-5 items-center justify-center rounded-full bg-brand text-white">
                         <Check className="h-3.5 w-3.5" strokeWidth={2.5} />
                       </div>
                     )}
@@ -429,7 +429,7 @@ export function BuilderView({
 
       {/* 3. Right Column: "Your Build" Summary Panel */}
       <aside className="space-y-4">
-        <div className="rounded-lg border border-border bg-white p-5 shadow-xs">
+        <div className="bg-white p-5">
           {/* Header */}
           <div className="flex items-center justify-between border-b border-border pb-3">
             <h3 className="text-[14px] font-extrabold text-graphite">Your Build</h3>
@@ -454,7 +454,7 @@ export function BuilderView({
                   <div className="flex items-center gap-2.5 min-w-0">
                     <span
                       className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[13px] font-bold ${
-                        selectedItem ? "bg-accent text-graphite" : "bg-surface-muted text-text-muted"
+                        selectedItem ? "bg-brand text-white" : "bg-surface-muted text-text-muted"
                       }`}
                     >
                       {selectedItem ? <Check className="h-3 w-3" /> : step.stepNum}
@@ -504,7 +504,7 @@ export function BuilderView({
                   handleAddToCart();
                 }
               }}
-              className="mt-4 flex w-full items-center justify-center gap-2 rounded-md bg-graphite py-3 text-[13px] font-bold text-white transition hover:bg-black shadow-xs"
+              className="mt-4 flex w-full items-center justify-center gap-2 rounded-md bg-graphite py-3 text-[13px] font-bold text-white transition hover:bg-black"
             >
               {activeStepIdx < BUILDER_STEPS.length - 2 ? (
                 <>Next: Select {BUILDER_STEPS[activeStepIdx + 1].label} &rarr;</>
