@@ -25,8 +25,8 @@ export async function Header() {
       </div>
       <header className="sticky top-0 z-50 bg-white/85 backdrop-blur-xl backdrop-saturate-150">
         <HeaderBar categories={tree.map((c) => ({ name: c.name, handle: c.handle }))} />
-        <nav aria-label="Categories" className="hidden lg:block">
-          <div className="mx-auto flex h-11 max-w-[1760px] items-center gap-7 px-8 text-[14px] font-medium text-text-secondary">
+        <nav aria-label="Categories" className="hidden pb-2.5 lg:block">
+          <div className="mx-auto flex h-10 max-w-[1760px] items-center gap-7 px-8 text-[14px] font-medium text-text-secondary">
             <CategoryMenu tree={tree} />
             <Suspense fallback={null}>
               {tree.length === 0 ? (

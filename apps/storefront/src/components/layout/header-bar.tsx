@@ -58,7 +58,7 @@ export function HeaderBar({ categories }: { categories: Cat[] }) {
 
   return (
     <>
-      <div className="mx-auto flex h-16 max-w-[1760px] items-center gap-3 px-4 md:h-[64px] md:gap-8 md:px-8">
+      <div className="mx-auto flex h-16 max-w-[1760px] items-center gap-3 px-4 md:h-[72px] md:gap-8 md:px-8">
         <button
           type="button"
           aria-label="Open menu"

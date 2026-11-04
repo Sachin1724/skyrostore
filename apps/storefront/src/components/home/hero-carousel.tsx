@@ -17,11 +17,16 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
     el.scrollTo({ left: ((i + slides.length) % slides.length) * el.clientWidth, behavior: "smooth" });
   };
 
+  // Advance on its own. The banner fills the first screen, so the pointer rests on it
+  // most of the time; pausing on hover stopped it for good. Keyboard focus and a hidden
+  // tab still hold it, and a reduced-motion preference turns it off.
   useEffect(() => {
     if (paused || slides.length < 2 || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const t = setInterval(() => go(index + 1), 6000);
+    const t = setInterval(() => {
+      if (!document.hidden) go(index + 1);
+    }, 6000);
     return () => clearInterval(t);
-  });
+  }, [paused, index, slides.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (slides.length === 0) return null;
 
@@ -30,8 +35,6 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
       aria-roledescription="carousel"
       aria-label="Featured"
       className="hero-in group relative overflow-hidden rounded-2xl bg-navy"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}
       onBlur={() => setPaused(false)}
     >
