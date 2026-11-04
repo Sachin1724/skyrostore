@@ -146,6 +146,8 @@
 
 /* Landing: brand band. */
 @keyframes brand-scroll { to { transform: translateX(-50%); } }
+.ticker-track { animation: brand-scroll 70s linear infinite; }
+.ticker:hover .ticker-track, .ticker:focus-within .ticker-track { animation-play-state: paused; }
 .brand-bar-track { animation: brand-scroll 40s linear infinite; }
 .brand-bar:hover .brand-bar-track,
 .brand-bar:focus-within .brand-bar-track { animation-play-state: paused; }

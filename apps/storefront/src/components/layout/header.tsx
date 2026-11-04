@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { getCategoryTree, type CategoryNode } from "@/lib/data/catalog";
 import { HeaderBar } from "./header-bar";
 import { CategoryMenu } from "./category-menu";
+import { Ticker } from "./ticker";
 import { NavLink } from "./nav-link";
 
 const BAR_LIMIT = 7;
@@ -16,13 +17,7 @@ export async function Header() {
       <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:bg-white focus:px-4 focus:py-2">
         Skip to content
       </a>
-      <div className="bg-surface-muted text-[13px] text-text-secondary">
-        <ul className="mx-auto flex h-8 max-w-[1760px] items-center justify-center gap-10 px-4 md:px-8">
-          <li>Pay by UPI, card or netbanking, secured by Razorpay</li>
-          <li className="hidden md:block">Tracked delivery on every parcel</li>
-          <li className="hidden md:block">GST invoice with every order</li>
-        </ul>
-      </div>
+      <Ticker />
       <header className="sticky top-0 z-50 bg-white/85 backdrop-blur-xl backdrop-saturate-150">
         <HeaderBar categories={tree.map((c) => ({ name: c.name, handle: c.handle }))} />
         <nav aria-label="Categories" className="hidden pb-2.5 lg:block">
