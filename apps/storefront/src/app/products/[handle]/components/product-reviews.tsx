@@ -104,7 +104,7 @@ export function ProductReviews({ productId, productTitle }: ProductReviewsProps)
   }
 
   return (
-    <section id="reviews" aria-labelledby="reviews-heading" className="scroll-mt-36 pt-8">
+    <section id="reviews" aria-labelledby="reviews-heading" className="scroll-mt-36 pt-4">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border pb-6">
         <div>
           <h2 id="reviews-heading" className="text-[22px] font-extrabold tracking-[-0.02em] text-navy">
@@ -225,17 +225,12 @@ export function ProductReviews({ productId, productTitle }: ProductReviewsProps)
           </div>
         </div>
       ) : (
-        <div className="mt-8 card p-8 text-center">
-          <p className="text-[16px] font-bold text-navy">No reviews submitted yet.</p>
-          <p className="mt-1 text-[14px] text-text-secondary max-w-[50ch] mx-auto">
-            Be the first verified builder to review the {productTitle}. Share your flight logs, torque specs, and build notes.
+        <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-3 rounded-xl bg-white px-5 py-4">
+          <p className="flex-1 text-[14px] text-text-secondary">
+            No reviews yet. Be the first to review the {productTitle}.
           </p>
-          <button
-            type="button"
-            onClick={() => setIsModalOpen(true)}
-            className="mt-4 rounded-md bg-brand px-6 py-2.5 text-[14px] font-bold text-white transition-colors hover:bg-navy"
-          >
-            Leave First Review
+          <button type="button" onClick={() => setIsModalOpen(true)} className="btn btn-primary btn-sm">
+            Write a review
           </button>
         </div>
       )}

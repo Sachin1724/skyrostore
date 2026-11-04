@@ -77,7 +77,7 @@ export function ProductQuestions({ productId, productTitle }: ProductQuestionsPr
   }
 
   return (
-    <section id="questions" aria-labelledby="questions-heading" className="scroll-mt-36 pt-8">
+    <section id="questions" aria-labelledby="questions-heading" className="scroll-mt-36 pt-4">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border pb-6">
         <div>
           <h2 id="questions-heading" className="text-[22px] font-extrabold tracking-[-0.02em] text-navy">
@@ -199,18 +199,13 @@ export function ProductQuestions({ productId, productTitle }: ProductQuestionsPr
           ))}
         </div>
       ) : (
-        <div className="mt-8 card p-8 text-center">
-          <MessageSquare className="mx-auto h-8 w-8 text-text-muted" />
-          <p className="mt-2 text-[16px] font-bold text-navy">No questions asked yet.</p>
-          <p className="mt-1 text-[14px] text-text-secondary max-w-[45ch] mx-auto">
-            Need clarification on wiring pinouts, voltage tolerance, or CAD files? Ask our team directly.
+        <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-3 rounded-xl bg-white px-5 py-4">
+          <MessageSquare className="h-5 w-5 shrink-0 text-text-muted" aria-hidden />
+          <p className="flex-1 text-[14px] text-text-secondary">
+            No questions yet. Ask about wiring, voltage tolerance or CAD files and our team answers here.
           </p>
-          <button
-            type="button"
-            onClick={() => setIsAsking(true)}
-            className="mt-4 rounded-md border border-navy px-5 py-2 text-[13px] font-bold text-navy transition-colors hover:bg-navy hover:text-white"
-          >
-            Ask First Question
+          <button type="button" onClick={() => setIsAsking(true)} className="btn btn-secondary btn-sm">
+            Ask a question
           </button>
         </div>
       )}

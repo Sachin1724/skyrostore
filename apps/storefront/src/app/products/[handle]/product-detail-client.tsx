@@ -369,7 +369,7 @@ export function ProductDetailClient({
       </section>
 
       {/* 4-Column Trust Guarantee Strip */}
-      <ul className="mt-12 grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-border bg-border lg:grid-cols-4">
+      <ul className="mt-10 grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-border bg-border lg:grid-cols-4">
         {TRUST.map(({ icon: Icon, title: t, text, href }) => {
           const body = (
             <>
@@ -411,7 +411,7 @@ export function ProductDetailClient({
       />
 
       {/* Recently Viewed Products History */}
-      <RecentlyViewed currentProduct={product} />
+      <RecentlyViewed currentProduct={product} className="mt-12" />
 
       {/* Mobile Sticky Buy Bar */}
       <div

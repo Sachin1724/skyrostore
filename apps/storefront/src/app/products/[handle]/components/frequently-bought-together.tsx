@@ -103,7 +103,7 @@ export function FrequentlyBoughtTogether({
   }
 
   return (
-    <section aria-labelledby="bundle-heading" className="mt-14 border-t border-border pt-10">
+    <section aria-labelledby="bundle-heading" className="mt-12">
       <h2 id="bundle-heading" className="text-[22px] font-extrabold tracking-[-0.02em] text-navy">
         Frequently Bought Together
       </h2>

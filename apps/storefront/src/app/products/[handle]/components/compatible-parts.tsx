@@ -55,7 +55,7 @@ export function CompatibleParts({ items }: CompatiblePartsProps) {
   }
 
   return (
-    <section aria-labelledby="compatible-parts-heading" className="mt-14 border-t border-border pt-10">
+    <section aria-labelledby="compatible-parts-heading" className="mt-12">
       <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
         <div>
           <h2 id="compatible-parts-heading" className="text-[22px] font-extrabold tracking-[-0.02em] text-navy">

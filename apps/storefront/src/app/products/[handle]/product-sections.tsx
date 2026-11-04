@@ -60,7 +60,7 @@ export function ProductSections({
     .filter((g) => g.rows.length);
 
   return (
-    <div className="mt-10">
+    <div className="mt-12">
       <nav aria-label="Product sections" className="sticky top-[121px] z-20 border-b border-border bg-page/95 md:top-[77px] lg:top-[125px]">
         <ul className="flex gap-1 overflow-x-auto [scrollbar-width:none]">
           {sections.map((s) => (
@@ -83,7 +83,7 @@ export function ProductSections({
         </ul>
       </nav>
 
-      <div className="space-y-4 pt-4">
+      <div className="space-y-4 pt-5">
         {sections.some((s) => s.id === "overview") ? (
           <Section id="overview" title="Overview">
             <div className="grid gap-8 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
