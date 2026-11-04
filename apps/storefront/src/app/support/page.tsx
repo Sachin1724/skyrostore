@@ -14,7 +14,7 @@ export default function SupportPage() {
     <>
       <Header />
       <main id="main" className="min-h-screen bg-surface-soft pb-20">
-        <div className="mx-auto max-w-[1376px] px-4 md:px-8">
+        <div className="mx-auto max-w-[1760px] px-4 md:px-8">
           {/* Breadcrumb */}
           <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 pt-5 text-[13px] text-text-secondary">
             <Link href="/" className="hover:text-brand">Home</Link>

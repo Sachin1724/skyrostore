@@ -1,7 +1,8 @@
-import Link from "next/link";
+import { Suspense } from "react";
 import { getCategoryTree, type CategoryNode } from "@/lib/data/catalog";
 import { HeaderBar } from "./header-bar";
 import { CategoryMenu } from "./category-menu";
+import { NavLink } from "./nav-link";
 
 const BAR_LIMIT = 7;
 
@@ -15,33 +16,33 @@ export async function Header() {
       <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:bg-white focus:px-4 focus:py-2">
         Skip to content
       </a>
-      <div className="bg-navy text-[13px] text-[#DCE7F3]">
-        <ul className="mx-auto flex h-9 max-w-[1376px] items-center justify-center gap-10 px-4 md:px-8">
+      <div className="bg-surface-muted text-[13px] text-text-secondary">
+        <ul className="mx-auto flex h-8 max-w-[1760px] items-center justify-center gap-10 px-4 md:px-8">
           <li>Pay by UPI, card or netbanking, secured by Razorpay</li>
           <li className="hidden md:block">Tracked delivery on every parcel</li>
           <li className="hidden md:block">GST invoice with every order</li>
         </ul>
       </div>
-      <header className="sticky top-0 z-50 border-b border-border bg-white">
+      <header className="sticky top-0 z-50 bg-white/85 backdrop-blur-xl backdrop-saturate-150">
         <HeaderBar categories={tree.map((c) => ({ name: c.name, handle: c.handle }))} />
-        <nav aria-label="Categories" className="hidden border-t border-surface-muted lg:block">
-          <div className="mx-auto flex h-12 max-w-[1376px] items-center gap-7 px-8 text-[14px] font-semibold text-navy">
+        <nav aria-label="Categories" className="hidden lg:block">
+          <div className="mx-auto flex h-11 max-w-[1760px] items-center gap-7 px-8 text-[14px] font-medium text-text-secondary">
             <CategoryMenu tree={tree} />
-            {tree.length === 0 ? (
-              <>
-                <Link href="/uavs" className="hover:text-brand">Drones</Link>
-                <Link href="/parts" className="hover:text-brand">Parts</Link>
-              </>
-            ) : (
-              tree.slice(0, BAR_LIMIT).map((c) => (
-                <Link key={c.id} href={`/parts?category=${c.handle}`} className="whitespace-nowrap hover:text-brand">
-                  {c.name}
-                </Link>
-              ))
-            )}
-            <span className="flex-1" />
-            <Link href="/build" className="whitespace-nowrap text-brand hover:text-navy">Build checker</Link>
-            <Link href="/bulk-orders" className="whitespace-nowrap hover:text-brand">Bulk orders</Link>
+            <Suspense fallback={null}>
+              {tree.length === 0 ? (
+                <>
+                  <NavLink href="/uavs">Drones</NavLink>
+                  <NavLink href="/parts">Parts</NavLink>
+                </>
+              ) : (
+                tree.slice(0, BAR_LIMIT).map((c) => (
+                  <NavLink key={c.id} href={`/parts?category=${c.handle}`}>{c.name}</NavLink>
+                ))
+              )}
+              <span className="flex-1" />
+              <NavLink href="/build" className="font-semibold text-brand">Build your drone</NavLink>
+              <NavLink href="/bulk-orders">Bulk orders</NavLink>
+            </Suspense>
           </div>
         </nav>
       </header>

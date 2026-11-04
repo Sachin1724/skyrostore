@@ -48,7 +48,7 @@ export default async function BrandsPage() {
     <>
       <Header />
       <main id="main" className="min-h-screen bg-surface-soft pb-20">
-        <div className="mx-auto max-w-[1376px] px-4 md:px-8">
+        <div className="mx-auto max-w-[1760px] px-4 md:px-8">
           {/* Breadcrumbs */}
           <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 pt-5 text-[13px] text-text-secondary">
             <Link href="/" className="hover:text-brand">Home</Link>
@@ -57,37 +57,19 @@ export default async function BrandsPage() {
           </nav>
 
           {/* Hero Header */}
-          <div className="mt-4 rounded-xl border border-border-strong bg-navy p-6 md:p-10 text-white shadow-sm">
+          <div className="mt-4 card p-6 md:p-10 text-navy ">
             <div className="max-w-[720px]">
-              <div className="inline-flex items-center gap-1.5 rounded bg-brand/30 px-2.5 py-1 text-[11px] font-extrabold uppercase tracking-wider text-brand-cyan border border-brand/40">
-                <ShieldCheck className="h-3.5 w-3.5" aria-hidden />
-                Authorized Supply Chain
-              </div>
 
-              <h1 className="mt-3 text-[clamp(1.8rem,1.4rem+2.2vw,3rem)] font-extrabold leading-[1.08] tracking-[-0.03em] text-white">
+              <h1 className="mt-3 text-[clamp(1.8rem,1.4rem+2.2vw,3rem)] font-extrabold leading-[1.08] tracking-[-0.03em] text-navy">
                 Certified Component Manufacturers
               </h1>
 
-              <p className="mt-3 text-[14px] md:text-[16px] leading-relaxed text-[#C9D6E6]">
+              <p className="mt-3 text-[14px] md:text-[16px] leading-relaxed text-text-secondary">
                 Direct procurement partnerships with tier-1 multi-rotor manufacturers. All components carry official manufacturer warranty, batch traceability, and Indian GST tax invoices.
               </p>
             </div>
 
-            {/* Quick Stats Strip */}
-            <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-white/15 pt-5 text-[13px] text-[#A6BFDB]">
-              <div className="flex items-center gap-2.5">
-                <ShieldCheck className="h-4 w-4 text-brand-cyan shrink-0" aria-hidden />
-                <span><strong className="text-white tabular-nums">{listed.length}</strong> Authorized Brands</span>
-              </div>
-              <div className="flex items-center gap-2.5">
-                <Truck className="h-4 w-4 text-brand-cyan shrink-0" aria-hidden />
-                <span><strong className="text-white tabular-nums">{totalHardwareCount}</strong> Listed Components</span>
-              </div>
-              <div className="flex items-center gap-2.5">
-                <FileText className="h-4 w-4 text-brand-cyan shrink-0" aria-hidden />
-                <span>Delhivery Air Express Dispatch</span>
-              </div>
-            </div>
+
           </div>
 
           {/* Directory Component with Search & A-Z bar */}
@@ -96,12 +78,8 @@ export default async function BrandsPage() {
           </div>
 
           {/* Institutional / Manufacturer Callout */}
-          <div className="mt-14 rounded-xl border border-border bg-white p-6 md:p-8 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+          <div className="mt-14 card p-6 md:p-8 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div>
-              <div className="inline-flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-wider text-brand">
-                <Building2 className="h-3.5 w-3.5" aria-hidden />
-                Manufacturer Partnerships
-              </div>
               <h2 className="mt-1 text-[18px] md:text-[20px] font-extrabold text-navy">
                 Are you a certified UAV hardware manufacturer?
               </h2>
@@ -112,7 +90,7 @@ export default async function BrandsPage() {
 
             <Link
               href="/support"
-              className="inline-flex h-11 shrink-0 items-center gap-2 rounded-md bg-navy px-6 text-[14px] font-bold text-white transition-colors hover:bg-brand shadow-sm"
+              className="btn btn-primary shrink-0"
             >
               Contact Procurement Team
               <ArrowRight className="h-4 w-4" aria-hidden />

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getBrands, getCategoryTree, cleanName, type CategoryNode } from "@/lib/data/catalog";
 
 const BASE = process.env.NEXT_PUBLIC_MEDUSA_URL || "http://localhost:9000";
 const PK = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "";
@@ -34,29 +35,30 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const url = new URL(`${BASE}/store/products`);
-    url.searchParams.set("q", query);
-    url.searchParams.set("limit", String(MAX_RESULTS));
-    url.searchParams.set("region_id", REGION_ID);
-    url.searchParams.set(
-      "fields",
-      "id,title,handle,thumbnail,+categories.name,+collection.title,+variants.calculated_price,+variants.inventory_quantity,+variants.manage_inventory"
-    );
+    const fields =
+      "id,title,handle,thumbnail,+categories.name,+collection.title,+variants.calculated_price,+variants.inventory_quantity,+variants.manage_inventory";
+    // Short shared cache: the same prefixes are typed constantly. Nothing private here.
+    const find = async (term: string): Promise<any[]> => {
+      const url = new URL(`${BASE}/store/products`);
+      url.searchParams.set("q", term);
+      url.searchParams.set("limit", String(MAX_RESULTS));
+      url.searchParams.set("region_id", REGION_ID);
+      url.searchParams.set("fields", fields);
+      const res = await fetch(url.toString(), { headers: { "x-publishable-api-key": PK }, next: { revalidate: 60 } });
+      return res.ok ? ((await res.json()).products ?? []) : [];
+    };
 
-    const res = await fetch(url.toString(), {
-      headers: { "x-publishable-api-key": PK },
-      // Short shared cache: the same prefixes are typed constantly, and product
-      // names change rarely. Never cached per customer — nothing private here.
-      next: { revalidate: 60 },
-    });
-
-    if (!res.ok) {
-      return NextResponse.json({ suggestions: [], query });
+    let products = await find(query);
+    // "6s battery" matches no single title as a phrase: search each word, best match first.
+    const words = [...new Set(query.toLowerCase().split(/[\s,]+/).filter((w) => w.length > 1))];
+    if (products.length === 0 && words.length > 1) {
+      const hits = new Map<string, { p: any; n: number }>();
+      for (const list of await Promise.all(words.map(find)))
+        for (const p of list) hits.set(p.id, { p, n: (hits.get(p.id)?.n ?? 0) + 1 });
+      products = [...hits.values()].sort((a, b) => b.n - a.n).map((e) => e.p).slice(0, MAX_RESULTS);
     }
 
-    const { products } = await res.json();
-
-    const suggestions: Suggestion[] = (products || []).map((product: any) => {
+    const suggestions: Suggestion[] = products.map((product: any) => {
       const variant = product.variants?.[0];
       const price = variant?.calculated_price;
       const managed = product.variants?.some((v: any) => v.manage_inventory);
@@ -77,7 +79,17 @@ export async function GET(request: NextRequest) {
       };
     });
 
-    return NextResponse.json({ suggestions, query });
+    // Places to go: categories and brands whose name contains what was typed.
+    const q = query.toLowerCase();
+    const hit = (name: string) => name.toLowerCase().includes(q) || words.some((w) => name.toLowerCase().includes(w));
+    const flat = (nodes: CategoryNode[]): CategoryNode[] => nodes.flatMap((n) => [n, ...flat(n.children)]);
+    const [tree, brands] = await Promise.all([getCategoryTree().catch(() => []), getBrands().catch(() => [])]);
+    const places = [
+      ...flat(tree).filter((c) => hit(c.name)).map((c) => ({ kind: "Category", label: cleanName(c.name), href: `/parts?category=${c.handle}` })),
+      ...brands.filter((b) => hit(b.title)).map((b) => ({ kind: "Brand", label: b.title, href: `/brands/${b.handle}` })),
+    ].slice(0, 4);
+
+    return NextResponse.json({ suggestions, places, query });
   } catch {
     // Search must degrade to the full results page, never to an error.
     return NextResponse.json({ suggestions: [], query });

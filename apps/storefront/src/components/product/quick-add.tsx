@@ -38,7 +38,7 @@ export function QuickAdd({ productId, variantId, inStock, title = "item", classN
       onClick={add}
       disabled={!inStock || state === "adding"}
       aria-label={!inStock ? `${title} is out of stock` : state === "added" ? `${title} added to cart` : `Add ${title} to cart`}
-      className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-md border-[1.5px] border-brand bg-white text-brand transition-colors hover:bg-brand hover:text-white disabled:cursor-not-allowed disabled:border-border-strong disabled:text-text-muted disabled:hover:bg-white ${className}`}
+      className={`btn btn-secondary btn-icon shrink-0 disabled:text-text-muted disabled:hover:bg-white ${className}`}
     >
       {state === "added" ? (
         <Check key="added" className="fade-in h-4 w-4" strokeWidth={2.5} aria-hidden />

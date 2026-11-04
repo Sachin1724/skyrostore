@@ -111,7 +111,7 @@ export function FrequentlyBoughtTogether({
         Pair this component with matching propulsion and power hardware.
       </p>
 
-      <div className="mt-6 rounded-lg border border-border bg-white p-5 lg:p-7">
+      <div className="mt-6 card p-5 lg:p-7">
         <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
           {/* Visual Bundle Flow */}
           <div className="flex flex-wrap items-center gap-4 sm:gap-6">
@@ -143,7 +143,7 @@ export function FrequentlyBoughtTogether({
                       )}
                     </div>
                     <div className="mt-2">
-                      <span className="block truncate text-[11px] font-bold uppercase text-brand">
+                      <span className="block truncate text-[13px] font-bold text-brand">
                         {item.role}
                       </span>
                       <span className="mt-0.5 block truncate text-[13px] font-semibold text-navy">
@@ -168,11 +168,11 @@ export function FrequentlyBoughtTogether({
           {/* Bundle Summary & Add Action */}
           <div className="flex flex-col justify-between border-t border-border pt-5 lg:border-l lg:border-t-0 lg:pl-8 lg:pt-0">
             <div>
-              <span className="text-[13px] font-semibold uppercase tracking-wider text-text-secondary">
+              <span className="text-[13px] font-semibold text-text-secondary">
                 Bundle Price ({selectedProducts.length} items)
               </span>
               <div className="mt-1.5 flex items-baseline gap-2">
-                <span className="text-[26px] font-extrabold tabular-nums text-navy">
+                <span className="text-[28px] font-extrabold tabular-nums text-navy">
                   {formatPrice(totalPrice, currency)}
                 </span>
                 <span className="text-[13px] text-text-secondary">incl. GST</span>

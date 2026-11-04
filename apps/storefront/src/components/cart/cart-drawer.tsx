@@ -24,7 +24,7 @@ export type DrawerCart = {
 };
 
 export const cartCount = (cart: DrawerCart | null) => cart?.items?.reduce((s, i) => s + i.quantity, 0) ?? 0;
-export const cartTotal = (cart: DrawerCart | null) => cart?.items?.reduce((s, i) => s + i.total, 0) ?? 0;
+export const cartTotal = (cart: DrawerCart | null) => cart?.items?.reduce((s, i) => s + (Number(i.total) || Number(i.unit_price) * i.quantity || 0), 0) ?? 0;
 
 /**
  * Slide-over cart. A native <dialog> opened with showModal() gives focus trapping,
@@ -101,7 +101,7 @@ export function CartDrawer({
         {items.length === 0 ? (
           <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 text-center">
             <p className="text-[16px] text-text-secondary">Your cart is empty.</p>
-            <Link href="/parts" onClick={onClose} className="inline-flex h-11 items-center rounded-md bg-brand px-5 font-semibold text-white hover:bg-navy">
+            <Link href="/parts" onClick={onClose} className="btn btn-primary">
               Shop Parts
             </Link>
           </div>
@@ -117,11 +117,11 @@ export function CartDrawer({
                   </div>
                   <div className="min-w-0 flex-1">
                     {item.product_handle ? (
-                      <Link href={`/products/${item.product_handle}`} onClick={onClose} className="line-clamp-2 text-[15px] font-semibold leading-snug hover:text-brand">
+                      <Link href={`/products/${item.product_handle}`} onClick={onClose} className="line-clamp-2 text-[16px] font-semibold leading-snug hover:text-brand">
                         {name}
                       </Link>
                     ) : (
-                      <p className="line-clamp-2 text-[15px] font-semibold leading-snug">{name}</p>
+                      <p className="line-clamp-2 text-[16px] font-semibold leading-snug">{name}</p>
                     )}
                     <p className="mt-0.5 text-[13px] tabular-nums text-text-secondary">{formatPrice(item.unit_price, currency)} each</p>
                     <div className="mt-2 flex items-center justify-between gap-2">
@@ -148,7 +148,7 @@ export function CartDrawer({
                           <Plus className="h-4 w-4" aria-hidden />
                         </button>
                       </div>
-                      <span className="text-[15px] font-bold tabular-nums">{formatPrice(item.total, currency)}</span>
+                      <span className="text-[16px] font-bold tabular-nums">{formatPrice(item.total, currency)}</span>
                       <button
                         type="button"
                         aria-label={`Remove ${name}`}

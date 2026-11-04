@@ -30,7 +30,7 @@ export function CategoryMenu({ tree }: { tree: CategoryNode[] }) {
         aria-expanded={open}
         aria-controls="category-panel"
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex h-9 items-center gap-2 rounded-md bg-navy px-3.5 text-white transition-colors hover:bg-brand"
+        className="inline-flex h-9 items-center gap-2 rounded-full bg-navy px-4 text-[14px] font-medium text-white transition-colors hover:bg-brand"
       >
         <Menu className="h-[18px] w-[18px]" aria-hidden />
         All categories
@@ -40,11 +40,11 @@ export function CategoryMenu({ tree }: { tree: CategoryNode[] }) {
           id="category-panel"
           // A followed link closes the panel (same-path links do not change the route).
           onClick={(e) => (e.target as HTMLElement).closest("a") && setOpen(false)}
-          className="pop-in absolute left-0 top-[calc(100%+7px)] z-50 grid w-[min(880px,calc(100vw-4rem))] grid-cols-3 gap-x-8 gap-y-6 rounded-lg border border-border bg-white p-6 shadow-[0_12px_32px_rgba(10,26,47,0.12)]"
+          className="pop-in absolute left-0 top-[calc(100%+7px)] z-50 grid w-[min(880px,calc(100vw-4rem))] grid-cols-3 gap-x-8 gap-y-6 card p-6 shadow-[0_12px_32px_rgba(10,26,47,0.12)]"
         >
           {tree.map((root) => (
             <div key={root.id}>
-              <Link href={`/parts?category=${root.handle}`} className="text-[15px] font-bold text-navy hover:text-brand">
+              <Link href={`/parts?category=${root.handle}`} className="text-[16px] font-bold text-navy hover:text-brand">
                 {root.name}
               </Link>
               {root.children.length > 0 ? (

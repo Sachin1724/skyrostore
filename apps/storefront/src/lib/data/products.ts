@@ -50,9 +50,31 @@ async function fetchProducts(params?: ProductListParams) {
   return { products: products.map(stripInternalMetadata), count, offset, limit };
 }
 
+/**
+ * Medusa's `q` matches the whole phrase, so "6s battery" finds nothing when no title
+ * contains those words in that order. When the phrase misses, search each word and rank
+ * products by how many of the words they matched.
+ */
+async function searchProducts(params: ProductListParams & { q: string }) {
+  const full = await fetchProducts(params);
+  const words = [...new Set(params.q.toLowerCase().split(/[\s,]+/).filter((w) => w.length > 1))];
+  if (full.products.length > 0 || words.length < 2) return full;
+
+  const lists = await Promise.all(words.map((w) => fetchProducts({ ...params, q: w })));
+  const hits = new Map<string, { product: (typeof full.products)[number]; n: number }>();
+  for (const list of lists)
+    for (const product of list.products) {
+      const e = hits.get(product.id) ?? { product, n: 0 };
+      e.n += 1;
+      hits.set(product.id, e);
+    }
+  const ranked = [...hits.values()].sort((a, b) => b.n - a.n).map((e) => e.product);
+  return { ...full, products: ranked, count: ranked.length };
+}
+
 export async function getProducts(params?: ProductListParams) {
   // A search query is per-visitor and long-tail, so it is not worth caching.
-  if (params?.q) return fetchProducts(params);
+  if (params?.q) return searchProducts(params as ProductListParams & { q: string });
 
   return unstable_cache(
     () => fetchProducts(params),

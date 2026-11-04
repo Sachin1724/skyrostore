@@ -177,23 +177,19 @@ export function SupportView() {
   return (
     <div className="mt-4 space-y-10">
       {/* 1. Hero Search & Assistance Banner */}
-      <section className="rounded-xl border border-border-strong bg-navy p-6 md:p-10 text-white shadow-sm">
-        <div className="max-w-[760px]">
-          <div className="inline-flex items-center gap-1.5 rounded bg-brand/30 px-2.5 py-1 text-[11px] font-extrabold uppercase tracking-wider text-brand-cyan border border-brand/40">
-            <Headphones className="h-3.5 w-3.5" aria-hidden />
-            Skyrostore Technical Assistance &amp; Help Desk
-          </div>
+      <section className="rounded-2xl bg-white px-6 py-12 text-center text-navy md:py-16">
+        <div className="mx-auto max-w-[720px]">
 
-          <h1 className="mt-3 text-[clamp(2rem,1.5rem+2.6vw,3.6rem)] font-extrabold leading-[1.08] tracking-[-0.03em] text-white">
-            How can our engineering desk assist you?
+          <h1 className="mt-3 text-[clamp(2rem,1.5rem+2.6vw,3.6rem)] font-extrabold leading-[1.08] tracking-[-0.03em] text-navy">
+            How can we help?
           </h1>
 
-          <p className="mt-3 text-[14px] md:text-[16px] leading-relaxed text-[#C9D6E6]">
+          <p className="mt-3 text-[14px] md:text-[16px] leading-relaxed text-text-secondary">
             Search technical setup guides, track active courier consignments, verify delivery timelines to your PIN code, or consult directly with our applications engineering team.
           </p>
 
           {/* Integrated Search Input */}
-          <div className="mt-6 flex items-center overflow-hidden rounded-lg bg-white p-1 shadow-xs border border-white/20">
+          <div className="mt-6 flex items-center overflow-hidden rounded-lg bg-white p-1 border border-white/20">
             <Search className="ml-3 h-5 w-5 text-text-muted shrink-0" aria-hidden />
             <input
               type="text"
@@ -206,7 +202,7 @@ export function SupportView() {
               <button
                 type="button"
                 onClick={() => setSearchQuery("")}
-                className="mr-2 text-[12px] font-bold text-text-muted hover:text-navy"
+                className="mr-2 text-[13px] font-bold text-text-muted hover:text-navy"
               >
                 Clear
               </button>
@@ -214,8 +210,8 @@ export function SupportView() {
           </div>
 
           {/* Popular Search Tags */}
-          <div className="mt-4 flex flex-wrap items-center gap-2 text-[12px] text-[#A6BFDB]">
-            <span className="font-semibold text-white">Quick links:</span>
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-2 text-[13px] text-text-secondary">
+            <span className="font-semibold text-navy">Quick links:</span>
             {[
               "Track Order",
               "PIN Delivery Check",
@@ -228,7 +224,7 @@ export function SupportView() {
                 key={tag}
                 type="button"
                 onClick={() => setSearchQuery(tag)}
-                className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-medium text-white transition-colors hover:bg-white/20 hover:border-brand-cyan"
+                className="rounded-full border border-border bg-surface-soft px-3 py-1 text-[13px] font-medium text-navy transition-colors hover:bg-surface-muted hover:border-brand-cyan"
               >
                 {tag}
               </button>
@@ -240,7 +236,7 @@ export function SupportView() {
       {/* 2. Interactive Diagnostics Row (3 Columns: Track, PIN Check, Direct Desk) */}
       <section className="grid grid-cols-1 md:grid-cols-3 gap-5">
         {/* Card 1: Track Shipment */}
-        <div className="rounded-xl border border-border bg-white p-5 shadow-sm flex flex-col justify-between">
+        <div className="card p-5 flex flex-col justify-between">
           <div>
             <div className="flex items-center gap-2.5 border-b border-border pb-3">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-surface-soft text-navy">
@@ -248,12 +244,12 @@ export function SupportView() {
               </div>
               <div>
                 <h2 className="text-[14px] font-extrabold text-navy">Track Consignment</h2>
-                <p className="text-[11px] text-text-muted">Delhivery &amp; BlueDart Air Waybills</p>
+                <p className="text-[13px] text-text-muted">Delhivery &amp; BlueDart Air Waybills</p>
               </div>
             </div>
 
             <form onSubmit={handleTrackOrder} className="mt-4 space-y-2.5">
-              <label htmlFor="track-input" className="block text-[12px] font-semibold text-text-secondary">
+              <label htmlFor="track-input" className="block text-[13px] font-semibold text-text-secondary">
                 Air Waybill / Order Number
               </label>
               <input
@@ -266,20 +262,20 @@ export function SupportView() {
               />
               <button
                 type="submit"
-                className="w-full rounded-lg bg-navy py-2 text-[13px] font-bold text-white transition hover:bg-brand"
+                className="btn btn-primary btn-sm w-full"
               >
                 Track Live Status
               </button>
             </form>
 
             {trackingResult && (
-              <div className="mt-3 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-[12px] text-emerald-900 leading-snug">
+              <div className="mt-3 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-[13px] text-emerald-900 leading-snug">
                 {trackingResult}
               </div>
             )}
           </div>
 
-          <div className="mt-4 border-t border-border pt-3 text-[12px]">
+          <div className="mt-4 border-t border-border pt-3 text-[13px]">
             <Link
               href="/account/orders"
               className="inline-flex items-center gap-1 font-bold text-brand hover:underline"
@@ -290,7 +286,7 @@ export function SupportView() {
         </div>
 
         {/* Card 2: PIN Code Delivery Check */}
-        <div className="rounded-xl border border-border bg-white p-5 shadow-sm flex flex-col justify-between">
+        <div className="card p-5 flex flex-col justify-between">
           <div>
             <div className="flex items-center gap-2.5 border-b border-border pb-3">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-surface-soft text-navy">
@@ -298,12 +294,12 @@ export function SupportView() {
               </div>
               <div>
                 <h2 className="text-[14px] font-extrabold text-navy">PIN Delivery Lookup</h2>
-                <p className="text-[11px] text-text-muted">Instant serviceability &amp; transit SLA</p>
+                <p className="text-[13px] text-text-muted">Instant serviceability &amp; transit SLA</p>
               </div>
             </div>
 
             <form onSubmit={handleCheckPinCode} className="mt-4 space-y-2.5">
-              <label htmlFor="pin-input" className="block text-[12px] font-semibold text-text-secondary">
+              <label htmlFor="pin-input" className="block text-[13px] font-semibold text-text-secondary">
                 6-Digit Destination PIN Code
               </label>
               <div className="flex gap-2">
@@ -319,7 +315,7 @@ export function SupportView() {
                 <button
                   type="submit"
                   disabled={pinLoading || pinCode.length !== 6}
-                  className="rounded-lg bg-navy px-4 py-2 text-[13px] font-bold text-white transition hover:bg-brand disabled:opacity-50"
+                  className="btn btn-primary btn-sm"
                 >
                   {pinLoading ? "..." : "Check"}
                 </button>
@@ -328,7 +324,7 @@ export function SupportView() {
 
             {pinResult && (
               <div
-                className={`mt-3 rounded-lg border p-3 text-[12px] leading-snug ${
+                className={`mt-3 rounded-lg border p-3 text-[13px] leading-snug ${
                   pinResult.serviceable
                     ? "border-emerald-200 bg-emerald-50 text-emerald-900"
                     : "border-rose-200 bg-rose-50 text-rose-900"
@@ -339,7 +335,7 @@ export function SupportView() {
                     <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" aria-hidden />
                     <div>
                       <p className="font-bold">Serviceable for Express Dispatch</p>
-                      <p className="text-[11px] text-emerald-800">
+                      <p className="text-[13px] text-emerald-800">
                         {pinResult.city}, {pinResult.state} • Estimated {pinResult.sla_days} business days transit.
                       </p>
                     </div>
@@ -351,13 +347,13 @@ export function SupportView() {
             )}
           </div>
 
-          <div className="mt-4 border-t border-border pt-3 text-[12px] text-text-muted">
+          <div className="mt-4 border-t border-border pt-3 text-[13px] text-text-muted">
             <span className="font-medium text-text-secondary">Orders over ₹5,000</span> qualify for free standard shipping.
           </div>
         </div>
 
         {/* Card 3: Direct Engineering Desk */}
-        <div id="contact-desk" className="rounded-xl border border-border bg-white p-5 shadow-sm flex flex-col justify-between">
+        <div id="contact-desk" className="card p-5 flex flex-col justify-between">
           <div>
             <div className="flex items-center gap-2.5 border-b border-border pb-3">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-surface-soft text-navy">
@@ -365,7 +361,7 @@ export function SupportView() {
               </div>
               <div>
                 <h2 className="text-[14px] font-extrabold text-navy">Technical Desk Contact</h2>
-                <p className="text-[11px] text-text-muted">Bhubaneswar Facility • 9 AM - 6 PM IST</p>
+                <p className="text-[13px] text-text-muted">Bhubaneswar Facility • 9 AM - 6 PM IST</p>
               </div>
             </div>
 
@@ -400,7 +396,7 @@ export function SupportView() {
             </div>
           </div>
 
-          <div className="mt-4 border-t border-border pt-3 text-[12px]">
+          <div className="mt-4 border-t border-border pt-3 text-[13px]">
             <Link
               href="/bulk-orders/request"
               className="inline-flex items-center gap-1 font-bold text-navy hover:text-brand"
@@ -412,7 +408,7 @@ export function SupportView() {
       </section>
 
       {/* 3. Browse Help Categories Grid (9 Cards) */}
-      <section className="rounded-xl border border-border bg-white p-6 md:p-8 shadow-sm">
+      <section className="card p-6 md:p-8">
         <div className="border-b border-border pb-4">
           <h2 className="text-[20px] font-extrabold text-navy">
             Technical Knowledge &amp; Category Topics
@@ -429,7 +425,7 @@ export function SupportView() {
               <Link
                 key={topic.title}
                 href={topic.href}
-                className="group flex items-start justify-between rounded-xl border border-border bg-surface-soft p-4 transition-all hover:border-slate-400 hover:bg-white hover:shadow-2xs"
+                className="group flex items-start justify-between rounded-xl border border-border bg-surface-soft p-4 transition-all hover:border-slate-400 hover:bg-white"
               >
                 <div className="flex items-start gap-3 min-w-0">
                   <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white border border-border text-navy group-hover:bg-navy group-hover:text-white transition-colors">
@@ -439,7 +435,7 @@ export function SupportView() {
                     <h3 className="text-[13px] font-extrabold text-navy group-hover:text-brand truncate">
                       {topic.title}
                     </h3>
-                    <p className="mt-0.5 text-[12px] leading-relaxed text-text-muted">
+                    <p className="mt-0.5 text-[13px] leading-relaxed text-text-muted">
                       {topic.desc}
                     </p>
                   </div>
@@ -452,7 +448,7 @@ export function SupportView() {
       </section>
 
       {/* 4. Frequently Asked Questions Accordion */}
-      <section className="rounded-xl border border-border bg-white p-6 md:p-8 shadow-sm">
+      <section className="card p-6 md:p-8">
         <div className="flex items-center justify-between border-b border-border pb-4">
           <div>
             <h2 className="text-[20px] font-extrabold text-navy">
@@ -463,7 +459,7 @@ export function SupportView() {
             </p>
           </div>
 
-          <span className="text-[12px] font-mono text-text-muted">
+          <span className="text-[13px] font-mono text-text-muted">
             {filteredFaqs.length} Articles
           </span>
         </div>
@@ -490,7 +486,7 @@ export function SupportView() {
                   />
                 </button>
                 {isOpen && (
-                  <div className="border-t border-border bg-surface-soft/60 px-4 py-3.5 text-[13px] leading-relaxed text-[#334155]">
+                  <div className="border-t border-border bg-surface-soft/60 px-4 py-3.5 text-[13px] leading-relaxed text-text-secondary">
                     {faq.answer}
                   </div>
                 )}

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BackLink } from "@/components/layout/back-link";
 import { notFound } from "next/navigation";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
@@ -157,13 +158,16 @@ export default async function PolicyPage({ params }: { params: Promise<{ slug: s
       <main id="main" className="min-h-screen bg-surface-soft pb-20">
         <div className="mx-auto max-w-[1100px] px-4 md:px-8">
           {/* Breadcrumb */}
-          <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 pt-5 text-[13px] text-text-secondary">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 pt-4">
+          <BackLink fallback="/" />
+          <nav aria-label="Breadcrumb" className="flex items-center gap-1.5  text-[13px] text-text-secondary">
             <Link href="/" className="hover:text-brand">Home</Link>
             <span aria-hidden>/</span>
             <span className="text-text-muted">Policies</span>
             <span aria-hidden>/</span>
             <span className="font-semibold text-navy">{policy.title}</span>
           </nav>
+        </div>
 
           {/* Policy Navigation Tabs */}
           <div className="mt-4 flex gap-2 overflow-x-auto border-b border-border pb-3 text-[13px]">
@@ -176,7 +180,7 @@ export default async function PolicyPage({ params }: { params: Promise<{ slug: s
                   href={`/policies/${item.slug}`}
                   className={`flex items-center gap-2 rounded-lg px-4 py-2 font-bold transition-colors whitespace-nowrap ${
                     isActive
-                      ? "bg-navy text-white shadow-2xs"
+                      ? "bg-navy text-white"
                       : "bg-white text-text-secondary border border-border hover:text-navy hover:bg-surface-soft"
                   }`}
                 >
@@ -188,10 +192,10 @@ export default async function PolicyPage({ params }: { params: Promise<{ slug: s
           </div>
 
           {/* Policy Document Content */}
-          <article className="mt-6 rounded-xl border border-border bg-white p-6 md:p-12 shadow-sm">
+          <article className="mt-6 card p-6 md:p-12">
             {/* Header */}
             <div className="border-b border-border pb-6">
-              <span className="inline-flex items-center gap-1.5 rounded bg-brand/10 px-2.5 py-1 text-[11px] font-extrabold uppercase tracking-wider text-brand">
+              <span className="inline-flex items-center gap-1.5 rounded bg-brand/10 px-2.5 py-1 text-[13px] font-extrabold text-brand">
                 <ShieldCheck className="h-3.5 w-3.5" aria-hidden />
                 {policy.badge}
               </span>
@@ -204,7 +208,7 @@ export default async function PolicyPage({ params }: { params: Promise<{ slug: s
                 {policy.intro}
               </p>
 
-              <div className="mt-4 flex items-center gap-4 text-[12px] font-mono text-text-muted">
+              <div className="mt-4 flex items-center gap-4 text-[13px] font-mono text-text-muted">
                 <span>Effective: {policy.effectiveDate}</span>
                 <span>Jurisdiction: Bhubaneswar, Odisha, India</span>
               </div>
@@ -222,7 +226,7 @@ export default async function PolicyPage({ params }: { params: Promise<{ slug: s
                       {heading}
                     </h2>
                   </div>
-                  <p className="mt-2.5 text-[14px] md:text-[15px] leading-relaxed text-[#334155] pl-7">
+                  <p className="mt-2.5 text-[14px] md:text-[16px] leading-relaxed text-text-secondary pl-7">
                     {body}
                   </p>
                 </section>
@@ -242,7 +246,7 @@ export default async function PolicyPage({ params }: { params: Promise<{ slug: s
 
               <Link
                 href="/support"
-                className="inline-flex items-center gap-1.5 rounded-lg bg-navy px-5 py-2.5 text-[13px] font-bold text-white transition hover:bg-brand whitespace-nowrap"
+                className="btn btn-primary whitespace-nowrap"
               >
                 Contact Support Desk <ChevronRight className="h-4 w-4" aria-hidden />
               </Link>

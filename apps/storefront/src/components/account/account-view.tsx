@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { FirebaseSignIn } from "./firebase-sign-in";
 import { firebaseConfigured } from "@/lib/firebase";
-import { ShieldCheck, ArrowRight, Lock } from "lucide-react";
+import { ShieldCheck, ArrowRight } from "lucide-react";
 
 type AuthMode = "login" | "register";
 
@@ -103,7 +103,7 @@ export function AccountView() {
         return;
       }
 
-      router.push("/account/orders");
+      router.replace("/account/orders");
       router.refresh();
     } catch {
       setError("Something went wrong");
@@ -113,13 +113,9 @@ export function AccountView() {
   }
 
   return (
-    <div className="rounded-xl border border-border bg-white p-6 md:p-8 shadow-sm">
+    <div className="card p-6 md:p-8">
       <div className="border-b border-border pb-4">
-        <div className="inline-flex items-center gap-1.5 rounded bg-brand/10 px-2 py-0.5 text-[11px] font-extrabold uppercase tracking-wider text-brand">
-          <Lock className="h-3 w-3" aria-hidden />
-          Secure Builder Access
-        </div>
-        <h1 className="mt-2 text-[24px] font-extrabold tracking-tight text-navy">
+        <h1 className="text-[24px] font-semibold text-navy">
           {mode === "login" ? "Sign in to Skyrostore" : "Create Builder Account"}
         </h1>
         <p className="mt-1 text-[13px] text-text-secondary">
@@ -142,13 +138,13 @@ export function AccountView() {
           <FirebaseSignIn
             onError={setError}
             onSignedIn={() => {
-              router.push("/account/orders");
+              router.replace("/account/orders");
               router.refresh();
             }}
           />
           <div className="mt-6 flex items-center gap-3">
             <span className="h-px flex-1 bg-border" />
-            <span className="text-[12px] font-bold text-text-muted uppercase tracking-wider">
+            <span className="text-[13px] font-bold text-text-muted">
               or with email &amp; password
             </span>
             <span className="h-px flex-1 bg-border" />
@@ -162,7 +158,7 @@ export function AccountView() {
             type="button"
             onClick={handleGoogle}
             disabled={googleStarting}
-            className="flex h-11 w-full items-center justify-center gap-2.5 rounded-md border border-border-strong bg-white px-4 text-[14px] font-bold text-navy shadow-sm transition-all hover:bg-surface-soft hover:border-brand disabled:opacity-50"
+            className="btn btn-secondary flex w-full"
           >
             <svg className="h-[18px] w-[18px]" viewBox="0 0 18 18" aria-hidden="true">
               <path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.92c1.7-1.57 2.68-3.88 2.68-6.62Z" />
@@ -175,7 +171,7 @@ export function AccountView() {
 
           <div className="mt-5 flex items-center gap-3">
             <span className="h-px flex-1 bg-border" />
-            <span className="text-[12px] font-bold text-text-muted uppercase tracking-wider">
+            <span className="text-[13px] font-bold text-text-muted">
               or use email
             </span>
             <span className="h-px flex-1 bg-border" />
@@ -187,7 +183,7 @@ export function AccountView() {
         {mode === "register" && (
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-[12px] font-bold text-navy mb-1">First Name</label>
+              <label className="block text-[13px] font-bold text-navy mb-1">First Name</label>
               <input
                 required
                 aria-label="First name"
@@ -199,7 +195,7 @@ export function AccountView() {
               />
             </div>
             <div>
-              <label className="block text-[12px] font-bold text-navy mb-1">Last Name</label>
+              <label className="block text-[13px] font-bold text-navy mb-1">Last Name</label>
               <input
                 required
                 aria-label="Last name"
@@ -214,7 +210,7 @@ export function AccountView() {
         )}
 
         <div>
-          <label className="block text-[12px] font-bold text-navy mb-1">Email Address</label>
+          <label className="block text-[13px] font-bold text-navy mb-1">Email Address</label>
           <input
             type="email"
             required
@@ -229,7 +225,7 @@ export function AccountView() {
         </div>
 
         <div>
-          <label className="block text-[12px] font-bold text-navy mb-1">Password</label>
+          <label className="block text-[13px] font-bold text-navy mb-1">Password</label>
           <input
             type="password"
             required
@@ -245,7 +241,7 @@ export function AccountView() {
         <button
           type="submit"
           disabled={loading}
-          className="mt-2 flex h-11 w-full items-center justify-center rounded-md bg-brand text-[14px] font-bold text-white transition-colors hover:bg-navy disabled:opacity-50 shadow-sm"
+          className="btn btn-primary mt-2 flex w-full"
         >
           {loading
             ? "Processing..."
@@ -281,7 +277,7 @@ export function AccountView() {
         )}
       </div>
 
-      <div className="mt-6 pt-4 border-t border-border flex items-center justify-between text-[12px] text-text-muted">
+      <div className="mt-6 pt-4 border-t border-border flex items-center justify-between text-[13px] text-text-muted">
         <span className="flex items-center gap-1.5">
           <ShieldCheck className="h-4 w-4 text-brand" aria-hidden />
           <span>GST Compliance Verified</span>

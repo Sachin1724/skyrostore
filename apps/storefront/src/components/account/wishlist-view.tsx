@@ -1,5 +1,6 @@
 "use client";
 
+import { ProductTile } from "@/components/product/product-tile";
 import { useEffect, useState, useTransition } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -138,7 +139,7 @@ export function WishlistView() {
 
   if (loading) {
     return (
-      <div className="rounded-xl border border-border bg-white p-6 shadow-sm">
+      <div className="card p-6">
         <div className="skeleton h-48 rounded-lg" />
       </div>
     );
@@ -146,7 +147,7 @@ export function WishlistView() {
 
   if (items.length === 0) {
     return (
-      <div className="rounded-xl border border-border bg-white p-8 md:p-14 text-center shadow-sm">
+      <div className="card p-8 md:p-14 text-center">
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-brand-soft text-brand">
           <Heart className="h-6 w-6" aria-hidden />
         </div>
@@ -156,7 +157,7 @@ export function WishlistView() {
         </p>
         <Link
           href="/parts"
-          className="mt-6 inline-flex h-11 items-center gap-2 rounded-md bg-brand px-6 text-[14px] font-bold text-white hover:bg-navy transition-colors shadow-sm"
+          className="btn btn-primary mt-6"
         >
           Explore UAV Catalogue
           <ArrowRight className="h-4 w-4" aria-hidden />
@@ -166,7 +167,7 @@ export function WishlistView() {
   }
 
   return (
-    <div className="rounded-xl border border-border bg-white p-6 shadow-sm">
+    <div className="card p-6">
       <div className="border-b border-border pb-4 flex items-center justify-between">
         <div>
           <h2 className="text-[20px] font-extrabold text-navy">Saved Components</h2>
@@ -176,88 +177,45 @@ export function WishlistView() {
         </div>
       </div>
 
-      <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+      <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
         {items.map((item) => (
-          <div
+          <ProductTile
             key={item.productId}
-            className="flex flex-col justify-between rounded-lg border border-border bg-white p-4 shadow-sm hover:border-brand transition-colors"
-          >
-            <div>
-              <div className="relative aspect-square w-full rounded bg-surface-soft overflow-hidden border border-border/50">
-                {item.thumbnail ? (
-                  <Image
-                    src={item.thumbnail}
-                    alt={item.title}
-                    fill
-                    sizes="220px"
-                    className="object-contain p-3"
-                  />
-                ) : (
-                  <ProductMediaFallback title={item.title} />
-                )}
-
-                <button
-                  type="button"
-                  onClick={() => handleRemove(item.productId)}
-                  aria-label={`Remove ${item.title} from wishlist`}
-                  className="absolute right-2.5 top-2.5 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-text-muted hover:text-error shadow-sm backdrop-blur transition-colors"
-                >
-                  <Trash2 className="h-4 w-4" aria-hidden />
-                </button>
-              </div>
-
-              <div className="mt-3">
-                <Link
-                  href={`/products/${item.handle}`}
-                  className="text-[14px] font-bold text-navy hover:text-brand line-clamp-2 leading-snug"
-                >
-                  {item.title}
-                </Link>
-
-                <div className="mt-2 flex items-baseline justify-between">
-                  <span className="text-[16px] font-extrabold tabular-nums text-navy">
-                    {item.price != null ? formatPrice(item.price, item.currency) : "Price on request"}
-                  </span>
-                  <span
-                    className={`text-[12px] font-semibold ${
-                      item.inStock ? "text-success" : "text-text-muted"
-                    }`}
-                  >
-                    {item.inStock ? "In Stock" : "Out of Stock"}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-4 pt-3 border-t border-border">
+            href={`/products/${item.handle}`}
+            image={item.thumbnail}
+            fallback={<ProductMediaFallback title={item.title} />}
+            title={item.title}
+            price={<p className="text-[16px] font-semibold tabular-nums text-navy">{item.price != null ? formatPrice(item.price, item.currency) : "Price on request"}</p>}
+            status={<p className={`text-[13px] font-medium ${item.inStock ? "text-success" : "text-text-muted"}`}>{item.inStock ? "In stock" : "Out of stock"}</p>}
+            overlay={
+              <button
+                type="button"
+                onClick={() => handleRemove(item.productId)}
+                aria-label={`Remove ${item.title} from wishlist`}
+                className="absolute right-2.5 top-2.5 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white text-text-muted transition-colors hover:text-error"
+              >
+                <Trash2 className="h-4 w-4" aria-hidden />
+              </button>
+            }
+            action={
               <button
                 type="button"
                 onClick={() => handleAddToCart(item)}
                 disabled={!item.inStock || isPending}
-                className={`flex h-10 w-full items-center justify-center gap-2 rounded-md text-[13px] font-bold transition-all ${
-                  addedMap[item.productId]
-                    ? "bg-success text-white"
-                    : item.inStock
-                    ? "bg-navy text-white hover:bg-brand shadow-sm"
-                    : "bg-surface-muted text-text-muted cursor-not-allowed"
-                }`}
+                className={`btn btn-sm ${addedMap[item.productId] ? "btn-light" : "btn-primary"}`}
               >
                 {isPending && !addedMap[item.productId] ? (
                   <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
                 ) : addedMap[item.productId] ? (
                   <>
-                    <CheckCircle2 className="h-4 w-4" aria-hidden />
-                    <span>Added to Cart</span>
+                    <CheckCircle2 className="h-4 w-4" aria-hidden /> Added
                   </>
                 ) : (
-                  <>
-                    <ShoppingCart className="h-4 w-4" aria-hidden />
-                    <span>Move to Cart</span>
-                  </>
+                  "Move to cart"
                 )}
               </button>
-            </div>
-          </div>
+            }
+          />
         ))}
       </div>
     </div>

@@ -53,7 +53,7 @@ export function FilterPanel({ activeCount, resultCount, children }: { activeCoun
         className={`${open ? "rise-in fixed inset-0 z-[60] flex flex-col overscroll-contain bg-white" : "hidden"} lg:static lg:z-auto lg:block lg:rounded-lg lg:border lg:border-border lg:bg-white`}
       >
         <div className="flex h-14 shrink-0 items-center justify-between border-b border-border px-4 lg:hidden">
-          <h2 className="text-[17px] font-bold">Filters</h2>
+          <h2 className="text-[16px] font-bold">Filters</h2>
           <button type="button" onClick={() => setOpen(false)} aria-label="Close filters" className="flex h-11 w-11 items-center justify-center">
             <X className="h-5 w-5" aria-hidden />
           </button>

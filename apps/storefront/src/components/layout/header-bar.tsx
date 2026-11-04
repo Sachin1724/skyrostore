@@ -19,7 +19,6 @@ export function HeaderBar({ categories }: { categories: Cat[] }) {
   const [cart, setCart] = useState<DrawerCart | null>(null);
   const [cartOpen, setCartOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [scope, setScope] = useState("");
   const [bump, setBump] = useState(0);
   const menuRef = useRef<HTMLDialogElement>(null);
 
@@ -59,7 +58,7 @@ export function HeaderBar({ categories }: { categories: Cat[] }) {
 
   return (
     <>
-      <div className="mx-auto flex h-16 max-w-[1376px] items-center gap-3 px-4 md:h-[76px] md:gap-8 md:px-8">
+      <div className="mx-auto flex h-16 max-w-[1760px] items-center gap-3 px-4 md:h-[64px] md:gap-8 md:px-8">
         <button
           type="button"
           aria-label="Open menu"
@@ -73,32 +72,17 @@ export function HeaderBar({ categories }: { categories: Cat[] }) {
           <SkyroLogo />
         </Link>
 
-        <div role="search" className="hidden h-[46px] min-w-0 flex-1 rounded-md border-[1.5px] border-border-strong focus-within:border-brand md:flex">
-          {categories.length > 0 ? (
-            <>
-              <label htmlFor="search-scope" className="sr-only">Search in</label>
-              <select
-                id="search-scope"
-                value={scope}
-                onChange={(e) => setScope(e.target.value)}
-                className="max-w-[170px] rounded-l-[4px] border-r border-border bg-surface-soft px-3 text-[13px] font-semibold text-navy"
-              >
-                <option value="">All categories</option>
-                {categories.map((c) => (
-                  <option key={c.handle} value={c.handle}>{c.name}</option>
-                ))}
-              </select>
-            </>
-          ) : null}
-          <SearchAutocomplete className="min-w-0 flex-1" category={scope} />
+        <div role="search" className="hidden h-11 min-w-0 flex-1 overflow-hidden rounded-full bg-surface-soft focus-within:bg-white focus-within:ring-2 focus-within:ring-brand/40 md:flex md:max-w-[720px]">
+          <SearchAutocomplete className="min-w-0 flex-1" browse={categories} />
         </div>
+        <span className="hidden flex-1 md:block" />
 
         <nav aria-label="Account" className="ml-auto flex items-center gap-1 md:ml-0 md:gap-3">
-          <Link href="/support" className="hidden min-w-11 flex-col items-center gap-0.5 text-[12px] font-medium text-navy hover:text-brand lg:flex">
+          <Link href="/support" className="hidden min-w-11 flex-col items-center gap-0.5 text-[13px] font-medium text-navy hover:text-brand lg:flex">
             <Headset className="h-[22px] w-[22px]" strokeWidth={1.8} aria-hidden />
             Support
           </Link>
-          <Link href="/account" aria-label="Account" className="flex h-11 min-w-11 flex-col items-center justify-center gap-0.5 text-[12px] font-medium text-navy hover:text-brand">
+          <Link href="/account" aria-label="Account" className="flex h-11 min-w-11 flex-col items-center justify-center gap-0.5 text-[13px] font-medium text-navy hover:text-brand">
             <User className="h-[22px] w-[22px]" strokeWidth={1.8} aria-hidden />
             <span className="hidden lg:block">Account</span>
           </Link>
@@ -109,12 +93,12 @@ export function HeaderBar({ categories }: { categories: Cat[] }) {
               setCartOpen(true);
             }}
             aria-label={`Open cart, ${count} ${count === 1 ? "item" : "items"}`}
-            className="flex h-11 items-center gap-2.5 rounded-md px-2.5 text-[14px] font-semibold text-navy hover:text-brand md:h-[46px] md:bg-brand-soft md:px-3.5"
+            className="flex h-11 items-center gap-2.5 rounded-full px-2.5 text-[14px] font-medium text-navy hover:text-brand md:h-10 md:bg-surface-soft md:px-3.5"
           >
             <span className="relative">
               <ShoppingCart className="h-[22px] w-[22px]" strokeWidth={1.8} aria-hidden />
               {count > 0 ? (
-                <span key={bump} className={`absolute -right-2.5 -top-2 ${bump ? "count-bump" : ""} flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-brand px-1 text-[11px] font-bold tabular-nums text-white`}>
+                <span key={bump} className={`absolute -right-2.5 -top-2 ${bump ? "count-bump" : ""} flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-brand px-1 text-[13px] font-bold tabular-nums text-white`}>
                   {count}
                 </span>
               ) : null}
@@ -128,8 +112,8 @@ export function HeaderBar({ categories }: { categories: Cat[] }) {
 
       {/* Phones: search always visible on its own row. */}
       <div className="px-4 pb-3 md:hidden">
-        <div role="search" className="flex h-11 rounded-md border-[1.5px] border-border-strong focus-within:border-brand">
-          <SearchAutocomplete className="min-w-0 flex-1" />
+        <div role="search" className="flex h-11 overflow-hidden rounded-full bg-surface-soft focus-within:ring-2 focus-within:ring-brand/40">
+          <SearchAutocomplete className="min-w-0 flex-1" browse={categories} />
         </div>
       </div>
 
@@ -153,13 +137,13 @@ export function HeaderBar({ categories }: { categories: Cat[] }) {
           <ul>
             {categories.map((c) => (
               <li key={c.handle}>
-                <Link href={`/parts?category=${c.handle}`} className="flex min-h-12 items-center border-b border-surface-muted text-[17px] font-semibold">
+                <Link href={`/parts?category=${c.handle}`} className="flex min-h-12 items-center border-b border-surface-muted text-[16px] font-semibold">
                   {c.name}
                 </Link>
               </li>
             ))}
-            <li><Link href="/parts" className="flex min-h-12 items-center border-b border-surface-muted text-[17px] font-semibold text-brand">All parts</Link></li>
-            <li><Link href="/uavs" className="flex min-h-12 items-center border-b border-surface-muted text-[17px] font-semibold">Drones</Link></li>
+            <li><Link href="/parts" className="flex min-h-12 items-center border-b border-surface-muted text-[16px] font-semibold text-brand">All parts</Link></li>
+            <li><Link href="/uavs" className="flex min-h-12 items-center border-b border-surface-muted text-[16px] font-semibold">Drones</Link></li>
           </ul>
           <p className="pb-1 pt-5 text-[13px] font-semibold text-text-secondary">More</p>
           <ul>
@@ -171,7 +155,7 @@ export function HeaderBar({ categories }: { categories: Cat[] }) {
               { href: "/support", label: "Support" },
             ].map((l) => (
               <li key={l.href}>
-                <Link href={l.href} className="flex min-h-12 items-center border-b border-surface-muted text-[17px] font-medium">{l.label}</Link>
+                <Link href={l.href} className="flex min-h-12 items-center border-b border-surface-muted text-[16px] font-medium">{l.label}</Link>
               </li>
             ))}
           </ul>

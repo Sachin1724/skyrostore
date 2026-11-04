@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useMemo } from "react";
+import { BackLink } from "@/components/layout/back-link";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { HttpTypes } from "@medusajs/types";
@@ -143,9 +144,11 @@ export function ProductDetailClient({
   const priceText = amount != null ? formatPrice(amount, currency) : null;
 
   return (
-    <div className="mx-auto max-w-[1376px] px-4 pb-28 md:px-8 lg:pb-16">
+    <div className="mx-auto max-w-[1760px] px-4 pb-28 md:px-8 lg:pb-16">
       {/* Breadcrumb Hierarchy */}
-      <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-1.5 pt-5 text-[13px] text-text-secondary">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 pt-4">
+          <BackLink fallback="/parts" />
+          <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-1.5  text-[13px] text-text-secondary">
         <Link href="/" className="hover:text-brand">Home</Link>
         <span aria-hidden>/</span>
         <Link href="/parts" className="hover:text-brand">Parts</Link>
@@ -158,9 +161,10 @@ export function ProductDetailClient({
         <span aria-hidden>/</span>
         <span aria-current="page" className="max-w-[40ch] truncate font-medium text-navy">{title}</span>
       </nav>
+        </div>
 
       {/* Main PDP Grid: Gallery (Left) and Buy Box (Right) */}
-      <section className="mt-4 grid gap-8 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-12">
+      <section className="mt-4 grid gap-8 lg:grid-cols-[minmax(0,6fr)_minmax(0,5fr)] lg:gap-12">
         {/* Product Gallery Island */}
         <ProductGallery
           title={title}
@@ -191,7 +195,7 @@ export function ProductDetailClient({
           {highlights.length ? (
             <ul className="mt-3 flex flex-wrap gap-1.5">
               {highlights.map((h) => (
-                <li key={h} className="rounded-md bg-brand-soft px-2.5 py-1 text-[13px] font-semibold tabular-nums text-navy">
+                <li key={h} className="rounded-full bg-surface-muted px-3 py-1 text-[13px] font-medium tabular-nums text-navy">
                   {h}
                 </li>
               ))}
@@ -202,7 +206,7 @@ export function ProductDetailClient({
           <div className="mt-5 border-t border-border pt-5">
             <p className="flex flex-wrap items-baseline gap-x-3 tabular-nums">
               <span className="text-[30px] font-extrabold text-navy">{priceText ?? "Price on request"}</span>
-              {original ? <s className="text-[17px] text-text-muted">{formatPrice(original, currency)}</s> : null}
+              {original ? <s className="text-[16px] text-text-muted">{formatPrice(original, currency)}</s> : null}
               {priceText ? <span className="text-[14px] text-text-secondary">incl. GST</span> : null}
             </p>
             {discountPercent ? (
@@ -212,7 +216,7 @@ export function ProductDetailClient({
             ) : null}
 
             {/* Inventory Indicator */}
-            <p className={`mt-1 text-[15px] font-semibold ${!inStock ? "text-text-muted" : stock != null && stock <= LOW_STOCK ? "text-[#8A5B00]" : "text-success"}`}>
+            <p className={`mt-1 text-[16px] font-semibold ${!inStock ? "text-text-muted" : stock != null && stock <= LOW_STOCK ? "text-warning-strong" : "text-success"}`}>
               {!inStock ? "Out of stock" : stock != null && stock <= LOW_STOCK ? `Only ${stock} left in stock` : "In stock"}
               {sku ? <span className="ml-3 font-normal text-text-secondary">SKU: {sku}</span> : null}
             </p>
@@ -303,7 +307,7 @@ export function ProductDetailClient({
                 type="button"
                 onClick={() => addToCart(true)}
                 disabled={!inStock || cartState === "adding"}
-                className="h-12 rounded-md bg-brand text-[16px] font-bold text-white transition-colors hover:bg-navy disabled:opacity-40"
+                className="btn btn-primary"
               >
                 {addLabel}
               </button>
@@ -311,7 +315,7 @@ export function ProductDetailClient({
                 type="button"
                 onClick={buyNow}
                 disabled={!inStock || cartState === "adding"}
-                className="h-12 rounded-md border-[1.5px] border-navy text-[16px] font-bold text-navy transition-colors hover:bg-navy hover:text-white disabled:opacity-40"
+                className="btn btn-secondary"
               >
                 Buy Now
               </button>
@@ -330,7 +334,7 @@ export function ProductDetailClient({
             <WishlistButton
               productId={product.id}
               showLabel
-              className="mr-2 inline-flex h-9 items-center rounded-md border border-border-strong px-3 font-semibold text-navy hover:border-brand hover:text-brand"
+              className="btn btn-secondary btn-sm mr-2"
             />
             <ShareButton title={title} />
             <Link href="/build" className="font-semibold text-brand hover:text-navy">
@@ -344,6 +348,23 @@ export function ProductDetailClient({
               Request a bulk quote
             </Link>
           </div>
+
+          {specRows.length ? (
+            <div className="mt-6">
+              <div className="flex items-baseline justify-between">
+                <h2 className="text-[16px] font-semibold text-navy">Key specifications</h2>
+                <a href="#specifications" className="text-[13px] font-medium text-brand hover:text-navy">All specifications</a>
+              </div>
+              <dl className="mt-2 divide-y divide-border text-[14px]">
+                {specRows.slice(0, 6).map((r) => (
+                  <div key={r.key} className="flex justify-between gap-4 py-2">
+                    <dt className="text-text-secondary">{r.label}</dt>
+                    <dd className="font-medium tabular-nums text-navy">{r.value}{r.unit ? ` ${r.unit}` : ""}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          ) : null}
         </div>
       </section>
 
@@ -400,14 +421,14 @@ export function ProductDetailClient({
         aria-hidden={buyBoxVisible}
         inert={buyBoxVisible}
       >
-        <p className="min-w-0 flex-1 truncate text-[17px] font-extrabold tabular-nums text-navy">
+        <p className="min-w-0 flex-1 truncate text-[16px] font-extrabold tabular-nums text-navy">
           {priceText ?? "Price on request"}
         </p>
         <button
           type="button"
           onClick={() => addToCart(true)}
           disabled={!inStock || cartState === "adding"}
-          className="h-11 rounded-md border-[1.5px] border-brand px-4 text-[15px] font-bold text-brand disabled:opacity-40"
+          className="btn btn-secondary btn-sm"
         >
           {cartState === "added" ? "Added" : "Add"}
         </button>
@@ -415,7 +436,7 @@ export function ProductDetailClient({
           type="button"
           onClick={buyNow}
           disabled={!inStock || cartState === "adding"}
-          className="h-11 rounded-md bg-brand px-5 text-[15px] font-bold text-white disabled:opacity-40"
+          className="btn btn-primary btn-sm"
         >
           Buy Now
         </button>
@@ -436,7 +457,7 @@ function ShareButton({ title }: { title: string }) {
         setCopied(true);
         setTimeout(() => setCopied(false), 1800);
       }}
-      className="mr-3 inline-flex h-9 items-center gap-1.5 rounded-md border border-border-strong px-3 font-semibold text-navy hover:border-brand hover:text-brand"
+      className="btn btn-secondary btn-sm mr-3"
     >
       <Share2 className="h-4 w-4" aria-hidden />
       <span aria-live="polite">{copied ? "Link Copied" : "Share"}</span>
@@ -483,12 +504,12 @@ function DeliveryCheck() {
           onChange={(e) => setPin(e.target.value.replace(/\D/g, ""))}
           placeholder="e.g. 751024…"
           aria-describedby="pin-result"
-          className="h-11 min-w-0 flex-1 rounded-md border border-border-strong bg-white px-3 text-[15px] tabular-nums text-navy focus:border-brand"
+          className="h-11 min-w-0 flex-1 rounded-md border border-border-strong bg-white px-3 text-[16px] tabular-nums text-navy focus:border-brand"
         />
         <button
           type="submit"
           disabled={state.kind === "checking"}
-          className="h-11 rounded-md border-[1.5px] border-brand bg-white px-4 text-[14px] font-bold text-brand hover:bg-brand hover:text-white"
+          className="btn btn-secondary"
         >
           Check
         </button>

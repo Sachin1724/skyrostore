@@ -59,7 +59,7 @@ export function ProductGallery({
       }}
       className="lg:sticky lg:top-[125px] lg:self-start"
     >
-      <div className="flex flex-col-reverse gap-4 lg:grid lg:grid-cols-[82px_minmax(0,1fr)]">
+      <div className={`flex flex-col-reverse gap-4 ${displayImages.length > 1 || videoUrl ? "lg:grid lg:grid-cols-[82px_minmax(0,1fr)]" : ""}`}>
         {/* Thumbnail Strip (Vertical on Desktop, Horizontal on Mobile) */}
         {displayImages.length > 1 || videoUrl ? (
           <ul
@@ -105,7 +105,7 @@ export function ProductGallery({
                   }`}
                 >
                   <Play className="h-6 w-6 text-brand-cyan" fill="currentColor" aria-hidden />
-                  <span className="mt-1 text-[11px] font-bold">Video</span>
+                  <span className="mt-1 text-[13px] font-bold">Video</span>
                 </button>
               </li>
             ) : null}
@@ -113,7 +113,7 @@ export function ProductGallery({
         ) : null}
 
         {/* Main Viewport */}
-        <div className="relative aspect-square w-full overflow-hidden rounded-lg border border-border bg-white">
+        <div className="relative aspect-[4/3] max-h-[560px] w-full overflow-hidden card">
           {isVideoActive && videoUrl ? (
             <div className="relative h-full w-full bg-black">
               <iframe
@@ -126,7 +126,7 @@ export function ProductGallery({
               <button
                 type="button"
                 onClick={() => setIsVideoActive(false)}
-                className="absolute right-3 top-3 flex h-8 items-center gap-1.5 rounded bg-navy/80 px-2.5 text-[12px] font-semibold text-white backdrop-blur hover:bg-navy"
+                className="absolute right-3 top-3 flex h-8 items-center gap-1.5 rounded bg-navy/80 px-2.5 text-[13px] font-semibold text-white hover:bg-navy"
               >
                 <X className="h-4 w-4" aria-hidden /> Return to Photos
               </button>
@@ -140,12 +140,12 @@ export function ProductGallery({
                   fill
                   priority
                   sizes="(min-width: 1024px) 50vw, 100vw"
-                  className="object-contain p-8 transition-transform duration-300 hover:scale-[1.02]"
+                  className="object-contain p-6 transition-transform duration-300 hover:scale-[1.02]"
                 />
               </div>
 
               {discountPercent ? (
-                <span className="absolute left-3 top-3 rounded bg-error px-2.5 py-1 text-[12px] font-extrabold uppercase tracking-wide text-white">
+                <span className="absolute left-3 top-3 rounded bg-error px-2.5 py-1 text-[13px] font-extrabold uppercase tracking-wide text-white">
                   -{discountPercent}%
                 </span>
               ) : null}
@@ -154,7 +154,7 @@ export function ProductGallery({
                 type="button"
                 onClick={() => setIsZoomOpen(true)}
                 aria-label="Zoom photo"
-                className="absolute bottom-3 right-3 flex h-10 w-10 items-center justify-center rounded-md border border-border bg-white/90 text-navy shadow-sm backdrop-blur transition-colors hover:bg-brand hover:text-white"
+                className="absolute bottom-3 right-3 flex h-10 w-10 items-center justify-center rounded-md border border-border bg-white text-navy transition-colors hover:bg-brand hover:text-white"
               >
                 <ZoomIn className="h-4 w-4" strokeWidth={2} aria-hidden />
               </button>
@@ -165,7 +165,7 @@ export function ProductGallery({
                     type="button"
                     onClick={() => handleStep(-1)}
                     aria-label="Previous image"
-                    className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-white/95 text-navy shadow transition-transform hover:scale-105"
+                    className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-white text-navy shadow transition-transform hover:scale-105"
                   >
                     <ChevronLeft className="h-4 w-4" aria-hidden />
                   </button>
@@ -173,7 +173,7 @@ export function ProductGallery({
                     type="button"
                     onClick={() => handleStep(1)}
                     aria-label="Next image"
-                    className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-white/95 text-navy shadow transition-transform hover:scale-105"
+                    className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-white text-navy shadow transition-transform hover:scale-105"
                   >
                     <ChevronRight className="h-4 w-4" aria-hidden />
                   </button>
@@ -199,7 +199,7 @@ export function ProductGallery({
           if (e.key === "Escape") setIsZoomOpen(false);
         }}
         aria-label={`${title} high-resolution photograph`}
-        className="pop m-auto h-[min(94vh,960px)] w-[min(94vw,960px)] max-w-none overscroll-contain rounded-lg border border-border bg-white p-0 shadow-2xl backdrop:bg-navy/75"
+        className="pop m-auto h-[min(94vh,960px)] w-[min(94vw,960px)] max-w-none overscroll-contain card p-0 shadow-2xl backdrop:bg-navy/75"
       >
         <div className="relative flex h-full w-full flex-col">
           <div className="flex items-center justify-between border-b border-border px-5 py-3.5">

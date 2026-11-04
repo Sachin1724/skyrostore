@@ -26,7 +26,7 @@ export function QuickViewButton({ product, className = "", variant = "icon" }: Q
         type="button"
         onClick={handleClick}
         aria-label={`Quick view ${product.title}`}
-        className={`inline-flex items-center gap-1.5 rounded bg-white/95 px-3 py-1.5 text-[12px] font-bold text-navy shadow-sm backdrop-blur transition-all hover:bg-navy hover:text-white ${className}`}
+        className={`inline-flex items-center gap-1.5 rounded bg-white px-3 py-1.5 text-[13px] font-bold text-navy transition-all hover:bg-navy hover:text-white ${className}`}
       >
         <Eye className="h-3.5 w-3.5" aria-hidden />
         <span>Quick View</span>
@@ -39,7 +39,7 @@ export function QuickViewButton({ product, className = "", variant = "icon" }: Q
       type="button"
       onClick={handleClick}
       aria-label={`Quick view ${product.title}`}
-      className={`flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-navy shadow-sm backdrop-blur transition-transform hover:scale-110 hover:text-brand ${className}`}
+      className={`flex h-8 w-8 items-center justify-center rounded-full bg-white text-navy transition-transform hover:scale-110 hover:text-brand ${className}`}
     >
       <Eye className="h-4 w-4" aria-hidden />
     </button>

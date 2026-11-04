@@ -131,106 +131,9 @@ export function OrderDashboard() {
   });
 
   return (
-    <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
-      {/* 1. LEFT SIDEBAR: ACCOUNT NAVIGATION (3 cols) */}
-      <aside className="rounded-xl border border-white/15 bg-navy p-6 text-white lg:col-span-3">
-        {/* User Card */}
-        <div className="flex items-center gap-3.5 border-b border-white/15 pb-6">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-[15px] font-bold text-white">
-            UAV
-          </div>
-          <div className="overflow-hidden">
-            <h3 className="truncate text-[14px] font-bold text-white">
-              {unauthenticated ? "Guest Account" : "Enterprise Customer"}
-            </h3>
-            <p className="truncate text-[13px] text-white/80">
-              {unauthenticated ? "Sign in to access orders" : "Verified Customer"}
-            </p>
-          </div>
-        </div>
-
-        {/* Navigation Links */}
-        <nav className="mt-6 space-y-1 text-[13px]">
-          <Link
-            href="/account"
-            className="flex items-center justify-between rounded-md px-3 py-2.5 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
-          >
-            <span>Dashboard</span>
-          </Link>
-          <Link
-            href="/account/orders"
-            className="flex items-center justify-between rounded-md bg-white/10 px-3 py-2.5 font-bold text-white"
-          >
-            <span>My Orders</span>
-          </Link>
-          <Link
-            href="/account/bulk-requests"
-            className="flex items-center justify-between rounded-md px-3 py-2.5 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
-          >
-            <span>Bulk Requests</span>
-          </Link>
-          <Link
-            href="/build"
-            className="flex items-center justify-between rounded-md px-3 py-2.5 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
-          >
-            <span>Saved Configurations</span>
-          </Link>
-          <Link
-            href="/parts"
-            className="flex items-center justify-between rounded-md px-3 py-2.5 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
-          >
-            <span>Wishlist</span>
-          </Link>
-          <Link
-            href="/account"
-            className="flex items-center justify-between rounded-md px-3 py-2.5 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
-          >
-            <span>Addresses</span>
-          </Link>
-          <Link
-            href="/account"
-            className="flex items-center justify-between rounded-md px-3 py-2.5 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
-          >
-            <span>Profile &amp; Security</span>
-          </Link>
-          <Link
-            href="/account"
-            className="flex items-center justify-between rounded-md px-3 py-2.5 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
-          >
-            <span>Notifications</span>
-          </Link>
-          <Link
-            href="/support"
-            className="flex items-center justify-between rounded-md px-3 py-2.5 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
-          >
-            <span>Support</span>
-          </Link>
-          <div className="pt-4 border-t border-white/15">
-            <Link
-              href="/account"
-              className="flex items-center justify-between rounded-md px-3 py-2.5 text-[#ffb4b4] transition-colors hover:bg-white/10"
-            >
-              <span>Log Out</span>
-            </Link>
-          </div>
-        </nav>
-      </aside>
-
-      {/* 2. CENTER: MY ORDERS WORKSPACE (6 cols) */}
-      <section className="space-y-6 lg:col-span-6">
-        <div>
-          <span className="text-[15px] font-semibold text-brand">
-            My account
-          </span>
-          <h1 className="text-[clamp(2.5rem,1.6rem+3.6vw,4.5rem)] font-bold leading-[0.95] tracking-[-0.04em] text-balance mt-1 text-graphite">
-            My Orders
-          </h1>
-          <p className="mt-4 text-[16px] text-text-secondary">
-            Track your orders, view details, download invoices and manage returns.
-          </p>
-        </div>
-
-        {/* 3 Metric Cards */}
+    <div>
+      <section className="space-y-6">
+        {totalOrdersCount > 0 ? (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div className="flex items-center gap-3.5 bg-white p-4">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-success-soft text-success">
@@ -265,6 +168,7 @@ export function OrderDashboard() {
             </div>
           </div>
         </div>
+        ) : null}
 
         {/* Status Filter Tabs & Search Bar */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-border pb-3">
@@ -444,7 +348,7 @@ export function OrderDashboard() {
                 "Loading orders from account..."
               ) : unauthenticated ? (
                 <div>
-                  <p className="font-bold text-graphite text-[15px]">Sign in required to view order history</p>
+                  <p className="font-bold text-graphite text-[16px]">Sign in required to view order history</p>
                   <p className="mt-1 text-text-secondary">Please sign in to view your verified orders and commercial invoices.</p>
                   <Link
                     href="/account"
@@ -455,7 +359,7 @@ export function OrderDashboard() {
                 </div>
               ) : (
                 <div>
-                  <p className="font-bold text-graphite text-[15px]">No orders placed yet</p>
+                  <p className="font-bold text-graphite text-[16px]">No orders placed yet</p>
                   <p className="mt-1 text-text-secondary">Explore our catalog or configure your custom UAV build.</p>
                   <Link
                     href="/parts"
@@ -469,148 +373,6 @@ export function OrderDashboard() {
           )}
         </div>
       </section>
-
-      {/* 3. RIGHT SIDEBAR: ACCOUNT OVERVIEW & QUICK ACTIONS (3 cols) */}
-      <aside className="space-y-6 lg:col-span-3">
-        {/* Card 1: Account Overview */}
-        <div className="bg-white p-5">
-          <div className="flex items-center justify-between border-b border-border pb-3">
-            <h3 className="text-[14px] font-bold text-graphite">Account Overview</h3>
-            <Link
-              href="/account"
-              className="text-[13px] font-bold text-brand hover:underline"
-            >
-              {unauthenticated ? "Sign In" : "Manage"}
-            </Link>
-          </div>
-
-          <div className="mt-4 flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-surface-soft text-[14px] font-bold text-graphite border border-border">
-              UAV
-            </div>
-            <div>
-              <p className="text-[13px] font-bold text-graphite">
-                {unauthenticated ? "Guest Customer" : "Enterprise Account"}
-              </p>
-              <p className="text-[13px] text-text-muted">
-                {unauthenticated ? "No active session" : "Verified Customer"}
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-4 space-y-2 border-t border-border pt-3 text-[14px]">
-            <div className="flex justify-between">
-              <span className="text-text-muted">Account Status</span>
-              <span className="font-semibold text-graphite">
-                {unauthenticated ? "Guest Mode" : "Active"}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-text-muted">Procurement Currency</span>
-              <span className="font-semibold text-graphite">INR (₹)</span>
-            </div>
-            <div className="pt-1">
-              <div className="flex justify-between">
-                <span className="text-text-muted">Procurement Tier</span>
-                <Link href="/account" className="text-[13px] font-medium text-brand hover:underline">
-                  {unauthenticated ? "Sign In" : "Manage"}
-                </Link>
-              </div>
-              <p className="mt-1 font-semibold text-graphite">Direct UAV Procurement</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Card 2: Quick Actions */}
-        <div className="bg-white p-5">
-          <h3 className="text-[14px] font-bold text-graphite">Quick Actions</h3>
-          <div className="mt-3 space-y-2.5">
-            <Link
-              href="/support"
-              className="flex items-center gap-3 rounded-md border border-border p-2.5 transition-colors hover:bg-surface-soft"
-            >
-              <div className="flex h-8 w-8 items-center justify-center rounded bg-surface-soft text-graphite">
-                <Search className="h-4 w-4" />
-              </div>
-              <div>
-                <p className="text-[14px] font-bold text-graphite">Track an Order</p>
-                <p className="text-[13px] text-text-muted">Enter order ID</p>
-              </div>
-            </Link>
-
-            <Link
-              href="/bulk-orders/request"
-              className="flex items-center gap-3 rounded-md border border-border p-2.5 transition-colors hover:bg-surface-soft"
-            >
-              <div className="flex h-8 w-8 items-center justify-center rounded bg-surface-soft text-graphite">
-                <Boxes className="h-4 w-4" />
-              </div>
-              <div>
-                <p className="text-[14px] font-bold text-graphite">Bulk Order Request</p>
-                <p className="text-[13px] text-text-muted">Request quote for multiple units</p>
-              </div>
-            </Link>
-
-            <Link
-              href="/build"
-              className="flex items-center gap-3 rounded-md border border-border p-2.5 transition-colors hover:bg-surface-soft"
-            >
-              <div className="flex h-8 w-8 items-center justify-center rounded bg-surface-soft text-graphite">
-                <Sliders className="h-4 w-4" />
-              </div>
-              <div>
-                <p className="text-[14px] font-bold text-graphite">Build New UAV</p>
-                <p className="text-[13px] text-text-muted">Configure and save</p>
-              </div>
-            </Link>
-
-            <Link
-              href="/account"
-              className="flex items-center gap-3 rounded-md border border-border p-2.5 transition-colors hover:bg-surface-soft"
-            >
-              <div className="flex h-8 w-8 items-center justify-center rounded bg-surface-soft text-graphite">
-                <MapPin className="h-4 w-4" />
-              </div>
-              <div>
-                <p className="text-[14px] font-bold text-graphite">Manage Addresses</p>
-                <p className="text-[13px] text-text-muted">View and edit addresses</p>
-              </div>
-            </Link>
-          </div>
-        </div>
-
-        {/* Card 3: Need Help? */}
-        <div className="bg-white p-5">
-          <h3 className="text-[14px] font-bold text-graphite">Need Help?</h3>
-          <div className="mt-3 space-y-2.5">
-            <Link
-              href="/support"
-              className="flex items-center gap-3 rounded-md border border-border p-2.5 transition-colors hover:bg-surface-soft"
-            >
-              <div className="flex h-8 w-8 items-center justify-center rounded bg-surface-soft text-graphite">
-                <RotateCcw className="h-4 w-4" />
-              </div>
-              <div>
-                <p className="text-[14px] font-bold text-graphite">Return or Replace</p>
-                <p className="text-[13px] text-text-muted">Request a return</p>
-              </div>
-            </Link>
-
-            <Link
-              href="/support"
-              className="flex items-center gap-3 rounded-md border border-border p-2.5 transition-colors hover:bg-surface-soft"
-            >
-              <div className="flex h-8 w-8 items-center justify-center rounded bg-surface-soft text-graphite">
-                <Headphones className="h-4 w-4" />
-              </div>
-              <div>
-                <p className="text-[14px] font-bold text-graphite">Order Support</p>
-                <p className="text-[13px] text-text-muted">Get help with your order</p>
-              </div>
-            </Link>
-          </div>
-        </div>
-      </aside>
 
       {/* Order Detail Modal */}
       {selectedOrder && (

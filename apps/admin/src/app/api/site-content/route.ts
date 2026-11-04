@@ -4,7 +4,10 @@ import { getStoreMetadata, setStoreMetadata } from "@/lib/medusa-admin";
 // Homepage copy lives in the store's metadata: `site_content_draft` while editing,
 // `site_content` once published. The storefront reads only the published key.
 
+export type HeroSlide = { image: string; title: string; text: string; cta: string; href: string };
+
 export type SiteContent = {
+  heroSlides: HeroSlide[];
   heroTitle: string;
   heroSentence: string;
   faq: { q: string; a: string }[];
@@ -18,7 +21,12 @@ const text = (value: unknown, max: number) => (typeof value === "string" ? value
 function clean(input: unknown): SiteContent {
   const v = (input ?? {}) as Record<string, unknown>;
   const faq = Array.isArray(v.faq) ? v.faq : [];
+  const slides = Array.isArray(v.heroSlides) ? v.heroSlides : [];
   return {
+    heroSlides: slides
+      .slice(0, 6)
+      .map((s) => ({ image: text(s?.image, 500), title: text(s?.title, 80), text: text(s?.text, 160), cta: text(s?.cta, 30), href: text(s?.href, 200) }))
+      .filter((s) => s.image),
     heroTitle: text(v.heroTitle, 80),
     heroSentence: text(v.heroSentence, 240),
     faq: faq

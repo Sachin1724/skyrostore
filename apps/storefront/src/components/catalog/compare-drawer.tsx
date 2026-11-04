@@ -98,7 +98,7 @@ export function CompareCheckbox({ product }: { product: HttpTypes.StoreProduct }
   return (
     <label
       onClick={(e) => e.stopPropagation()}
-      className="inline-flex cursor-pointer items-center gap-1.5 rounded bg-white/90 px-2 py-1 text-[11px] font-bold text-navy shadow-sm backdrop-blur transition-all hover:bg-white"
+      className="inline-flex cursor-pointer items-center gap-1.5 rounded bg-white px-2 py-1 text-[13px] font-medium text-navy transition-all hover:bg-white"
     >
       <input
         type="checkbox"
@@ -160,7 +160,7 @@ export function CompareDrawer() {
       {/* Floating Bottom Drawer */}
       <aside
         aria-label="Product Comparison Bar"
-        className="fixed bottom-4 left-1/2 z-50 flex -translate-x-1/2 items-center gap-4 rounded-xl border border-navy/20 bg-navy px-4 py-3 text-white shadow-2xl backdrop-blur max-w-[94vw] overflow-x-auto"
+        className="fixed bottom-4 left-1/2 z-50 flex -translate-x-1/2 items-center gap-4 rounded-xl border border-navy/20 bg-navy px-4 py-3 text-white shadow-2xl max-w-[94vw] overflow-x-auto"
       >
         <div className="flex items-center gap-2 pr-2 border-r border-white/20">
           <SlidersHorizontal className="h-4 w-4 text-brand-cyan" aria-hidden />
@@ -177,7 +177,7 @@ export function CompareDrawer() {
               {item.thumbnail ? (
                 <Image src={item.thumbnail} alt="" fill sizes="40px" className="object-contain p-1" />
               ) : (
-                <div className="flex h-full w-full items-center justify-center text-[10px] font-bold text-navy">
+                <div className="flex h-full w-full items-center justify-center text-[13px] font-bold text-navy">
                   UAV
                 </div>
               )}
@@ -220,18 +220,18 @@ export function CompareDrawer() {
           role="dialog"
           aria-modal="true"
           aria-labelledby="compare-modal-title"
-          className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-navy/60 backdrop-blur-sm"
+          className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-navy/60"
         >
           <div className="absolute inset-0" onClick={() => setModalOpen(false)} aria-hidden />
 
-          <div className="relative z-10 flex max-h-[92vh] w-full max-w-5xl flex-col rounded-xl border border-border bg-white shadow-2xl overflow-hidden">
+          <div className="relative z-10 flex max-h-[92vh] w-full max-w-5xl flex-col card shadow-2xl overflow-hidden">
             {/* Header */}
             <div className="flex items-center justify-between border-b border-border px-6 py-4 bg-surface-soft">
               <div>
                 <h2 id="compare-modal-title" className="text-[18px] font-extrabold text-navy">
                   Technical Hardware Comparison
                 </h2>
-                <p className="text-[12px] text-text-muted">
+                <p className="text-[13px] text-text-muted">
                   Comparing {items.length} drone components side by side
                 </p>
               </div>
@@ -255,7 +255,7 @@ export function CompareDrawer() {
                 {items.map((item) => (
                   <div
                     key={item.id}
-                    className="flex flex-col rounded-lg border border-border bg-white p-4 shadow-sm"
+                    className="flex flex-col card p-4 shadow-sm"
                   >
                     {/* Thumbnail */}
                     <div className="relative aspect-square w-full rounded bg-surface-soft overflow-hidden">
@@ -275,7 +275,7 @@ export function CompareDrawer() {
                     {/* Metadata & Title */}
                     <div className="mt-3 min-h-[50px]">
                       {item.brand ? (
-                        <span className="block text-[11px] font-bold uppercase tracking-wider text-brand">
+                        <span className="block text-[13px] font-bold text-brand">
                           {item.brand}
                         </span>
                       ) : null}
@@ -292,19 +292,19 @@ export function CompareDrawer() {
                       <p className="text-[16px] font-extrabold tabular-nums text-navy">
                         {item.price != null ? formatPrice(item.price, item.currency) : "Price on request"}
                       </p>
-                      <p className="text-[11px] text-text-muted">Incl. 18% GST</p>
-                      <p className="mt-1 text-[12px] font-semibold text-success">
+                      <p className="text-[13px] text-text-muted">Incl. 18% GST</p>
+                      <p className="mt-1 text-[13px] font-semibold text-success">
                         {item.inStock ? "In Stock" : "Out of Stock"}
                       </p>
                     </div>
 
                     {/* Technical Specifications Specs */}
                     <div className="mt-4 flex-1 border-t border-border pt-3">
-                      <span className="block text-[11px] font-extrabold uppercase tracking-wider text-text-muted">
+                      <span className="block text-[13px] font-extrabold text-text-muted">
                         Key Specs
                       </span>
                       {item.highlights.length > 0 ? (
-                        <ul className="mt-2 space-y-1.5 text-[12px] text-navy">
+                        <ul className="mt-2 space-y-1.5 text-[13px] text-navy">
                           {item.highlights.map((h) => (
                             <li key={h} className="rounded bg-surface-soft px-2 py-1 font-semibold tabular-nums">
                               {h}
@@ -312,7 +312,7 @@ export function CompareDrawer() {
                           ))}
                         </ul>
                       ) : (
-                        <p className="mt-2 text-[12px] text-text-muted">Standard configuration</p>
+                        <p className="mt-2 text-[13px] text-text-muted">Standard configuration</p>
                       )}
                     </div>
 

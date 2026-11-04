@@ -54,6 +54,8 @@ export function QuickViewModal() {
   const managed = variant?.manage_inventory !== false && qty != null;
   const inStock = !managed || qty! > 0;
   const amount = price?.calculated_amount ?? null;
+  // MRP only when Medusa reports a genuinely higher original (a price list or sale).
+  const mrp = amount != null && (price?.original_amount ?? 0) > amount ? price!.original_amount! : null;
   const currency = price?.currency_code ?? "inr";
   const title = cleanName(product.title ?? "");
   const brand = product.collection?.title;
@@ -86,13 +88,13 @@ export function QuickViewModal() {
       role="dialog"
       aria-modal="true"
       aria-labelledby="quick-view-title"
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-navy/60 backdrop-blur-sm"
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-navy/60"
     >
       {/* Click outside to close */}
       <div className="absolute inset-0" onClick={() => setProduct(null)} aria-hidden />
 
       {/* Modal Content */}
-      <div className="relative z-10 flex max-h-[90vh] w-full max-w-3xl flex-col overflow-y-auto rounded-xl border border-border bg-white shadow-2xl sm:flex-row">
+      <div className="relative z-10 flex max-h-[90vh] w-full max-w-3xl flex-col overflow-y-auto card shadow-2xl sm:flex-row">
         {/* Close Button */}
         <button
           type="button"
@@ -124,11 +126,11 @@ export function QuickViewModal() {
           )}
 
           {inStock ? (
-            <span className="absolute bottom-4 left-4 rounded bg-success/10 border border-success/20 px-2 py-0.5 text-[11px] font-bold text-success">
+            <span className="absolute bottom-4 left-4 rounded bg-success/10 border border-success/20 px-2 py-0.5 text-[13px] font-bold text-success">
               In Stock &amp; Ready to Ship
             </span>
           ) : (
-            <span className="absolute bottom-4 left-4 rounded bg-border px-2 py-0.5 text-[11px] font-bold text-text-muted">
+            <span className="absolute bottom-4 left-4 rounded bg-border px-2 py-0.5 text-[13px] font-bold text-text-muted">
               Out of Stock
             </span>
           )}
@@ -138,7 +140,7 @@ export function QuickViewModal() {
         <div className="flex flex-1 flex-col justify-between p-6 sm:p-7">
           <div>
             {/* Brand / Category */}
-            <div className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-wider text-brand">
+            <div className="flex items-center gap-2 text-[13px] font-bold text-brand">
               {brand ? <span>{brand}</span> : null}
               {brand && category ? <span>·</span> : null}
               {category ? <span>{category}</span> : null}
@@ -150,24 +152,30 @@ export function QuickViewModal() {
             </h2>
 
             {/* Price Row */}
-            <div className="mt-3 flex items-baseline gap-2">
-              <span className="text-[22px] font-extrabold tabular-nums text-navy">
+            <div className="mt-3 flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
+              <span className="text-[22px] font-semibold tabular-nums text-navy">
                 {amount != null ? formatPrice(amount, currency) : "Price on request"}
               </span>
-              <span className="text-[12px] text-text-muted">Includes GST</span>
+              {mrp ? (
+                <>
+                  <s className="text-[14px] tabular-nums text-text-muted">{formatPrice(mrp, currency)}</s>
+                  <span className="text-[14px] font-medium text-success">{Math.round((1 - amount! / mrp) * 100)}% off</span>
+                </>
+              ) : null}
+              <span className="text-[13px] text-text-muted">Includes GST</span>
             </div>
 
             {/* Technical Highlights */}
             {specs.length > 0 ? (
               <div className="mt-4 rounded-lg border border-border bg-surface-soft/60 p-3">
-                <span className="block text-[11px] font-extrabold uppercase tracking-wider text-text-muted">
+                <span className="block text-[13px] font-extrabold text-text-muted">
                   Engineering Specifications
                 </span>
                 <div className="mt-2 flex flex-wrap gap-1.5">
                   {specs.map((spec) => (
                     <span
                       key={spec}
-                      className="rounded border border-border bg-white px-2 py-1 text-[12px] font-semibold tabular-nums text-navy"
+                      className="rounded border border-border bg-white px-2 py-1 text-[13px] font-semibold tabular-nums text-navy"
                     >
                       {spec}
                     </span>
@@ -177,7 +185,7 @@ export function QuickViewModal() {
             ) : null}
 
             {/* Guarantees */}
-            <div className="mt-4 grid grid-cols-2 gap-2 text-[12px] text-text-secondary border-t border-border pt-3">
+            <div className="mt-4 grid grid-cols-2 gap-2 text-[13px] text-text-secondary border-t border-border pt-3">
               <div className="flex items-center gap-1.5">
                 <Truck className="h-3.5 w-3.5 text-brand" aria-hidden />
                 <span>Delhivery Air Express</span>

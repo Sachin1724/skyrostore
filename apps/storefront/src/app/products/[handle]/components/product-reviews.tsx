@@ -127,7 +127,7 @@ export function ProductReviews({ productId, productTitle }: ProductReviewsProps)
       {total > 0 ? (
         <div className="mt-8 grid gap-8 lg:grid-cols-[280px_1fr]">
           {/* Summary Card */}
-          <div className="rounded-lg border border-border bg-white p-6">
+          <div className="card p-6">
             <div className="flex items-baseline gap-3">
               <span className="text-[44px] font-extrabold tabular-nums text-navy">{average}</span>
               <span className="text-[16px] text-text-secondary">out of 5</span>
@@ -155,7 +155,7 @@ export function ProductReviews({ productId, productTitle }: ProductReviewsProps)
                 const count = breakdown[star] || 0;
                 const percent = total > 0 ? Math.round((count / total) * 100) : 0;
                 return (
-                  <div key={star} className="flex items-center gap-2 text-[12px] font-medium text-navy">
+                  <div key={star} className="flex items-center gap-2 text-[13px] font-medium text-navy">
                     <span className="w-8 tabular-nums">{star} star</span>
                     <div className="h-2 flex-1 overflow-hidden rounded-full bg-surface-soft">
                       <div
@@ -173,7 +173,7 @@ export function ProductReviews({ productId, productTitle }: ProductReviewsProps)
           {/* Review List */}
           <div className="space-y-4">
             {reviews.map((r) => (
-              <article key={r.id} className="rounded-lg border border-border bg-white p-5 sm:p-6">
+              <article key={r.id} className="card p-5 sm:p-6">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-surface-soft text-navy">
@@ -196,11 +196,11 @@ export function ProductReviews({ productId, productTitle }: ProductReviewsProps)
 
                   <div className="flex items-center gap-3">
                     {r.verified_purchase ? (
-                      <span className="flex items-center gap-1 rounded bg-success-soft px-2 py-0.5 text-[11px] font-bold text-success">
+                      <span className="flex items-center gap-1 rounded bg-success-soft px-2 py-0.5 text-[13px] font-bold text-success">
                         <Check className="h-3 w-3" strokeWidth={3} /> Verified Purchase
                       </span>
                     ) : null}
-                    <time className="text-[12px] text-text-muted">
+                    <time className="text-[13px] text-text-muted">
                       {new Date(r.created_at).toLocaleDateString("en-IN", {
                         year: "numeric",
                         month: "short",
@@ -210,13 +210,13 @@ export function ProductReviews({ productId, productTitle }: ProductReviewsProps)
                   </div>
                 </div>
 
-                <h3 className="mt-3 text-[15px] font-bold text-navy">{r.title}</h3>
+                <h3 className="mt-3 text-[16px] font-bold text-navy">{r.title}</h3>
                 <p className="mt-1.5 text-[14px] leading-relaxed text-text-secondary whitespace-pre-line">
                   {r.content}
                 </p>
 
                 {r.hardware_setup ? (
-                  <div className="mt-3 inline-flex items-center gap-1.5 rounded bg-surface-soft px-2.5 py-1 text-[12px] font-semibold text-text-secondary">
+                  <div className="mt-3 inline-flex items-center gap-1.5 rounded bg-surface-soft px-2.5 py-1 text-[13px] font-semibold text-text-secondary">
                     <span className="font-bold text-navy">Hardware Setup:</span> {r.hardware_setup}
                   </div>
                 ) : null}
@@ -225,7 +225,7 @@ export function ProductReviews({ productId, productTitle }: ProductReviewsProps)
           </div>
         </div>
       ) : (
-        <div className="mt-8 rounded-lg border border-border bg-white p-8 text-center">
+        <div className="mt-8 card p-8 text-center">
           <p className="text-[16px] font-bold text-navy">No reviews submitted yet.</p>
           <p className="mt-1 text-[14px] text-text-secondary max-w-[50ch] mx-auto">
             Be the first verified builder to review the {productTitle}. Share your flight logs, torque specs, and build notes.
@@ -244,7 +244,7 @@ export function ProductReviews({ productId, productTitle }: ProductReviewsProps)
       <dialog
         ref={modalRef}
         onClose={() => setIsModalOpen(false)}
-        className="pop m-auto w-[min(92vw,560px)] rounded-lg border border-border bg-white p-6 shadow-2xl backdrop:bg-navy/70"
+        className="pop m-auto w-[min(92vw,560px)] card p-6 shadow-2xl backdrop:bg-navy/70"
       >
         <div className="flex items-center justify-between border-b border-border pb-3">
           <h3 className="text-[18px] font-bold text-navy">Write a Review</h3>
@@ -351,7 +351,7 @@ export function ProductReviews({ productId, productTitle }: ProductReviewsProps)
               <button
                 type="submit"
                 disabled={submitting}
-                className="h-11 w-full rounded-md bg-navy text-[14px] font-bold text-white transition-colors hover:bg-brand disabled:opacity-50"
+                className="btn btn-primary w-full"
               >
                 {submitting ? "Submitting Review..." : "Submit Verified Review"}
               </button>

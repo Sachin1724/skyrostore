@@ -57,7 +57,7 @@ export function BrandsDirectory({ brands }: BrandsDirectoryProps) {
   return (
     <div className="space-y-8">
       {/* Search and A-Z Jump Bar Controls */}
-      <div className="flex flex-col gap-5 rounded-xl border border-border bg-white p-5 shadow-sm md:p-6">
+      <div className="flex flex-col gap-5 card p-5 md:p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" aria-hidden />
@@ -82,9 +82,9 @@ export function BrandsDirectory({ brands }: BrandsDirectoryProps) {
               type="button"
               onClick={() => setSelectedLetter("ALL")}
               aria-pressed={selectedLetter === "ALL"}
-              className={`h-8 rounded px-2.5 text-[12px] font-bold transition-all ${
+              className={`h-8 rounded px-2.5 text-[13px] font-bold transition-all ${
                 selectedLetter === "ALL"
-                  ? "bg-navy text-white shadow-sm"
+                  ? "bg-navy text-white"
                   : "bg-surface-soft text-text-secondary hover:bg-border"
               }`}
             >
@@ -95,9 +95,9 @@ export function BrandsDirectory({ brands }: BrandsDirectoryProps) {
               onClick={() => activeLetters.has("#") && setSelectedLetter("#")}
               disabled={!activeLetters.has("#")}
               aria-pressed={selectedLetter === "#"}
-              className={`h-8 w-8 rounded text-[12px] font-bold transition-all ${
+              className={`h-8 w-8 rounded text-[13px] font-bold transition-all ${
                 selectedLetter === "#"
-                  ? "bg-navy text-white shadow-sm"
+                  ? "bg-navy text-white"
                   : activeLetters.has("#")
                   ? "bg-surface-soft text-text-secondary hover:bg-border cursor-pointer"
                   : "text-text-muted/40 cursor-not-allowed"
@@ -115,9 +115,9 @@ export function BrandsDirectory({ brands }: BrandsDirectoryProps) {
                   onClick={() => hasItems && setSelectedLetter(letter)}
                   disabled={!hasItems}
                   aria-pressed={isSelected}
-                  className={`h-8 w-8 rounded text-[12px] font-bold transition-all ${
+                  className={`h-8 w-8 rounded text-[13px] font-bold transition-all ${
                     isSelected
-                      ? "bg-navy text-white shadow-sm"
+                      ? "bg-navy text-white"
                       : hasItems
                       ? "bg-surface-soft text-text-secondary hover:bg-border cursor-pointer"
                       : "text-text-muted/30 cursor-not-allowed"
@@ -133,8 +133,8 @@ export function BrandsDirectory({ brands }: BrandsDirectoryProps) {
 
       {/* Brands Card Grid */}
       {filteredBrands.length === 0 ? (
-        <div className="rounded-xl border border-border bg-white px-6 py-16 text-center shadow-sm">
-          <p className="text-[17px] font-bold text-navy">No manufacturers match your filter</p>
+        <div className="card px-6 py-16 text-center">
+          <p className="text-[16px] font-bold text-navy">No manufacturers match your filter</p>
           <p className="mt-1.5 text-[14px] text-text-secondary">
             Try clearing the search query or selecting &quot;All&quot; from the alphabet bar.
           </p>
@@ -155,7 +155,7 @@ export function BrandsDirectory({ brands }: BrandsDirectoryProps) {
             <Link
               key={b.id}
               href={`/brands/${b.handle}`}
-              className="group flex flex-col justify-between rounded-xl border border-border bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-brand hover:shadow-md"
+              className="group flex flex-col justify-between card p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-brand hover:shadow-md"
             >
               <div>
                 {/* Brand Header & Logo/Monogram */}
@@ -176,13 +176,13 @@ export function BrandsDirectory({ brands }: BrandsDirectoryProps) {
                     </div>
                   )}
 
-                  <span className="rounded-full bg-surface-soft px-2.5 py-1 text-[11px] font-bold tabular-nums text-text-muted">
+                  <span className="rounded-full bg-surface-soft px-2.5 py-1 text-[13px] font-bold tabular-nums text-text-muted">
                     {b.count} {b.count === 1 ? "component" : "components"}
                   </span>
                 </div>
 
                 {/* Title */}
-                <h2 className="mt-4 text-[17px] font-extrabold text-navy group-hover:text-brand transition-colors">
+                <h2 className="mt-4 text-[16px] font-extrabold text-navy group-hover:text-brand transition-colors">
                   {b.title}
                 </h2>
 
@@ -192,19 +192,19 @@ export function BrandsDirectory({ brands }: BrandsDirectoryProps) {
                     {b.categories.slice(0, 3).map((cat) => (
                       <span
                         key={cat}
-                        className="rounded bg-surface-soft px-2 py-0.5 text-[11px] font-semibold text-text-secondary"
+                        className="rounded bg-surface-soft px-2 py-0.5 text-[13px] font-semibold text-text-secondary"
                       >
                         {cat}
                       </span>
                     ))}
                     {b.categories.length > 3 ? (
-                      <span className="rounded bg-surface-soft px-1.5 py-0.5 text-[11px] font-bold text-text-muted">
+                      <span className="rounded bg-surface-soft px-1.5 py-0.5 text-[13px] font-bold text-text-muted">
                         +{b.categories.length - 3}
                       </span>
                     ) : null}
                   </div>
                 ) : (
-                  <p className="mt-2 text-[12px] text-text-muted">Certified hardware partner</p>
+                  <p className="mt-2 text-[13px] text-text-muted">Certified hardware partner</p>
                 )}
               </div>
 

@@ -80,21 +80,21 @@ function getStatusBadge(status: string, validUntil?: string | null) {
   switch (status) {
     case "SUBMITTED":
       return (
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-300 bg-slate-100 px-2.5 py-0.5 text-[11px] font-bold text-slate-800">
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-300 bg-slate-100 px-2.5 py-0.5 text-[13px] font-bold text-slate-800">
           <span className="h-1.5 w-1.5 rounded-full bg-slate-500" />
           Submitted
         </span>
       );
     case "UNDER_REVIEW":
       return (
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-sky-300 bg-sky-50 px-2.5 py-0.5 text-[11px] font-bold text-sky-800">
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-sky-300 bg-sky-50 px-2.5 py-0.5 text-[13px] font-bold text-sky-800">
           <span className="h-1.5 w-1.5 rounded-full bg-sky-500 animate-pulse" />
           Under Review
         </span>
       );
     case "NEEDS_INFORMATION":
       return (
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-300 bg-amber-50 px-2.5 py-0.5 text-[11px] font-bold text-amber-800">
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-300 bg-amber-50 px-2.5 py-0.5 text-[13px] font-bold text-amber-800">
           <AlertCircle className="h-3 w-3 text-amber-600" />
           Action Needed
         </span>
@@ -102,20 +102,20 @@ function getStatusBadge(status: string, validUntil?: string | null) {
     case "QUOTED":
       if (isExpired) {
         return (
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-300 bg-slate-100 px-2.5 py-0.5 text-[11px] font-bold text-slate-600">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-300 bg-slate-100 px-2.5 py-0.5 text-[13px] font-bold text-slate-600">
             Quote Expired
           </span>
         );
       }
       return (
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300 bg-emerald-50 px-2.5 py-0.5 text-[11px] font-extrabold text-emerald-800">
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300 bg-emerald-50 px-2.5 py-0.5 text-[13px] font-extrabold text-emerald-800">
           <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
           Quote Ready
         </span>
       );
     case "ACCEPTED":
       return (
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500 bg-emerald-600 px-2.5 py-0.5 text-[11px] font-bold text-white">
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500 bg-emerald-600 px-2.5 py-0.5 text-[13px] font-bold text-white">
           <CheckCircle2 className="h-3 w-3" />
           Accepted
         </span>
@@ -123,26 +123,26 @@ function getStatusBadge(status: string, validUntil?: string | null) {
     case "CONVERTED_TO_ORDER":
     case "IN_PRODUCTION":
       return (
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-navy bg-navy px-2.5 py-0.5 text-[11px] font-bold text-white">
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-navy bg-navy px-2.5 py-0.5 text-[13px] font-bold text-white">
           In Production
         </span>
       );
     case "EXPIRED":
       return (
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-300 bg-slate-100 px-2.5 py-0.5 text-[11px] font-bold text-slate-600">
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-300 bg-slate-100 px-2.5 py-0.5 text-[13px] font-bold text-slate-600">
           Expired
         </span>
       );
     case "CANCELLED":
     case "REJECTED":
       return (
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-rose-200 bg-rose-50 px-2.5 py-0.5 text-[11px] font-bold text-rose-700">
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-rose-200 bg-rose-50 px-2.5 py-0.5 text-[13px] font-bold text-rose-700">
           Declined
         </span>
       );
     default:
       return (
-        <span className="inline-flex items-center rounded-full border border-border bg-surface-soft px-2.5 py-0.5 text-[11px] font-bold text-navy">
+        <span className="inline-flex items-center rounded-full border border-border bg-surface-soft px-2.5 py-0.5 text-[13px] font-bold text-navy">
           {status}
         </span>
       );
@@ -255,7 +255,7 @@ export function BulkRequestsDashboard({
     <div className="space-y-6">
       {/* 1. Unauthenticated or Guest Notice Card */}
       {unauthenticated && (
-        <div className="rounded-xl border border-sky-200 bg-sky-50/70 p-5 text-navy shadow-xs">
+        <div className="rounded-xl border border-sky-200 bg-sky-50/70 p-5 text-navy">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-start gap-3">
               <Building2 className="h-5 w-5 text-brand shrink-0 mt-0.5" aria-hidden />
@@ -268,7 +268,7 @@ export function BulkRequestsDashboard({
             </div>
             <Link
               href="/account"
-              className="inline-flex h-9 items-center justify-center rounded-lg bg-navy px-4 text-[13px] font-bold text-white hover:bg-brand transition-colors whitespace-nowrap"
+              className="btn btn-primary btn-sm whitespace-nowrap"
             >
               Sign In to Account
             </Link>
@@ -277,7 +277,7 @@ export function BulkRequestsDashboard({
       )}
 
       {/* 2. Direct RFQ Reference Lookup Form */}
-      <div className="rounded-xl border border-border bg-white p-4 shadow-xs">
+      <div className="card p-4">
         <form onSubmit={handleLookup} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
           <div className="flex-1 flex items-center rounded-lg border border-border bg-surface-soft px-3 py-2 text-[13px]">
             <Search className="h-4 w-4 text-text-muted shrink-0 mr-2" aria-hidden />
@@ -294,7 +294,7 @@ export function BulkRequestsDashboard({
           </div>
           <button
             type="submit"
-            className="rounded-lg bg-navy px-5 py-2 text-[13px] font-bold text-white transition hover:bg-brand"
+            className="btn btn-primary btn-sm"
           >
             Track Reference
           </button>
@@ -317,14 +317,14 @@ export function BulkRequestsDashboard({
             className={cn(
               "flex items-center gap-2 rounded-lg px-3.5 py-1.5 font-bold transition-colors whitespace-nowrap",
               activeTab === tab.id
-                ? "bg-navy text-white shadow-2xs"
+                ? "bg-navy text-white"
                 : "bg-white text-text-secondary border border-border hover:text-navy hover:bg-surface-soft"
             )}
           >
             <span>{tab.label}</span>
             <span
               className={cn(
-                "rounded px-1.5 py-0.5 text-[11px] font-mono",
+                "rounded px-1.5 py-0.5 text-[13px] font-mono",
                 activeTab === tab.id ? "bg-white/20 text-white" : "bg-surface-soft text-text-muted"
               )}
             >
@@ -336,12 +336,12 @@ export function BulkRequestsDashboard({
 
       {/* 4. Requests Presentation (Desktop Table + Mobile Cards) */}
       {loading ? (
-        <div className="rounded-xl border border-border bg-white p-12 text-center text-[14px] text-text-muted shadow-sm">
+        <div className="card p-12 text-center text-[14px] text-text-muted">
           <RefreshCw className="h-5 w-5 animate-spin mx-auto text-brand mb-2" aria-hidden />
           Loading your bulk quotations...
         </div>
       ) : filteredRequests.length === 0 ? (
-        <div className="rounded-xl border border-border bg-white p-8 md:p-14 text-center shadow-sm">
+        <div className="card p-8 md:p-14 text-center">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-brand-soft text-brand">
             <Layers className="h-6 w-6" aria-hidden />
           </div>
@@ -358,14 +358,14 @@ export function BulkRequestsDashboard({
               <button
                 type="button"
                 onClick={() => setSearchQuery("")}
-                className="rounded-lg border border-border bg-white px-5 py-2 text-[13px] font-bold text-navy hover:bg-surface-soft"
+                className="card px-5 py-2 text-[13px] font-bold text-navy hover:bg-surface-soft"
               >
                 Clear Search
               </button>
             )}
             <Link
               href="/bulk-orders/request"
-              className="inline-flex h-10 items-center gap-2 rounded-lg bg-navy px-5 text-[13px] font-extrabold text-white hover:bg-brand transition-colors shadow-2xs"
+              className="btn btn-primary"
             >
               <Plus className="h-4 w-4" aria-hidden />
               Submit New RFQ
@@ -375,9 +375,9 @@ export function BulkRequestsDashboard({
       ) : (
         <>
           {/* Desktop Table (Hidden on Mobile) */}
-          <div className="hidden md:block overflow-x-auto rounded-xl border border-border bg-white shadow-sm">
+          <div className="hidden md:block overflow-x-auto card">
             <table className="w-full text-left text-[13px]">
-              <thead className="border-b border-border bg-surface-soft text-[11px] font-extrabold uppercase text-text-muted">
+              <thead className="border-b border-border bg-surface-soft text-[13px] font-extrabold uppercase text-text-muted">
                 <tr>
                   <th className="py-3 px-4">Reference No</th>
                   <th className="py-3 px-4">Date</th>
@@ -400,7 +400,7 @@ export function BulkRequestsDashboard({
                           {r.reference_no}
                         </Link>
                         {r.company_name && (
-                          <span className="block text-[11px] font-sans font-normal text-text-muted truncate max-w-[200px]">
+                          <span className="block text-[13px] font-sans font-normal text-text-muted truncate max-w-[200px]">
                             {r.company_name}
                           </span>
                         )}
@@ -416,7 +416,7 @@ export function BulkRequestsDashboard({
                         {r.request_type.replace(/_/g, " ")}
                       </td>
                       <td className="py-3.5 px-4 text-center font-mono font-semibold text-navy">
-                        {totalUnits} <span className="text-[11px] font-sans text-text-muted">units</span>
+                        {totalUnits} <span className="text-[13px] font-sans text-text-muted">units</span>
                       </td>
                       <td className="py-3.5 px-4 text-right font-mono font-extrabold text-navy">
                         {r.quote_total ? formatINR(r.quote_total) : "Pending Review"}
@@ -428,7 +428,7 @@ export function BulkRequestsDashboard({
                         {isQuoted ? (
                           <Link
                             href={`/account/bulk-requests/${r.id}`}
-                            className="inline-flex items-center gap-1 rounded-md bg-navy px-3 py-1.5 text-[12px] font-extrabold text-white hover:bg-brand transition-colors shadow-2xs"
+                            className="btn btn-primary btn-sm"
                           >
                             <span>Review Quote</span>
                             <ArrowRight className="h-3 w-3" aria-hidden />
@@ -459,14 +459,14 @@ export function BulkRequestsDashboard({
               return (
                 <div
                   key={r.id}
-                  className="rounded-xl border border-border bg-white p-4 shadow-xs space-y-3"
+                  className="card p-4 space-y-3"
                 >
                   <div className="flex items-start justify-between gap-2 border-b border-border pb-3">
                     <div>
                       <span className="font-mono text-[14px] font-extrabold text-navy">
                         {r.reference_no}
                       </span>
-                      <p className="text-[11px] text-text-muted">
+                      <p className="text-[13px] text-text-muted">
                         {new Date(r.created_at).toLocaleDateString("en-IN", {
                           day: "numeric",
                           month: "short",
@@ -477,7 +477,7 @@ export function BulkRequestsDashboard({
                     {getStatusBadge(r.status, r.quote_valid_until)}
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2 text-[12px]">
+                  <div className="grid grid-cols-2 gap-2 text-[13px]">
                     <div>
                       <span className="text-text-muted block">Request Type</span>
                       <span className="font-semibold text-navy">{r.request_type.replace(/_/g, " ")}</span>
@@ -488,7 +488,7 @@ export function BulkRequestsDashboard({
                     </div>
                     <div className="col-span-2 pt-1 border-t border-border">
                       <span className="text-text-muted block">Quotation Total</span>
-                      <span className="font-mono text-[15px] font-extrabold text-navy">
+                      <span className="font-mono text-[16px] font-extrabold text-navy">
                         {r.quote_total ? formatINR(r.quote_total) : "Pending Engineering Review"}
                       </span>
                     </div>

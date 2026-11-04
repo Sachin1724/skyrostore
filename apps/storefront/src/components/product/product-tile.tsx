@@ -1,0 +1,92 @@
+import Link from "next/link";
+import Image from "next/image";
+
+/**
+ * The one product card. Catalog, shelves, the builder and the account pages all render this,
+ * so the image box, text sizes and spacing are the same everywhere. Callers pass content only.
+ */
+export function ProductTile({
+  href,
+  image,
+  fallback,
+  eyebrow,
+  title,
+  spec,
+  price,
+  status,
+  action,
+  overlay,
+  badge,
+  selected = false,
+  priority = false,
+}: {
+  href?: string;
+  image?: string | null;
+  fallback: React.ReactNode;
+  eyebrow?: string;
+  title: string;
+  spec?: string;
+  price: React.ReactNode;
+  status?: React.ReactNode;
+  action?: React.ReactNode;
+  overlay?: React.ReactNode;
+  badge?: React.ReactNode;
+  selected?: boolean;
+  priority?: boolean;
+}) {
+  const media = (
+    <>
+      {image ? (
+        <Image
+          src={image}
+          alt=""
+          fill
+          priority={priority}
+          sizes="(min-width: 1280px) 20vw, (min-width: 640px) 33vw, 50vw"
+          className="object-contain p-4 transition-transform duration-300 ease-out group-hover:scale-[1.04]"
+        />
+      ) : (
+        fallback
+      )}
+      {badge}
+    </>
+  );
+  const mediaClass = "relative block aspect-[4/3] w-full bg-surface-soft";
+
+  return (
+    <article
+      className={`group card relative flex h-full flex-col overflow-hidden transition-[box-shadow,translate] duration-200 ease-out hover:-translate-y-0.5 hover:shadow-[0_2px_4px_rgba(0,0,0,0.04),0_12px_24px_rgba(0,0,0,0.08)] ${
+        selected ? "outline outline-2 -outline-offset-1 outline-navy" : ""
+      }`}
+    >
+      {overlay}
+      {href ? (
+        <Link href={href} tabIndex={-1} aria-hidden className={mediaClass}>
+          {media}
+        </Link>
+      ) : (
+        <div className={mediaClass}>{media}</div>
+      )}
+      <div className="flex flex-1 flex-col gap-1 p-3.5">
+        {eyebrow ? <p className="truncate text-[13px] text-text-muted">{eyebrow}</p> : null}
+        <h3 className="line-clamp-2 min-h-[2.6em] text-[14px] font-medium leading-snug text-navy">
+          {href ? (
+            <Link href={href} className="hover:text-brand">
+              {title}
+            </Link>
+          ) : (
+            title
+          )}
+        </h3>
+        {spec ? <p className="truncate text-[13px] tabular-nums text-text-secondary">{spec}</p> : null}
+        <div className="mt-auto flex items-end justify-between gap-2 pt-2">
+          <div className="min-w-0">
+            {price}
+            {status}
+          </div>
+          {action}
+        </div>
+      </div>
+    </article>
+  );
+}

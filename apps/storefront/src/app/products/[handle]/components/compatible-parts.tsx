@@ -7,6 +7,7 @@ import { Check, Plus, ShoppingCart } from "lucide-react";
 import type { CompatibleItem } from "@/lib/data/compatible-products";
 import { formatPrice } from "@/lib/utils";
 import { CART_ADDED } from "@/components/layout/header-bar";
+import { ProductTile } from "@/components/product/product-tile";
 import { ProductMediaFallback } from "@/components/product/product-media-fallback";
 
 interface CompatiblePartsProps {
@@ -69,7 +70,7 @@ export function CompatibleParts({ items }: CompatiblePartsProps) {
         </Link>
       </div>
 
-      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5">
         {items.map(({ product, roleLabel, compatibilityReason }) => {
           const variant = product.variants?.[0];
           const price = variant?.calculated_price;
@@ -81,81 +82,37 @@ export function CompatibleParts({ items }: CompatiblePartsProps) {
           const meta = (product.metadata ?? {}) as Record<string, unknown>;
 
           return (
-            <div
+            <ProductTile
               key={product.id}
-              className="flex flex-col justify-between rounded-lg border border-border bg-white p-4 transition-all hover:border-border-strong hover:shadow-sm"
-            >
-              <div>
-                <div className="flex items-center justify-between gap-2">
-                  <span className="rounded bg-brand-soft px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider text-brand">
-                    {roleLabel}
-                  </span>
-                  <span className="flex items-center gap-1 text-[11px] font-semibold text-success">
-                    <Check className="h-3.5 w-3.5 text-success" strokeWidth={3} /> Verified Fit
-                  </span>
-                </div>
-
-                <Link href={`/products/${product.handle}`} className="group mt-3 block">
-                  <div className="relative aspect-square w-full overflow-hidden rounded border border-border bg-surface-soft">
-                    {product.thumbnail ? (
-                      <Image
-                        src={product.thumbnail}
-                        alt={product.title}
-                        fill
-                        sizes="(min-width: 1024px) 25vw, 50vw"
-                        className="object-contain p-3 transition-transform duration-200 group-hover:scale-105"
-                      />
-                    ) : (
-                      <ProductMediaFallback
-                        componentType={meta.component_type as string | undefined}
-                        title={product.title}
-                      />
-                    )}
-                  </div>
-                  <h3 className="mt-3 line-clamp-2 text-[14px] font-bold text-navy group-hover:text-brand">
-                    {product.title.replace("[DEV] ", "")}
-                  </h3>
-                </Link>
-
-                <p className="mt-1.5 rounded bg-surface-soft p-2 text-[12px] leading-tight text-text-secondary">
-                  {compatibilityReason}
-                </p>
-              </div>
-
-              <div className="mt-4 border-t border-border pt-3">
-                <div className="flex items-baseline justify-between mb-3">
-                  <span className="text-[17px] font-extrabold tabular-nums text-navy">
-                    {amount != null ? formatPrice(amount, currency) : "Price on request"}
-                  </span>
-                  <span className={`text-[12px] font-medium ${inStock ? "text-success" : "text-text-muted"}`}>
-                    {inStock ? "In Stock" : "Out of Stock"}
-                  </span>
-                </div>
-
-                {variant?.id ? (
+              href={`/products/${product.handle}`}
+              image={product.thumbnail}
+              fallback={<ProductMediaFallback componentType={meta.component_type as string | undefined} title={product.title} />}
+              eyebrow={`${roleLabel} · Verified fit`}
+              title={product.title.replace("[DEV] ", "")}
+              spec={compatibilityReason}
+              price={<p className="text-[16px] font-semibold tabular-nums text-navy">{amount != null ? formatPrice(amount, currency) : "Price on request"}</p>}
+              status={<p className={`text-[13px] font-medium ${inStock ? "text-success" : "text-text-muted"}`}>{inStock ? "In stock" : "Out of stock"}</p>}
+              action={
+                variant?.id ? (
                   <button
                     type="button"
                     disabled={!inStock || isAdding}
                     onClick={() => handleQuickAdd(variant.id, product.id)}
-                    className={`flex h-10 w-full items-center justify-center gap-1.5 rounded-md text-[13px] font-bold transition-colors ${
-                      isAdded
-                        ? "bg-success text-white"
-                        : "border border-navy bg-white text-navy hover:bg-navy hover:text-white"
-                    } disabled:opacity-40`}
+                    className={`btn btn-sm ${isAdded ? "btn-light" : "btn-primary"}`}
                   >
                     {isAdded ? (
                       <>
-                        <Check className="h-4 w-4" /> Added to Cart
+                        <Check className="h-4 w-4" /> Added
                       </>
                     ) : (
                       <>
-                        <Plus className="h-4 w-4" /> Add Compatible Part
+                        <Plus className="h-4 w-4" /> Add
                       </>
                     )}
                   </button>
-                ) : null}
-              </div>
-            </div>
+                ) : null
+              }
+            />
           );
         })}
       </div>

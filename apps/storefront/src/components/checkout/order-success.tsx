@@ -32,7 +32,7 @@ function NextStep({ icon: Icon, title, body }: { icon: typeof TruckIcon; title: 
         <Icon ref={ref} size={22} />
       </span>
       <span>
-        <span className="block text-[15px] font-bold text-navy">{title}</span>
+        <span className="block text-[16px] font-bold text-navy">{title}</span>
         <span className="block text-[14px] text-text-secondary">{body}</span>
       </span>
     </li>
@@ -46,7 +46,7 @@ function ActionLink({ href, children, primary }: { href: string; children: React
       href={href}
       {...triggerProps}
       className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-md px-6 text-[14px] font-bold transition-colors ${
-        primary ? "bg-brand text-white hover:bg-navy shadow-sm" : "border border-border bg-white text-navy hover:bg-surface-soft"
+        primary ? "bg-brand text-white hover:bg-navy" : "border border-border bg-white text-navy hover:bg-surface-soft"
       }`}
     >
       {children}
@@ -128,7 +128,7 @@ export function OrderSuccess({ orderId, summary }: { orderId?: string; summary: 
         </svg>
 
         <div>
-          <div className="success-rise inline-flex items-center gap-1.5 rounded bg-success/10 px-2.5 py-0.5 text-[11px] font-extrabold uppercase tracking-wider text-success">
+          <div className="success-rise inline-flex items-center gap-1.5 rounded bg-success/10 px-2.5 py-0.5 text-[13px] font-extrabold text-success">
             <CheckCircle2 className="h-3.5 w-3.5" aria-hidden />
             Payment Verified &amp; Confirmed
           </div>
@@ -157,7 +157,7 @@ export function OrderSuccess({ orderId, summary }: { orderId?: string; summary: 
             <button
               type="button"
               onClick={() => setShowInvoiceModal(true)}
-              className="inline-flex min-h-11 items-center gap-2 rounded-md border border-border-strong bg-white px-5 text-[14px] font-bold text-navy shadow-sm transition-colors hover:border-brand hover:text-brand"
+              className="inline-flex min-h-11 items-center gap-2 rounded-md border border-border-strong bg-white px-5 text-[14px] font-bold text-navy transition-colors hover:border-brand hover:text-brand"
             >
               <FileText className="h-4 w-4 text-brand" aria-hidden />
               <span>View GST Tax Invoice</span>
@@ -169,7 +169,7 @@ export function OrderSuccess({ orderId, summary }: { orderId?: string; summary: 
           </div>
 
           {/* Fulfillment Pipeline */}
-          <ol className="mt-8 divide-y divide-border rounded-xl border border-border bg-white px-5 py-2 shadow-sm">
+          <ol className="mt-8 divide-y divide-border card px-5 py-2">
             <NextStep
               icon={ClipboardCheckIcon}
               title="Technical Inspection &amp; Batch QA"
@@ -195,16 +195,16 @@ export function OrderSuccess({ orderId, summary }: { orderId?: string; summary: 
           role="dialog"
           aria-modal="true"
           aria-labelledby="invoice-modal-title"
-          className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-navy/70 backdrop-blur-sm"
+          className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-navy/70"
         >
           <div className="absolute inset-0" onClick={() => setShowInvoiceModal(false)} aria-hidden />
 
-          <div className="relative z-10 flex max-h-[90vh] w-full max-w-2xl flex-col rounded-xl border border-border bg-white shadow-2xl overflow-hidden">
+          <div className="relative z-10 flex max-h-[90vh] w-full max-w-2xl flex-col card shadow-2xl overflow-hidden">
             {/* Modal Header */}
             <div className="flex items-center justify-between border-b border-border px-6 py-4 bg-surface-soft">
               <div className="flex items-center gap-2">
                 <FileText className="h-5 w-5 text-brand" aria-hidden />
-                <h2 id="invoice-modal-title" className="text-[17px] font-extrabold text-navy">
+                <h2 id="invoice-modal-title" className="text-[16px] font-extrabold text-navy">
                   Tax Invoice / Receipt
                 </h2>
               </div>
@@ -212,7 +212,7 @@ export function OrderSuccess({ orderId, summary }: { orderId?: string; summary: 
                 <button
                   type="button"
                   onClick={() => window.print()}
-                  className="inline-flex items-center gap-1.5 rounded-md border border-border bg-white px-3 py-1.5 text-[12px] font-bold text-navy hover:bg-surface-soft"
+                  className="inline-flex items-center gap-1.5 rounded-md border border-border bg-white px-3 py-1.5 text-[13px] font-bold text-navy hover:bg-surface-soft"
                 >
                   <Printer className="h-3.5 w-3.5" aria-hidden />
                   <span>Print</span>
@@ -235,7 +235,7 @@ export function OrderSuccess({ orderId, summary }: { orderId?: string; summary: 
                   <span className="text-[20px] font-extrabold tracking-tight text-navy">
                     SKYROSTORE SYSTEMS
                   </span>
-                  <p className="mt-1 text-[12px] text-text-secondary leading-relaxed">
+                  <p className="mt-1 text-[13px] text-text-secondary leading-relaxed">
                     Technology Hub, Infocity Road<br />
                     Bhubaneswar, Odisha 751024, India<br />
                     <strong>GSTIN:</strong> 21AAECS9821R1ZM<br />
@@ -244,26 +244,26 @@ export function OrderSuccess({ orderId, summary }: { orderId?: string; summary: 
                 </div>
 
                 <div className="text-left sm:text-right">
-                  <span className="inline-block rounded bg-brand-soft px-2.5 py-0.5 text-[11px] font-extrabold uppercase text-brand">
+                  <span className="inline-block rounded bg-brand-soft px-2.5 py-0.5 text-[13px] font-extrabold text-brand">
                     ORIGINAL FOR RECIPIENT
                   </span>
                   <p className="mt-2 text-[14px] font-bold text-navy">
                     Invoice #{summary?.display_id ?? orderId ?? "PENDING"}
                   </p>
-                  <p className="text-[12px] text-text-secondary">Date: {today}</p>
-                  <p className="text-[12px] text-text-secondary">Payment: Razorpay / Prepaid</p>
+                  <p className="text-[13px] text-text-secondary">Date: {today}</p>
+                  <p className="text-[13px] text-text-secondary">Payment: Razorpay / Prepaid</p>
                 </div>
               </div>
 
               {/* Recipient Details */}
               <div className="rounded-lg border border-border bg-surface-soft/60 p-4">
-                <span className="block text-[11px] font-bold uppercase tracking-wider text-text-muted">
+                <span className="block text-[13px] font-bold text-text-muted">
                   Billed To
                 </span>
                 <p className="mt-1 text-[14px] font-bold text-navy">
                   {summary?.email ?? "Verified Customer"}
                 </p>
-                <p className="text-[12px] text-text-secondary">
+                <p className="text-[13px] text-text-secondary">
                   Place of Supply: India · Courier via Delhivery Tracked Express
                 </p>
               </div>
@@ -271,7 +271,7 @@ export function OrderSuccess({ orderId, summary }: { orderId?: string; summary: 
               {/* Items Breakdown Table */}
               <div className="rounded-lg border border-border overflow-hidden">
                 <table className="w-full text-left text-[13px]">
-                  <thead className="bg-surface-soft text-[11px] font-extrabold uppercase text-text-muted border-b border-border">
+                  <thead className="bg-surface-soft text-[13px] font-extrabold text-text-muted border-b border-border">
                     <tr>
                       <th className="p-3">Description</th>
                       <th className="p-3 text-center">HSN/SAC</th>
@@ -283,9 +283,9 @@ export function OrderSuccess({ orderId, summary }: { orderId?: string; summary: 
                     <tr>
                       <td className="p-3">
                         <span className="font-bold text-navy">UAV Components &amp; Avionics Hardware</span>
-                        <span className="block text-[11px] text-text-muted">Order Ref: #{summary?.display_id ?? orderId}</span>
+                        <span className="block text-[13px] text-text-muted">Order Ref: #{summary?.display_id ?? orderId}</span>
                       </td>
-                      <td className="p-3 text-center font-mono text-[12px]">88069000</td>
+                      <td className="p-3 text-center font-mono text-[13px]">88069000</td>
                       <td className="p-3 text-center tabular-nums">{summary?.item_count ?? 1}</td>
                       <td className="p-3 text-right font-bold tabular-nums">
                         {summary?.total != null ? formatPrice(summary.total, currency) : "Paid"}
@@ -299,19 +299,19 @@ export function OrderSuccess({ orderId, summary }: { orderId?: string; summary: 
               <div className="flex justify-between items-center rounded-lg border border-border bg-surface-soft/40 p-4 text-[13px]">
                 <div>
                   <span className="font-bold text-navy">Statutory GST 18% Included</span>
-                  <span className="block text-[11px] text-text-muted">
+                  <span className="block text-[13px] text-text-muted">
                     Eligible for Input Tax Credit (ITC) under Section 16 of CGST Act
                   </span>
                 </div>
                 <div className="text-right">
-                  <span className="text-[11px] uppercase text-text-muted">Total Paid</span>
+                  <span className="text-[13px] uppercase text-text-muted">Total Paid</span>
                   <span className="block text-[18px] font-extrabold tabular-nums text-navy">
                     {summary?.total != null ? formatPrice(summary.total, currency) : "Paid in Full"}
                   </span>
                 </div>
               </div>
 
-              <div className="border-t border-border pt-4 text-center text-[11px] text-text-muted">
+              <div className="border-t border-border pt-4 text-center text-[13px] text-text-muted">
                 Computer-generated tax invoice. No signature required. Skyrostore Systems Private Limited.
               </div>
             </div>

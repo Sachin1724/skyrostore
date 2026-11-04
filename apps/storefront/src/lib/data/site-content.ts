@@ -1,7 +1,10 @@
 import { unstable_cache } from "next/cache";
 import { medusa } from "@/lib/medusa";
 
+export type HeroSlide = { image: string; title: string; text: string; cta: string; href: string };
+
 export type SiteContent = {
+  heroSlides: HeroSlide[];
   heroTitle: string;
   heroSentence: string;
   faq: { q: string; a: string }[];
@@ -11,6 +14,12 @@ export type SiteContent = {
 
 // Shown until the team publishes their own copy from the admin, and for any field left empty.
 export const DEFAULT_CONTENT: SiteContent = {
+  // Shown until the team publishes its own banners; every one points at a real page.
+  heroSlides: [
+    { image: "/images/hero/storefront-hero-drone.png", title: "Parts that fly together.", text: "Motors, props, ESCs, packs and frames, checked against each other before they ship.", cta: "Shop all parts", href: "/parts" },
+    { image: "/images/hero/builder-drone-frame.png", title: "Build it before you buy it.", text: "Pick every part and we check the voltages, currents and clearances as you go.", cta: "Build your drone", href: "/build" },
+    { image: "/images/hero/bulk-hero-drone.png", title: "Equipping a team?", text: "Send quantities for a fleet, a lab or a course and we reply with a quotation.", cta: "Request a quote", href: "/bulk-orders" },
+  ],
   heroTitle: "Parts that fly together.",
   heroSentence: "Motors, props, ESCs, packs and frames, each checked against the others before it ships from Odisha.",
   faq: [
@@ -31,6 +40,7 @@ async function fetchContent(): Promise<SiteContent> {
   const { content } = await medusa.client.fetch<{ content: Partial<SiteContent> | null }>("/store/site-content");
   const c = content ?? {};
   return {
+    heroSlides: c.heroSlides?.filter((s) => s.image).length ? c.heroSlides.filter((s) => s.image) : DEFAULT_CONTENT.heroSlides,
     heroTitle: c.heroTitle || DEFAULT_CONTENT.heroTitle,
     heroSentence: c.heroSentence || DEFAULT_CONTENT.heroSentence,
     faq: c.faq?.length ? c.faq : DEFAULT_CONTENT.faq,

@@ -7,7 +7,7 @@ export default function Loading() {
     <>
       <Header />
       <main id="main" className="bg-page">
-        <div className="mx-auto min-h-screen max-w-[1376px] px-4 pb-28 md:px-8" role="status" aria-label="Loading product">
+        <div className="mx-auto min-h-screen max-w-[1760px] px-4 pb-28 md:px-8" role="status" aria-label="Loading product">
           {/* Breadcrumb Bone */}
           <Bone className="mt-5 h-4 w-64" />
 
@@ -20,7 +20,7 @@ export default function Loading() {
                 <Bone className="h-20 w-20 rounded-md" />
                 <Bone className="h-20 w-20 rounded-md" />
               </div>
-              <div className="aspect-square w-full rounded-lg border border-border bg-white" />
+              <div className="aspect-square w-full card" />
             </div>
 
             {/* Buy Box Skeleton */}
@@ -56,7 +56,7 @@ export default function Loading() {
           </section>
 
           {/* Trust Row Skeleton */}
-          <div className="mt-12 h-20 rounded-lg border border-border bg-white" />
+          <div className="mt-12 h-20 card" />
 
           {/* Section Tabs Skeleton */}
           <div className="mt-10 border-b border-border pb-3">

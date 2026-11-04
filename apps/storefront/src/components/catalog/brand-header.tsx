@@ -7,13 +7,9 @@ interface BrandHeaderProps {
 
 export function BrandHeader({ brandTitle, count }: BrandHeaderProps) {
   return (
-    <div className="mb-6 rounded-xl border border-border-strong bg-white p-5 md:p-6 shadow-sm">
+    <div className="mb-6 rounded-xl border border-border-strong bg-white p-5 md:p-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <div className="inline-flex items-center gap-1.5 rounded bg-brand/10 px-2.5 py-0.5 text-[11px] font-extrabold uppercase tracking-wider text-brand">
-            <ShieldCheck className="h-3.5 w-3.5" aria-hidden />
-            Authorized Direct Distributor
-          </div>
           <h1 className="mt-2 text-[clamp(1.75rem,1.3rem+1.5vw,2.4rem)] font-extrabold tracking-[-0.03em] text-navy">
             {brandTitle}
           </h1>
@@ -26,13 +22,13 @@ export function BrandHeader({ brandTitle, count }: BrandHeaderProps) {
           <span className="text-[28px] font-extrabold tabular-nums text-navy leading-none">
             {count}
           </span>
-          <span className="text-[12px] font-bold text-text-muted">
+          <span className="text-[13px] font-bold text-text-muted">
             {count === 1 ? "Listed Component" : "Listed Components"}
           </span>
         </div>
       </div>
 
-      <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3 border-t border-border pt-4 text-[12px] text-text-secondary">
+      <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3 border-t border-border pt-4 text-[13px] text-text-secondary">
         <div className="flex items-center gap-2">
           <Truck className="h-4 w-4 text-brand shrink-0" aria-hidden />
           <span>Same-Day Tracked Dispatch</span>

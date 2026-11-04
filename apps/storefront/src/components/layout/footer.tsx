@@ -34,11 +34,11 @@ const PAYMENT_METHODS = ["UPI", "Cards", "Netbanking", "Razorpay"];
 
 export function Footer() {
   return (
-    <footer className="bg-navy text-[#DCE7F3]">
-      <div className="mx-auto grid max-w-[1376px] gap-10 px-4 pb-10 pt-14 sm:grid-cols-2 md:px-8 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+    <footer className="bg-navy text-on-dark">
+      <div className="mx-auto grid max-w-[1760px] gap-10 px-4 pb-10 pt-14 sm:grid-cols-2 md:px-8 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
         <div className="space-y-3">
           <SkyroLogo light />
-          <p className="max-w-[34ch] text-[14px] leading-relaxed text-[#C9D6E6]">
+          <p className="max-w-[34ch] text-[14px] leading-relaxed text-on-dark">
             Drone parts and complete UAVs, checked for compatibility before they ship from Odisha.
           </p>
         </div>
@@ -48,7 +48,7 @@ export function Footer() {
             <ul className="mt-3 space-y-2.5 text-[14px]">
               {col.links.map((l) => (
                 <li key={l.href}>
-                  <Link href={l.href} className="text-[#C9D6E6] transition-colors hover:text-white">
+                  <Link href={l.href} className="text-on-dark transition-colors hover:text-white">
                     {l.label}
                   </Link>
                 </li>
@@ -57,8 +57,8 @@ export function Footer() {
           </div>
         ))}
       </div>
-      <div className="border-t border-graphite-soft">
-        <div className="mx-auto flex max-w-[1376px] flex-wrap items-center justify-between gap-4 px-4 py-5 text-[13px] text-[#9FB3CB] md:px-8">
+      <div className="bg-graphite-soft/30">
+        <div className="mx-auto flex max-w-[1760px] flex-wrap items-center justify-between gap-4 px-4 py-5 text-[13px] text-on-dark-muted md:px-8">
           <p>
             &copy; {new Date().getFullYear()} Skyrostore ·{" "}
             <Link href="/policies/terms" className="hover:text-white">Terms</Link> ·{" "}
@@ -66,7 +66,7 @@ export function Footer() {
           </p>
           <ul aria-label="Payment methods" className="flex flex-wrap gap-2">
             {PAYMENT_METHODS.map((m) => (
-              <li key={m} className="rounded border border-graphite-soft px-2.5 py-1 text-[#DCE7F3]">{m}</li>
+              <li key={m} className="rounded border border-graphite-soft px-2.5 py-1 text-on-dark">{m}</li>
             ))}
           </ul>
         </div>

@@ -3,8 +3,9 @@
 import { useEffect, useState } from "react";
 import { Plus, Trash2, ArrowUp, ArrowDown } from "lucide-react";
 import type { SiteContent } from "@/app/api/site-content/route";
+import { UploadButton, LibraryButton } from "../products/image-uploader";
 
-const EMPTY: SiteContent = { heroTitle: "", heroSentence: "", faq: [], closingTitle: "", closingSentence: "" };
+const EMPTY: SiteContent = { heroSlides: [], heroTitle: "", heroSentence: "", faq: [], closingTitle: "", closingSentence: "" };
 const input = "mt-1 w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-gray-900 focus:outline-none";
 
 function Field({ label, value, onChange, max, long }: { label: string; value: string; onChange: (v: string) => void; max: number; long?: boolean }) {
@@ -81,6 +82,39 @@ export function ContentEditor({ storefrontUrl }: { storefrontUrl: string }) {
 
   return (
     <div className="mt-6 space-y-6">
+      <section className="rounded-md border border-gray-200 bg-white p-5">
+        <h2 className="text-sm font-semibold text-gray-900">Banner slides</h2>
+        <p className="mt-1 text-sm text-gray-500">Wide images (about 1920 x 600) at the top of the homepage, up to 6. With none, the site shows its standard banner.</p>
+        <ol className="mt-4 space-y-4">
+          {content.heroSlides.map((s, i) => {
+            const setSlide = (patch: Partial<typeof s>) => set({ heroSlides: content.heroSlides.map((x, j) => (j === i ? { ...x, ...patch } : x)) });
+            return (
+              <li key={i} className="rounded border border-gray-200 p-3">
+                <div className="flex items-center justify-between text-xs text-gray-500">
+                  <span>Slide {i + 1}</span>
+                  <button type="button" aria-label="Remove slide" onClick={() => set({ heroSlides: content.heroSlides.filter((_, j) => j !== i) })} className="hover:text-rose-600"><Trash2 className="h-4 w-4" /></button>
+                </div>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                {s.image && <img src={s.image} alt="" className="mt-2 h-24 w-full rounded border border-gray-200 object-cover" />}
+                <div className="mt-2 flex gap-2">
+                  <UploadButton multiple={false} label={s.image ? "Replace image" : "Upload image"} onUploaded={(urls) => setSlide({ image: urls[0] || "" })} />
+                  <LibraryButton onPicked={(urls) => setSlide({ image: urls[0] || "" })} />
+                </div>
+                <div className="mt-3 space-y-3">
+                  <Field label="Headline (optional)" value={s.title} onChange={(title) => setSlide({ title })} max={80} />
+                  <Field label="Line under it (optional)" value={s.text} onChange={(text) => setSlide({ text })} max={160} />
+                  <Field label="Button text (optional)" value={s.cta} onChange={(cta) => setSlide({ cta })} max={30} />
+                  <Field label="Link, for example /parts or /brands/dji" value={s.href} onChange={(href) => setSlide({ href })} max={200} />
+                </div>
+              </li>
+            );
+          })}
+        </ol>
+        <button type="button" disabled={content.heroSlides.length >= 6} onClick={() => set({ heroSlides: [...content.heroSlides, { image: "", title: "", text: "", cta: "", href: "" }] })} className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-gray-900 hover:underline disabled:opacity-40">
+          <Plus className="h-4 w-4" /> Add a slide
+        </button>
+      </section>
+
       <section className="space-y-4 rounded-md border border-gray-200 bg-white p-5">
         <h2 className="text-sm font-semibold text-gray-900">Top of the page</h2>
         <Field label="Headline" value={content.heroTitle} onChange={(heroTitle) => set({ heroTitle })} max={80} />

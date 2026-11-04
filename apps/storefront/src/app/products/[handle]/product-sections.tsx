@@ -61,14 +61,14 @@ export function ProductSections({
 
   return (
     <div className="mt-10">
-      <nav aria-label="Product sections" className="sticky top-[121px] z-20 border-b border-border bg-page/95 backdrop-blur md:top-[77px] lg:top-[125px]">
+      <nav aria-label="Product sections" className="sticky top-[121px] z-20 border-b border-border bg-page/95 md:top-[77px] lg:top-[125px]">
         <ul className="flex gap-1 overflow-x-auto [scrollbar-width:none]">
           {sections.map((s) => (
             <li key={s.id}>
               <a
                 href={`#${s.id}`}
                 aria-current={active === s.id ? "true" : undefined}
-                className={`relative inline-flex h-12 items-center whitespace-nowrap px-3 text-[15px] first:pl-0 font-semibold transition-colors ${
+                className={`relative inline-flex h-12 items-center whitespace-nowrap px-3 text-[16px] first:pl-0 font-semibold transition-colors ${
                   active === s.id ? "text-brand" : "text-text-secondary hover:text-navy"
                 }`}
               >
@@ -90,10 +90,10 @@ export function ProductSections({
               {description ? <p className="whitespace-pre-line text-[16px] leading-relaxed text-text-secondary">{description}</p> : <div />}
               {listing.key_features.length ? (
                 <div className="rounded-lg bg-surface-soft p-5">
-                  <h3 className="text-[15px] font-bold text-navy">Key Features</h3>
+                  <h3 className="text-[16px] font-bold text-navy">Key Features</h3>
                   <ul className="mt-3 space-y-2.5">
                     {listing.key_features.map((f) => (
-                      <li key={f} className="flex gap-2.5 text-[15px] leading-snug text-navy">
+                      <li key={f} className="flex gap-2.5 text-[16px] leading-snug text-navy">
                         <Check className="mt-0.5 h-4 w-4 shrink-0 text-success" strokeWidth={2.5} aria-hidden />
                         {f}
                       </li>
@@ -110,7 +110,7 @@ export function ProductSections({
             <div className="grid gap-x-8 gap-y-6 lg:grid-cols-2">
               {groups.map((g) => (
                 <div key={g.name} className="break-inside-avoid">
-                  <h3 className="border-b border-border pb-1.5 text-[13px] font-bold uppercase tracking-wider text-text-muted">{g.name}</h3>
+                  <h3 className="border-b border-border pb-1.5 text-[13px] font-bold text-text-muted">{g.name}</h3>
                   <dl className="divide-y divide-border text-[14px]">
                     {g.rows.map((r) => (
                       <div key={r.key} className="flex justify-between gap-4 py-2">
@@ -123,7 +123,7 @@ export function ProductSections({
               ))}
             </div>
           ) : (
-            <p className="text-[15px] text-text-muted">No specifications published yet.</p>
+            <p className="text-[16px] text-text-muted">No specifications published yet.</p>
           )}
         </Section>
 
@@ -147,7 +147,7 @@ export function ProductSections({
                 <li key={d.url}>
                   <a href={d.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-md border border-border p-3 hover:border-brand">
                     <FileText className="h-5 w-5 text-brand" aria-hidden />
-                    <span className="min-w-0 flex-1 truncate text-[15px] font-semibold text-navy">{d.name}</span>
+                    <span className="min-w-0 flex-1 truncate text-[16px] font-semibold text-navy">{d.name}</span>
                     <span className="shrink-0 text-[13px] tabular-nums text-text-muted">PDF{fileSize(d.size) ? ` · ${fileSize(d.size)}` : ""}</span>
                   </a>
                 </li>
@@ -168,7 +168,7 @@ export function ProductSections({
 
 function Section({ id, title, action, children }: { id: string; title: string; action?: React.ReactNode; children: React.ReactNode }) {
   return (
-    <section id={id} aria-labelledby={`${id}-title`} className="scroll-mt-[190px] rounded-lg border border-border bg-white p-5 md:p-6">
+    <section id={id} aria-labelledby={`${id}-title`} className="scroll-mt-[190px] card p-5 md:p-6">
       <div className="mb-4 flex items-center justify-between gap-4">
         <h2 id={`${id}-title`} className="text-[19px] font-extrabold tracking-[-0.01em] text-navy">{title}</h2>
         {action}

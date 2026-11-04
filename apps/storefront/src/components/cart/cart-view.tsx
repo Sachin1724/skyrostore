@@ -290,27 +290,27 @@ export function CartView() {
   if (items.length === 0) {
     return (
       <div className="space-y-10">
-        <div className="rounded-xl border border-border bg-white p-8 md:p-14 text-center shadow-sm">
+        <div className="card p-8 md:p-14 text-center">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-brand-soft text-brand">
             <Truck className="h-8 w-8" aria-hidden />
           </div>
-          <h2 className="mt-4 text-[22px] md:text-[26px] font-extrabold text-navy">
+          <h2 className="mt-4 text-[22px] md:text-[28px] font-extrabold text-navy">
             Your shopping cart is currently empty
           </h2>
-          <p className="mt-2 text-[15px] text-text-secondary max-w-[48ch] mx-auto">
+          <p className="mt-2 text-[16px] text-text-secondary max-w-[48ch] mx-auto">
             Browse our catalogue of verified brushless motors, digital autopilots, and airframes to build your fleet.
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-3">
             <Link
               href="/parts"
-              className="inline-flex h-11 items-center gap-2 rounded-md bg-brand px-6 text-[14px] font-bold text-white transition-colors hover:bg-navy shadow-sm"
+              className="btn btn-primary"
             >
               Shop UAV Parts
               <ArrowRight className="h-4 w-4" aria-hidden />
             </Link>
             <Link
               href="/build"
-              className="inline-flex h-11 items-center rounded-md border border-border-strong bg-white px-5 text-[14px] font-semibold text-navy hover:border-brand transition-colors"
+              className="btn btn-secondary"
             >
               Launch Build Configurator
             </Link>
@@ -319,7 +319,7 @@ export function CartView() {
 
         {/* Saved for Later Shelf even when cart is empty */}
         {savedItems.length > 0 ? (
-          <section aria-labelledby="saved-for-later-empty-heading" className="rounded-xl border border-border bg-white p-6 shadow-sm">
+          <section aria-labelledby="saved-for-later-empty-heading" className="card p-6">
             <h3 id="saved-for-later-empty-heading" className="text-[18px] font-extrabold text-navy">
               Saved for Later ({savedItems.length})
             </h3>
@@ -341,7 +341,7 @@ export function CartView() {
                     <button
                       type="button"
                       onClick={() => moveToCart(saved)}
-                      className="flex-1 rounded bg-navy py-1.5 text-[12px] font-bold text-white hover:bg-brand"
+                      className="flex-1 rounded bg-navy py-1.5 text-[13px] font-bold text-white hover:bg-brand"
                     >
                       Move to Cart
                     </button>
@@ -368,7 +368,7 @@ export function CartView() {
       {/* Free Shipping Progress Indicator */}
       <section
         aria-label="Shipping threshold tracker"
-        className="rounded-xl border border-border bg-white p-4 md:p-5 shadow-sm"
+        className="card p-4 md:p-5"
       >
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-2.5">
@@ -385,7 +385,7 @@ export function CartView() {
               )}
             </span>
           </div>
-          <span className="text-[12px] font-bold tabular-nums text-text-muted">
+          <span className="text-[13px] font-bold tabular-nums text-text-muted">
             {shippingPercent}%
           </span>
         </div>
@@ -426,7 +426,7 @@ export function CartView() {
             {cartMessage}
           </p>
 
-          <ul className="divide-y divide-border rounded-xl border border-border bg-white px-4 md:px-6 shadow-sm">
+          <ul className="divide-y divide-border card px-4 md:px-6">
             {items.map((item) => {
               const title = (item.product_title ?? item.title)?.replace("[DEV] ", "");
               const busy = pendingItemId === item.id;
@@ -539,8 +539,8 @@ export function CartView() {
 
           {/* Saved for Later Shelf */}
           {savedItems.length > 0 ? (
-            <section aria-labelledby="saved-for-later-heading" className="rounded-xl border border-border bg-white p-5 md:p-6 shadow-sm">
-              <h3 id="saved-for-later-heading" className="text-[17px] font-extrabold text-navy">
+            <section aria-labelledby="saved-for-later-heading" className="card p-5 md:p-6">
+              <h3 id="saved-for-later-heading" className="text-[16px] font-extrabold text-navy">
                 Saved for Later ({savedItems.length})
               </h3>
               <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
@@ -563,7 +563,7 @@ export function CartView() {
                       <button
                         type="button"
                         onClick={() => moveToCart(saved)}
-                        className="flex-1 rounded bg-navy py-1.5 text-[12px] font-bold text-white hover:bg-brand transition-colors"
+                        className="flex-1 rounded bg-navy py-1.5 text-[13px] font-bold text-white hover:bg-brand transition-colors"
                       >
                         Move to Cart
                       </button>
@@ -584,7 +584,7 @@ export function CartView() {
         </div>
 
         {/* Order Summary Sidebar */}
-        <div className="rounded-xl border border-border bg-white p-6 shadow-sm lg:sticky lg:top-[120px]">
+        <div className="card p-6 lg:sticky lg:top-[120px]">
           <h2 className="text-[18px] font-extrabold text-navy border-b border-border pb-3">
             Order Summary
           </h2>
@@ -619,7 +619,7 @@ export function CartView() {
             </div>
           </dl>
 
-          <p className="mt-1 text-[11px] text-text-muted">
+          <p className="mt-1 text-[13px] text-text-muted">
             Includes all statutory Indian GST taxes. ITC tax invoice generated upon confirmation.
           </p>
 
@@ -650,13 +650,13 @@ export function CartView() {
               </div>
 
               {promoSuccess ? (
-                <p className="text-[12px] font-bold text-success flex items-center gap-1">
+                <p className="text-[13px] font-bold text-success flex items-center gap-1">
                   <CheckCircle2 className="h-3.5 w-3.5" aria-hidden />
                   {promoSuccess}
                 </p>
               ) : null}
               {promoError ? (
-                <p className="text-[12px] font-semibold text-error">
+                <p className="text-[13px] font-semibold text-error">
                   {promoError}
                 </p>
               ) : null}
@@ -666,14 +666,14 @@ export function CartView() {
           {/* Checkout CTA */}
           <Link
             href="/checkout"
-            className="mt-6 flex h-12 w-full items-center justify-center gap-2 rounded-md bg-brand text-[15px] font-bold text-white transition-colors hover:bg-navy shadow-sm"
+            className="btn btn-primary mt-6 flex w-full"
           >
             <span>Proceed to Checkout</span>
             <ArrowRight className="h-4 w-4" aria-hidden />
           </Link>
 
           {/* Trust Guarantees */}
-          <div className="mt-5 space-y-2 border-t border-border pt-4 text-[12px] text-text-secondary">
+          <div className="mt-5 space-y-2 border-t border-border pt-4 text-[13px] text-text-secondary">
             <div className="flex items-center gap-2">
               <Lock className="h-3.5 w-3.5 text-brand shrink-0" aria-hidden />
               <span>Razorpay Secured · UPI, Cards, NetBanking</span>

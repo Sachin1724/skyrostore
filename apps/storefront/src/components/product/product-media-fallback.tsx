@@ -66,10 +66,10 @@ export function ProductMediaFallback({
 
   return (
     <div
-      className={`relative flex h-full w-full flex-col items-center justify-center p-6 text-center select-none bg-brand-soft transition-colors ${className}`}
+      className={`relative flex h-full w-full flex-col items-center justify-center p-6 text-center select-none bg-surface-soft ${className}`}
     >
       {/* Placeholder until the admin uploads a photo: the part's type, drawn flat. */}
-      <IconComponent className="h-12 w-12 text-brand stroke-[1.4]" aria-hidden="true" />
+      <IconComponent className="h-12 w-12 text-text-muted stroke-[1.4]" aria-hidden="true" />
       <span className="mt-3 text-[14px] font-medium text-text-secondary">
         {typeLabel.charAt(0) + typeLabel.slice(1).toLowerCase()}
       </span>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BackLink } from "@/components/layout/back-link";
 import type { HttpTypes } from "@medusajs/types";
 import { ProductCard, ProductListRow } from "@/components/product/product-card";
 import { getProducts } from "@/lib/data/products";
@@ -9,14 +10,13 @@ import {
   pathTo,
   descendantIds,
   countForNode,
+  cleanName,
   type CategoryNode,
 } from "@/lib/data/catalog";
 import { applyFacets, buildFacets } from "@/lib/technical-specs";
 import { FilterPanel, SortSelect } from "./catalog-controls";
 import { BrandHeader } from "./brand-header";
 import { SearchSuggestions } from "./search-suggestions";
-import { QuickViewModal } from "./quick-view-modal";
-import { CompareDrawer } from "./compare-drawer";
 
 export type CatalogParams = Record<string, string | undefined>;
 
@@ -140,16 +140,17 @@ export async function CatalogView({
   const levelNodes: CategoryNode[] = fixed.category ? active?.children ?? [] : active ? active.children : tree;
   const visibleBrands = fixed.brand ? [] : brands.filter((b) => (index.byBrand.get(b.id) ?? 0) > 0);
   const title = heading ?? (activeBrand && !fixed.brand ? `${activeBrand.title}${active ? ` ${active.name}` : ""}` : active?.name ?? "All Parts");
-  const railHeading = "text-[14px] font-bold text-navy";
 
   const isBrandPage = Boolean(fixed.brand && activeBrand);
   const isSearchPage = basePath === "/search" || Boolean(q);
 
   return (
     <main id="main" className="min-h-screen bg-page pb-20">
-      <div className="mx-auto max-w-[1376px] px-4 md:px-8">
+      <div className="mx-auto max-w-[1760px] px-4 md:px-8">
         {/* Breadcrumb Navigation */}
-        <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-1.5 pt-5 text-[13px] text-text-secondary">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 pt-4">
+          <BackLink fallback="/" />
+          <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-1.5  text-[13px] text-text-secondary">
           <Link href="/" className="hover:text-brand">Home</Link>
           {crumbs.map((c) => (
             <span key={c.href} className="flex items-center gap-1.5">
@@ -165,6 +166,7 @@ export async function CatalogView({
               </span>
             ))}
         </nav>
+        </div>
 
         {/* Brand Header on /brands/[handle] */}
         {isBrandPage && activeBrand ? (
@@ -183,93 +185,109 @@ export async function CatalogView({
         {/* Search Popular Suggestions on /search */}
         {isSearchPage ? (
           <div className="mt-4">
-            <SearchSuggestions currentQuery={q} />
+            <SearchSuggestions currentQuery={q} terms={[...tree.map((c) => cleanName(c.name)), ...brands.map((b) => b.title)].slice(0, 10)} />
           </div>
         ) : null}
 
-        {intro ? <p className="mt-1 max-w-[60ch] text-[15px] text-text-secondary">{intro}</p> : null}
+        {intro ? <p className="mt-1 max-w-[60ch] text-[16px] text-text-secondary">{intro}</p> : null}
 
         <div className="mt-5 grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[264px_minmax(0,1fr)] lg:gap-8">
           <div className="lg:sticky lg:top-[150px] lg:self-start">
             <FilterPanel activeCount={chips.length} resultCount={list.length}>
               {levelNodes.length > 0 ? (
-                <section className="border-b border-border py-4">
-                  <h2 className={railHeading}>{active ? `Inside ${active.name}` : "Category"}</h2>
-                  <ul className="mt-2 text-[14px] text-text-secondary">
+                <Group title={active ? `Inside ${active.name}` : "Category"} open>
+                  <ul className="-my-1 text-[14px]">
                     {levelNodes.map((node) => (
                       <li key={node.id}>
                         <Link
                           href={fixed.category ? `/parts?category=${node.handle}` : href({ category: node.handle })}
-                          className="flex min-h-9 items-center justify-between gap-3 hover:text-brand"
+                          className="flex min-h-9 items-center justify-between gap-3 text-text-secondary hover:text-navy"
                         >
                           <span>{node.name}</span>
-                          <span className="tabular-nums text-text-muted">{countForNode(node, index)}</span>
+                          
                         </Link>
                       </li>
                     ))}
                   </ul>
-                </section>
+                </Group>
               ) : null}
 
-              <form action={basePath} className="border-b border-border py-4">
-                {/* Carry every other selection through the GET submit. */}
-                {Object.entries(params)
-                  .filter(([k, v]) => v && !["min", "max", "stock", "page"].includes(k) && !(fixed.category && k === "category") && !(fixed.brand && k === "brand"))
-                  .map(([k, v]) => <input key={k} type="hidden" name={k} value={v} />)}
-                <fieldset>
-                  <legend className={railHeading}>Price (₹)</legend>
-                  <div className="mt-2 flex items-end gap-2">
-                    <label className="flex flex-1 flex-col gap-1 text-[12px] text-text-secondary">
-                      Min
-                      <input name="min" type="text" inputMode="numeric" pattern="[0-9]*" defaultValue={min ?? ""} placeholder="0" autoComplete="off" className="h-10 w-full rounded-md border border-border-strong px-2.5 text-[14px] text-navy" />
-                    </label>
-                    <label className="flex flex-1 flex-col gap-1 text-[12px] text-text-secondary">
-                      Max
-                      <input name="max" type="text" inputMode="numeric" pattern="[0-9]*" defaultValue={max ?? ""} placeholder="Any" autoComplete="off" className="h-10 w-full rounded-md border border-border-strong px-2.5 text-[14px] text-navy" />
-                    </label>
-                  </div>
-                </fieldset>
-                <label className="mt-4 flex min-h-9 cursor-pointer items-center justify-between gap-3 text-[14px] font-bold text-navy">
-                  In stock only
-                  <input type="checkbox" name="stock" value="1" defaultChecked={stockOnly} className="h-[18px] w-[18px] accent-brand" />
-                </label>
-                <button type="submit" className="mt-3 h-10 w-full rounded-md border-[1.5px] border-brand text-[14px] font-semibold text-brand hover:bg-brand hover:text-white">
-                  Apply
-                </button>
-              </form>
+              <Group title="Price" open>
+                <div className="flex flex-wrap gap-1.5">
+                  {[
+                    { label: "Under ₹5,000", min: undefined, max: "5000" },
+                    { label: "₹5,000 – ₹15,000", min: "5000", max: "15000" },
+                    { label: "Over ₹15,000", min: "15000", max: undefined },
+                  ].map((r) => {
+                    const on = String(min ?? "") === (r.min ?? "") && String(max ?? "") === (r.max ?? "");
+                    return (
+                      <Link
+                        key={r.label}
+                        href={href({ min: on ? undefined : r.min, max: on ? undefined : r.max })}
+                        aria-current={on ? "true" : undefined}
+                        className={`rounded-full px-3 py-1.5 text-[13px] ${on ? "bg-navy text-white" : "bg-surface-soft text-navy hover:bg-surface-muted"}`}
+                      >
+                        {r.label}
+                      </Link>
+                    );
+                  })}
+                </div>
+                <form action={basePath} className="mt-3 flex items-center gap-2">
+                  {/* Carry every other selection through the GET submit. */}
+                  {Object.entries(params)
+                    .filter(([k, v]) => v && !["min", "max", "stock", "page"].includes(k) && !(fixed.category && k === "category") && !(fixed.brand && k === "brand"))
+                    .map(([k, v]) => <input key={k} type="hidden" name={k} value={v} />)}
+                  {stockOnly ? <input type="hidden" name="stock" value="1" /> : null}
+                  <input name="min" type="text" inputMode="numeric" pattern="[0-9]*" aria-label="Minimum price" defaultValue={min ?? ""} placeholder="Min" autoComplete="off" className="h-9 w-full min-w-0 rounded-lg bg-surface-soft px-3 text-[14px] text-navy placeholder:text-text-muted" />
+                  <span aria-hidden className="text-text-muted">–</span>
+                  <input name="max" type="text" inputMode="numeric" pattern="[0-9]*" aria-label="Maximum price" defaultValue={max ?? ""} placeholder="Max" autoComplete="off" className="h-9 w-full min-w-0 rounded-lg bg-surface-soft px-3 text-[14px] text-navy placeholder:text-text-muted" />
+                  <button type="submit" className="btn btn-primary btn-sm shrink-0">Set</button>
+                </form>
+              </Group>
 
-              {facets.map((facet) => (
-                <section key={facet.key} className="border-b border-border py-4">
-                  <h2 className={railHeading}>
-                    {facet.label}
-                    {facet.unit ? <span className="ml-1 font-normal text-text-secondary">({facet.unit})</span> : null}
-                  </h2>
-                  <div className="mt-2 flex flex-wrap gap-1.5">
-                    {facet.values.map(({ value, count }) => {
-                      const selected = specs[facet.key] === value;
-                      return (
-                        <Link
-                          key={value}
-                          href={href({ [`f_${facet.key}`]: selected ? undefined : value })}
-                          aria-current={selected ? "true" : undefined}
-                          className={`inline-flex min-h-9 items-center rounded-md border px-2.5 text-[14px] tabular-nums transition-colors ${
-                            selected ? "border-brand bg-brand text-white" : "border-border-strong bg-white text-navy hover:border-brand hover:text-brand"
-                          }`}
-                        >
-                          {value}
-                          {facet.unit && facet.unit.length <= 3 ? facet.unit : ""}
-                          <span className={selected ? "ml-1.5 text-white/80" : "ml-1.5 text-text-muted"}>{count}</span>
-                        </Link>
-                      );
-                    })}
-                  </div>
-                </section>
-              ))}
+              <Group title="Availability" open>
+                <Link
+                  href={href({ stock: stockOnly ? undefined : "1" })}
+                  role="switch"
+                  aria-checked={stockOnly}
+                  className="flex min-h-9 items-center justify-between gap-3 text-[14px] text-navy"
+                >
+                  In stock only
+                  <span className={`relative h-6 w-10 rounded-full transition-colors ${stockOnly ? "bg-navy" : "bg-surface-muted"}`}>
+                    <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${stockOnly ? "left-[18px]" : "left-0.5"}`} />
+                  </span>
+                </Link>
+              </Group>
+
+              {facets
+                .filter((facet) => facet.values.length > 1 || specs[facet.key])
+                .map((facet, i) => (
+                  <Group key={facet.key} title={facet.label + (facet.unit ? ` (${facet.unit})` : "")} open={i < 2 || Boolean(specs[facet.key])}>
+                    <div className="flex flex-wrap gap-1.5">
+                      {facet.values.map(({ value }) => {
+                        const selected = specs[facet.key] === value;
+                        return (
+                          <Link
+                            key={value}
+                            href={href({ [`f_${facet.key}`]: selected ? undefined : value })}
+                            aria-current={selected ? "true" : undefined}
+                            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[13px] ${
+                              selected ? "bg-navy text-white" : "bg-surface-soft text-navy hover:bg-surface-muted"
+                            }`}
+                          >
+                            {value}
+                            {facet.unit && facet.unit.length <= 3 ? facet.unit : ""}
+                            {selected ? <span aria-hidden>×</span> : null}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </Group>
+                ))}
 
               {visibleBrands.length > 0 ? (
-                <section className="py-4">
-                  <h2 className={railHeading}>Brand</h2>
-                  <ul className="mt-2 text-[14px] text-text-secondary">
+                <Group title="Brand" open>
+                  <ul className="-my-1 text-[14px]">
                     {visibleBrands.map((b) => {
                       const selected = activeBrand?.id === b.id;
                       return (
@@ -277,16 +295,16 @@ export async function CatalogView({
                           <Link
                             href={href({ brand: selected ? undefined : b.handle })}
                             aria-current={selected ? "true" : undefined}
-                            className={`flex min-h-9 items-center justify-between gap-3 hover:text-brand ${selected ? "font-bold text-brand" : ""}`}
+                            className={`flex min-h-9 items-center justify-between gap-3 hover:text-navy ${selected ? "font-semibold text-navy" : "text-text-secondary"}`}
                           >
                             <span>{b.title}</span>
-                            <span className="tabular-nums text-text-muted">{index.byBrand.get(b.id)}</span>
+                            
                           </Link>
                         </li>
                       );
                     })}
                   </ul>
-                </section>
+                </Group>
               ) : null}
             </FilterPanel>
           </div>
@@ -309,7 +327,7 @@ export async function CatalogView({
               </div>
             ) : null}
 
-            <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-white px-3 py-2.5">
+            <div className="flex flex-wrap items-center justify-between gap-3 card px-3 py-2.5">
               <SortSelect value={sort} options={SORTS.map((s) => ({ ...s, href: href({ sort: s.value === "best_selling" ? undefined : s.value }) }))} />
               <div className="flex items-center gap-2">
                 <div role="group" aria-label="View" className="flex gap-1.5">
@@ -330,17 +348,17 @@ export async function CatalogView({
             </div>
 
             {shown.length === 0 ? (
-              <div className="mt-4 rounded-lg border border-border bg-white px-6 py-12 text-center">
+              <div className="mt-4 card px-6 py-12 text-center">
                 <p className="text-[18px] font-bold text-navy">{q ? `Nothing matches “${q}”` : "No products match these filters"}</p>
-                <p className="mt-2 text-[15px] text-text-secondary">
+                <p className="mt-2 text-[16px] text-text-secondary">
                   {chips.length ? "Remove a filter, or browse a category." : "Try another word, or browse a category."}
                 </p>
                 <div className="mt-5 flex flex-wrap justify-center gap-2">
                   {chips.length ? (
-                    <Link href={clearAll} className="inline-flex h-10 items-center rounded-md bg-brand px-4 text-[14px] font-semibold text-white hover:bg-navy">Clear Filters</Link>
+                    <Link href={clearAll} className="btn btn-primary">Clear Filters</Link>
                   ) : null}
                   {tree.slice(0, 6).map((c) => (
-                    <Link key={c.id} href={`/parts?category=${c.handle}`} className="inline-flex h-10 items-center rounded-md border border-border-strong px-4 text-[14px] font-semibold text-navy hover:border-brand hover:text-brand">
+                    <Link key={c.id} href={`/parts?category=${c.handle}`} className="btn btn-secondary">
                       {c.name}
                     </Link>
                   ))}
@@ -350,11 +368,11 @@ export async function CatalogView({
                 </p>
               </div>
             ) : view === "list" ? (
-              <ul className="mt-4 divide-y divide-border rounded-lg border border-border bg-white px-4 md:px-5">
+              <ul className="mt-4 divide-y divide-border card px-4 md:px-5">
                 {shown.map((p) => <ProductListRow key={p.id} product={p} />)}
               </ul>
             ) : (
-              <div className="mt-4 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 2xl:grid-cols-4">
+              <div className="mt-4 grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
                 {shown.map((p, i) => <ProductCard key={p.id} product={p} priority={i < 4} />)}
               </div>
             )}
@@ -386,10 +404,23 @@ export async function CatalogView({
       </div>
 
       {/* Global Quick View Dialog */}
-      <QuickViewModal />
 
       {/* Floating Compare Drawer and Side-by-Side Modal */}
-      <CompareDrawer />
     </main>
+  );
+}
+
+/** Native collapsible group: no script needed, and it works in the phone sheet too. */
+function Group({ title, open, children }: { title: string; open?: boolean; children: React.ReactNode }) {
+  return (
+    <details open={open} className="group py-5">
+      <summary className="flex cursor-pointer list-none items-center justify-between text-[14px] font-semibold text-navy [&::-webkit-details-marker]:hidden">
+        {title}
+        <svg aria-hidden viewBox="0 0 12 12" className="h-3 w-3 text-text-muted transition-transform group-open:rotate-180">
+          <path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </summary>
+      <div className="mt-3">{children}</div>
+    </details>
   );
 }

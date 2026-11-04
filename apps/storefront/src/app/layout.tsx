@@ -1,14 +1,16 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
-import { Montserrat } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 
-const montserrat = Montserrat({
+// Inter is the closest web match to Apple's SF Pro; optical sizing keeps headings crisp.
+const inter = Inter({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
   variable: "--font-brand",
   display: "swap",
 });
+import { QuickViewModal } from "@/components/catalog/quick-view-modal";
+import { CompareDrawer } from "@/components/catalog/compare-drawer";
 import { AnalyticsTracker } from "@/components/analytics/tracker";
 
 export const metadata: Metadata = {
@@ -26,9 +28,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en-IN" className={montserrat.variable}>
+    <html lang="en-IN" className={inter.variable}>
       <body>
         {children}
+        <QuickViewModal />
+        <CompareDrawer />
         <Suspense fallback={null}>
           <AnalyticsTracker />
         </Suspense>

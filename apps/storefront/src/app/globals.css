@@ -2,10 +2,10 @@
 
 @theme {
   --color-white: #FFFFFF;
-  --color-page: #F7FAFD;
+  --color-page: #F5F5F7;
   --color-surface: #FFFFFF;
-  --color-surface-soft: #F4F8FC;
-  --color-surface-muted: #EAF3FC;
+  --color-surface-soft: #F5F5F7;
+  --color-surface-muted: #ECECF0;
 
   --color-graphite: #0A1A2F;
   --color-graphite-soft: #13294A;
@@ -15,8 +15,8 @@
   --color-text-muted: #5D6B7E;
   --color-text-disabled: #8C99AA;
 
-  --color-border: #DCE7F3;
-  --color-border-strong: #C3D3E6;
+  --color-border: #E6E8EC;
+  --color-border-strong: #D2D6DC;
 
   --color-accent: #9CCBF5;
   --color-accent-hover: #84BDF2;
@@ -28,6 +28,12 @@
   --color-brand-cyan: #52E1F2;
   --color-brand-soft: #EAF3FC;
   --color-navy: #0A1A2F;
+
+  /* Text and tints that sit on the dark navy surfaces (footer, banners). */
+  --color-on-dark: #C9D6E6;
+  --color-on-dark-muted: #A6BFDB;
+  --color-error-on-dark: #FFB4B4;
+  --color-warning-strong: #8A5B00;
 
   --color-success: #11703A;
   --color-success-soft: #EAF7EF;
@@ -41,13 +47,19 @@
   --color-info: #4F687D;
   --color-info-soft: #EEF3F6;
 
-  --font-sans: var(--font-brand), system-ui, sans-serif;
+  --font-sans: var(--font-brand), -apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, sans-serif;
   /* No monospace on the storefront: figures use the text face with tabular numbers. */
   --font-mono: var(--font-brand), system-ui, sans-serif;
 
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
+  /* Apple type uses Regular, Medium and Semibold; heavier weights collapse to Semibold. */
+  --font-weight-bold: 600;
+  --font-weight-extrabold: 600;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --shadow-card: 0 1px 2px rgba(0,0,0,.04), 0 8px 24px rgba(0,0,0,.06);
 
   /* Motion. Overrides Tailwind's weak built-in ease-out / ease-in-out. */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
@@ -61,6 +73,7 @@
     -moz-osx-font-smoothing: grayscale;
   }
   body {
+    font-feature-settings: "cv11", "ss01";
     background: var(--color-page);
     color: var(--color-text-primary);
     font-family: var(--font-sans);
@@ -68,6 +81,19 @@
   }
   h1, h2, h3, h4 {
     letter-spacing: -0.025em;
+    text-wrap: balance;
+  }
+  /* Press feedback lands on pointer-down, not on release. */
+  :where(button, a[class*="rounded"]):active {
+    scale: 0.97;
+  }
+  :where(button, a[class*="rounded"]) {
+    transition-property: color, background-color, border-color, box-shadow, scale, translate, opacity;
+    transition-duration: 150ms;
+    transition-timing-function: var(--ease-out);
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    header { backdrop-filter: none; background: #fff; }
   }
 }
 
@@ -206,3 +232,60 @@ details::details-content {
   transition: block-size 240ms var(--ease-out), content-visibility 240ms allow-discrete;
 }
 details[open]::details-content { block-size: auto; }
+
+
+/* One button and one card for the whole storefront. Pages add layout (width, margin) only. */
+@layer components {
+  /* A row with more content past its right edge fades out, so it reads as scrollable. */
+  .rail { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 64px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 64px), transparent); }
+  .rail-end { -webkit-mask-image: none; mask-image: none; }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+    height: 2.75rem; padding-inline: 1.5rem; border-radius: 9999px; white-space: nowrap;
+    font-size: 14px; font-weight: 500; line-height: 1;
+    transition: background-color 150ms var(--ease-out), color 150ms var(--ease-out), box-shadow 150ms var(--ease-out), scale 150ms var(--ease-out);
+  }
+  .btn:disabled, .btn[aria-disabled="true"] { opacity: 0.4; pointer-events: none; }
+  .btn-icon { width: 2.5rem; height: 2.5rem; padding: 0; }
+  .btn-sm { height: 2.25rem; padding-inline: 1rem; font-size: 13px; }
+  .btn-primary { background: var(--color-navy); color: #fff; }
+  .btn-primary:hover { background: var(--color-brand); }
+  .btn-light { background: #fff; color: var(--color-navy); }
+  .btn-light:hover { background: var(--color-brand-soft); }
+  .btn-secondary { background: transparent; color: var(--color-navy); box-shadow: inset 0 0 0 1px var(--color-border-strong); }
+  .btn-secondary:hover { background: var(--color-surface-soft); box-shadow: inset 0 0 0 1px var(--color-navy); }
+  .card { background: #fff; border-radius: var(--radius-xl); }
+}
+
+
+/* Compare and quick view stay out of the way until the card is hovered or focused; touch screens always show them. */
+@media (hover: hover) {
+  .card-extra { opacity: 0; transition: opacity 150ms var(--ease-out); }
+  .group:hover .card-extra, .group:focus-within .card-extra { opacity: 1; }
+}
+
+/* Motion. Everything here is off for visitors who ask for reduced motion. */
+@media (prefers-reduced-motion: no-preference) {
+  /* Page to page: a short cross-fade (supported browsers only, others just navigate). */
+  @view-transition { navigation: auto; }
+  ::view-transition-old(root) { animation: 160ms var(--ease-out) both vt-out; }
+  ::view-transition-new(root) { animation: 280ms var(--ease-out) both vt-in; }
+  @keyframes vt-out { to { opacity: 0; } }
+  @keyframes vt-in { from { opacity: 0; transform: translateY(8px); } }
+
+  /* Builder steps and filter groups ease in instead of snapping. */
+  @keyframes step { from { opacity: 0; transform: translateX(14px); } }
+  .step-in { animation: step 260ms var(--ease-out) both; }
+  details[open] > :not(summary) { animation: rise 220ms var(--ease-out) both; }
+
+  /* First screen of a page rises into place. */
+  @keyframes rise { from { opacity: 0; transform: translateY(14px); } }
+  .hero-in { animation: rise 600ms var(--ease-out) both; }
+
+  /* Sections fade up as they scroll into view. */
+  @supports (animation-timeline: view()) {
+    @keyframes reveal { from { opacity: 0; transform: translateY(24px); } }
+    .reveal { animation: reveal linear both; animation-timeline: view(); animation-range: entry 0% entry 28%; }
+  }
+}

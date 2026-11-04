@@ -144,7 +144,7 @@ export function ProductQuestions({ productId, productTitle }: ProductQuestionsPr
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="h-10 w-full rounded-md bg-navy text-[14px] font-bold text-white transition-colors hover:bg-brand disabled:opacity-50"
+                    className="btn btn-primary w-full"
                   >
                     {submitting ? "Submitting..." : "Submit Question"}
                   </button>
@@ -159,14 +159,14 @@ export function ProductQuestions({ productId, productTitle }: ProductQuestionsPr
       {total > 0 ? (
         <div className="mt-6 space-y-4">
           {questions.map((q) => (
-            <article key={q.id} className="rounded-lg border border-border bg-white p-5 sm:p-6">
+            <article key={q.id} className="card p-5 sm:p-6">
               <div className="flex items-start gap-3">
                 <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-soft text-brand font-bold text-[13px]">
                   Q
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-[15px] font-bold text-navy">{q.question}</h3>
-                  <div className="mt-1 flex items-center gap-2 text-[12px] text-text-muted">
+                  <h3 className="text-[16px] font-bold text-navy">{q.question}</h3>
+                  <div className="mt-1 flex items-center gap-2 text-[13px] text-text-muted">
                     <span>Asked by {q.author_name}</span>
                     <span>&bull;</span>
                     <time>
@@ -182,7 +182,7 @@ export function ProductQuestions({ productId, productTitle }: ProductQuestionsPr
 
               {q.answer ? (
                 <div className="mt-4 ml-10 rounded-md border-l-2 border-brand bg-surface-soft p-4">
-                  <div className="flex items-center gap-1.5 text-[12px] font-bold text-brand">
+                  <div className="flex items-center gap-1.5 text-[13px] font-bold text-brand">
                     <ShieldCheck className="h-4 w-4" />
                     <span>Answered by {q.answered_by || "Skyrostore Engineering Team"}</span>
                   </div>
@@ -199,7 +199,7 @@ export function ProductQuestions({ productId, productTitle }: ProductQuestionsPr
           ))}
         </div>
       ) : (
-        <div className="mt-8 rounded-lg border border-border bg-white p-8 text-center">
+        <div className="mt-8 card p-8 text-center">
           <MessageSquare className="mx-auto h-8 w-8 text-text-muted" />
           <p className="mt-2 text-[16px] font-bold text-navy">No questions asked yet.</p>
           <p className="mt-1 text-[14px] text-text-secondary max-w-[45ch] mx-auto">

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Clock, Trash2, ArrowRight } from "lucide-react";
 import type { HttpTypes } from "@medusajs/types";
 import { formatPrice } from "@/lib/utils";
+import { ProductTile } from "@/components/product/product-tile";
 import { ProductMediaFallback } from "@/components/product/product-media-fallback";
 
 const STORAGE_KEY = "skyro_recently_viewed_v1";
@@ -19,6 +20,7 @@ interface ViewedItem {
   price: number | null;
   currency: string;
   brand: string | null;
+  categoryId?: string;
 }
 
 interface RecentlyViewedProps {
@@ -54,6 +56,7 @@ export function RecentlyViewed({
           price: price?.calculated_amount ?? null,
           currency: price?.currency_code ?? "inr",
           brand: brandTitle,
+          categoryId: currentProduct.categories?.[0]?.id,
         };
 
         // Prepend current product, deduplicating by ID
@@ -81,69 +84,37 @@ export function RecentlyViewed({
   if (!mounted || items.length === 0) return null;
 
   return (
-    <section aria-labelledby="recently-viewed-heading" className={`rounded-xl border border-border bg-white p-5 md:p-6 ${className}`}>
+    <section aria-labelledby="recently-viewed-heading" className={`card p-5 md:p-6 ${className}`}>
       <div className="flex items-center justify-between border-b border-border pb-4">
         <div className="flex items-center gap-2.5">
           <Clock className="h-5 w-5 text-brand" aria-hidden />
           <h2 id="recently-viewed-heading" className="text-[18px] md:text-[20px] font-extrabold tracking-[-0.02em] text-navy">
             {title}
           </h2>
-          <span className="rounded bg-surface-soft px-2 py-0.5 text-[12px] font-bold text-text-muted">
+          <span className="rounded bg-surface-soft px-2 py-0.5 text-[13px] font-bold text-text-muted">
             {items.length} {items.length === 1 ? "item" : "items"}
           </span>
         </div>
         <button
           type="button"
           onClick={clearHistory}
-          className="flex items-center gap-1.5 text-[12px] font-semibold text-text-muted hover:text-error transition-colors"
+          className="flex items-center gap-1.5 text-[13px] font-semibold text-text-muted hover:text-error transition-colors"
         >
           <Trash2 className="h-3.5 w-3.5" aria-hidden /> Clear History
         </button>
       </div>
 
-      <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+      <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
         {items.map((item) => (
-          <Link
+          <ProductTile
             key={item.id}
             href={`/products/${item.handle}`}
-            className="group flex flex-col justify-between rounded-lg border border-border bg-surface-soft/40 p-2.5 transition-all hover:border-brand hover:bg-white hover:shadow-sm"
-          >
-            <div>
-              <div className="relative aspect-square w-full overflow-hidden rounded bg-white">
-                {item.thumbnail ? (
-                  <Image
-                    src={item.thumbnail}
-                    alt={item.title}
-                    fill
-                    sizes="(min-width: 1024px) 16vw, (min-width: 640px) 25vw, 50vw"
-                    className="object-contain p-2 transition-transform duration-200 group-hover:scale-105"
-                  />
-                ) : (
-                  <ProductMediaFallback title={item.title} />
-                )}
-              </div>
-
-              <div className="mt-2.5">
-                {item.brand ? (
-                  <span className="block truncate text-[10px] font-bold uppercase tracking-wider text-text-muted">
-                    {item.brand}
-                  </span>
-                ) : null}
-                <h3 className="line-clamp-2 text-[13px] font-bold leading-snug text-navy group-hover:text-brand">
-                  {item.title}
-                </h3>
-              </div>
-            </div>
-
-            <div className="mt-2 pt-2 border-t border-border/50 flex items-center justify-between">
-              <span className="text-[13px] font-extrabold tabular-nums text-navy">
-                {item.price != null ? formatPrice(item.price, item.currency) : "Price on request"}
-              </span>
-              <span className="text-[11px] font-semibold text-brand group-hover:translate-x-0.5 transition-transform flex items-center">
-                <ArrowRight className="h-3.5 w-3.5" aria-hidden />
-              </span>
-            </div>
-          </Link>
+            image={item.thumbnail}
+            fallback={<ProductMediaFallback title={item.title} />}
+            eyebrow={item.brand ?? undefined}
+            title={item.title}
+            price={<p className="text-[16px] font-semibold tabular-nums text-navy">{item.price != null ? formatPrice(item.price, item.currency) : "Price on request"}</p>}
+          />
         ))}
       </div>
     </section>

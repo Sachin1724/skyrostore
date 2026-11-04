@@ -92,11 +92,11 @@ export function OrderDetail({ orderId }: { orderId: string }) {
 
   if (error || !order) {
     return (
-      <div className="rounded-xl border border-border bg-white p-8 text-center shadow-sm">
+      <div className="card p-8 text-center">
         <p className="text-[16px] font-bold text-navy">{error || "Order not found."}</p>
         <Link
           href="/account"
-          className="mt-4 inline-flex h-10 items-center rounded-md bg-navy px-5 text-[13px] font-bold text-white hover:bg-brand transition-colors"
+          className="btn btn-primary mt-4"
         >
           Sign In to Your Account
         </Link>
@@ -135,14 +135,14 @@ export function OrderDetail({ orderId }: { orderId: string }) {
       </div>
 
       {/* Order Header Card */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 rounded-xl border border-border bg-white p-6 shadow-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 card p-6">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-[12px] font-extrabold uppercase tracking-wider text-brand">
+            <span className="text-[13px] font-extrabold text-brand">
               Order Details
             </span>
             <span className="text-text-muted">·</span>
-            <span className="rounded bg-surface-soft px-2 py-0.5 text-[11px] font-bold uppercase text-navy">
+            <span className="rounded bg-surface-soft px-2 py-0.5 text-[13px] font-bold text-navy">
               {order.status}
             </span>
           </div>
@@ -160,7 +160,7 @@ export function OrderDetail({ orderId }: { orderId: string }) {
           <button
             type="button"
             onClick={() => setShowInvoiceModal(true)}
-            className="inline-flex h-11 items-center gap-2 rounded-md border border-border bg-white px-5 text-[13px] font-bold text-navy hover:border-brand hover:text-brand shadow-sm transition-colors"
+            className="inline-flex h-11 items-center gap-2 rounded-md border border-border bg-white px-5 text-[13px] font-bold text-navy hover:border-brand hover:text-brand transition-colors"
           >
             <FileText className="h-4 w-4 text-brand" aria-hidden />
             <span>GST Tax Invoice</span>
@@ -169,13 +169,13 @@ export function OrderDetail({ orderId }: { orderId: string }) {
       </div>
 
       {/* Shipment & Tracking Card */}
-      <div className="rounded-xl border border-border bg-white p-6 shadow-sm">
+      <div className="card p-6">
         <div className="flex items-center justify-between border-b border-border pb-4">
           <div className="flex items-center gap-2">
             <Truck className="h-5 w-5 text-brand" aria-hidden />
             <h2 className="text-[16px] font-extrabold text-navy">Fulfillment &amp; Courier Tracking</h2>
           </div>
-          <span className="text-[12px] font-bold text-text-muted">
+          <span className="text-[13px] font-bold text-text-muted">
             Partner: Delhivery Air Express
           </span>
         </div>
@@ -186,7 +186,7 @@ export function OrderDetail({ orderId }: { orderId: string }) {
             <CheckCircle2 className="h-5 w-5 text-success shrink-0 mt-0.5" aria-hidden />
             <div>
               <p className="text-[13px] font-bold text-navy">Order Placed &amp; QA Checked</p>
-              <p className="text-[12px] text-text-secondary">{formattedDate}</p>
+              <p className="text-[13px] text-text-secondary">{formattedDate}</p>
             </div>
           </div>
 
@@ -198,7 +198,7 @@ export function OrderDetail({ orderId }: { orderId: string }) {
             )}
             <div>
               <p className="text-[13px] font-bold text-navy">Air Express Dispatch</p>
-              <p className="text-[12px] text-text-secondary">
+              <p className="text-[13px] text-text-secondary">
                 {isShipped ? "Handed over to Delhivery Hub" : "Preparing ESD anti-static packaging"}
               </p>
             </div>
@@ -212,7 +212,7 @@ export function OrderDetail({ orderId }: { orderId: string }) {
             )}
             <div>
               <p className="text-[13px] font-bold text-navy">Delivery Complete</p>
-              <p className="text-[12px] text-text-secondary">
+              <p className="text-[13px] text-text-secondary">
                 {isDelivered ? "Delivered to recipient address" : "In transit to destination PIN"}
               </p>
             </div>
@@ -239,7 +239,7 @@ export function OrderDetail({ orderId }: { orderId: string }) {
       {/* Grid: Items & Order Summary */}
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
         {/* Items */}
-        <div className="rounded-xl border border-border bg-white p-6 shadow-sm">
+        <div className="card p-6">
           <h2 className="text-[16px] font-extrabold text-navy border-b border-border pb-3">
             Hardware Line Items ({order.items.length})
           </h2>
@@ -248,7 +248,7 @@ export function OrderDetail({ orderId }: { orderId: string }) {
             {order.items.map((item) => (
               <div key={item.id} className="flex items-center justify-between py-4">
                 <div className="min-w-0 pr-4">
-                  <p className="text-[15px] font-bold text-navy leading-snug">
+                  <p className="text-[16px] font-bold text-navy leading-snug">
                     {item.title?.replace("[DEV] ", "")}
                   </p>
                   <p className="mt-1 text-[13px] tabular-nums text-text-muted">
@@ -266,7 +266,7 @@ export function OrderDetail({ orderId }: { orderId: string }) {
         {/* Summary & Address */}
         <div className="space-y-6">
           {/* Price Breakdown */}
-          <div className="rounded-xl border border-border bg-white p-6 shadow-sm">
+          <div className="card p-6">
             <h3 className="text-[16px] font-extrabold text-navy border-b border-border pb-3">
               Payment Summary
             </h3>
@@ -304,7 +304,7 @@ export function OrderDetail({ orderId }: { orderId: string }) {
 
           {/* Delivery Address */}
           {order.shipping_address ? (
-            <div className="rounded-xl border border-border bg-white p-6 shadow-sm text-[13px]">
+            <div className="card p-6 text-[13px]">
               <div className="flex items-center gap-2 text-navy font-bold border-b border-border pb-2.5">
                 <MapPin className="h-4 w-4 text-brand" aria-hidden />
                 <span>Shipping Address</span>
@@ -329,11 +329,11 @@ export function OrderDetail({ orderId }: { orderId: string }) {
         <div
           role="dialog"
           aria-modal="true"
-          className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-navy/70 backdrop-blur-sm"
+          className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-navy/70"
         >
           <div className="absolute inset-0" onClick={() => setShowInvoiceModal(false)} aria-hidden />
 
-          <div className="relative z-10 flex max-h-[90vh] w-full max-w-2xl flex-col rounded-xl border border-border bg-white shadow-2xl overflow-hidden">
+          <div className="relative z-10 flex max-h-[90vh] w-full max-w-2xl flex-col card shadow-2xl overflow-hidden">
             <div className="flex items-center justify-between border-b border-border px-6 py-4 bg-surface-soft">
               <div className="flex items-center gap-2">
                 <FileText className="h-5 w-5 text-brand" aria-hidden />
@@ -343,7 +343,7 @@ export function OrderDetail({ orderId }: { orderId: string }) {
                 <button
                   type="button"
                   onClick={() => window.print()}
-                  className="inline-flex items-center gap-1.5 rounded-md border border-border bg-white px-3 py-1.5 text-[12px] font-bold text-navy hover:bg-surface-soft"
+                  className="inline-flex items-center gap-1.5 rounded-md border border-border bg-white px-3 py-1.5 text-[13px] font-bold text-navy hover:bg-surface-soft"
                 >
                   <Printer className="h-3.5 w-3.5" aria-hidden />
                   <span>Print</span>
@@ -364,14 +364,14 @@ export function OrderDetail({ orderId }: { orderId: string }) {
                   <span className="text-[18px] font-extrabold tracking-tight text-navy">
                     SKYROSTORE SYSTEMS PRIVATE LIMITED
                   </span>
-                  <p className="mt-1 text-[12px] text-text-secondary leading-relaxed">
+                  <p className="mt-1 text-[13px] text-text-secondary leading-relaxed">
                     Infocity Complex, Bhubaneswar, Odisha 751024<br />
                     <strong>GSTIN:</strong> 21AAECS9821R1ZM<br />
                     <strong>State Code:</strong> 21 (Odisha)
                   </p>
                 </div>
 
-                <div className="text-left sm:text-right text-[12px]">
+                <div className="text-left sm:text-right text-[13px]">
                   <p className="font-bold text-navy text-[14px]">Invoice #{order.display_id}</p>
                   <p className="text-text-secondary">Date: {formattedDate}</p>
                   <p className="text-text-secondary">Payment: Prepaid (Razorpay)</p>
@@ -380,7 +380,7 @@ export function OrderDetail({ orderId }: { orderId: string }) {
 
               {/* Items Table */}
               <table className="w-full text-left text-[13px] border border-border rounded-lg overflow-hidden">
-                <thead className="bg-surface-soft text-[11px] font-extrabold uppercase text-text-muted border-b border-border">
+                <thead className="bg-surface-soft text-[13px] font-extrabold text-text-muted border-b border-border">
                   <tr>
                     <th className="p-3">Description</th>
                     <th className="p-3 text-center">HSN</th>
@@ -392,7 +392,7 @@ export function OrderDetail({ orderId }: { orderId: string }) {
                   {order.items.map((item) => (
                     <tr key={item.id}>
                       <td className="p-3 font-semibold text-navy">{item.title?.replace("[DEV] ", "")}</td>
-                      <td className="p-3 text-center font-mono text-[12px]">88069000</td>
+                      <td className="p-3 text-center font-mono text-[13px]">88069000</td>
                       <td className="p-3 text-center tabular-nums">{item.quantity}</td>
                       <td className="p-3 text-right font-bold tabular-nums">{formatPrice(item.total, currency)}</td>
                     </tr>
@@ -403,10 +403,10 @@ export function OrderDetail({ orderId }: { orderId: string }) {
               <div className="flex justify-between items-center rounded-lg border border-border bg-surface-soft/40 p-4 text-[13px]">
                 <div>
                   <span className="font-bold text-navy">18% GST Included (ITC claimable)</span>
-                  <span className="block text-[11px] text-text-muted">HSN Code 88069000: Unmanned Aircraft Systems &amp; Avionics</span>
+                  <span className="block text-[13px] text-text-muted">HSN Code 88069000: Unmanned Aircraft Systems &amp; Avionics</span>
                 </div>
                 <div className="text-right">
-                  <span className="text-[11px] uppercase text-text-muted">Total Paid</span>
+                  <span className="text-[13px] uppercase text-text-muted">Total Paid</span>
                   <span className="block text-[18px] font-extrabold tabular-nums text-navy">
                     {formatPrice(order.total, currency)}
                   </span>

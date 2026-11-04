@@ -391,7 +391,7 @@ export function BulkOrderRequestForm() {
               <Boxes className="h-6 w-6 stroke-[1.8]" />
             </div>
             <div>
-              <h3 className="text-[15px] font-bold text-graphite">Bulk Purchase</h3>
+              <h3 className="text-[16px] font-bold text-graphite">Bulk Purchase</h3>
               <p className="mt-0.5 text-[14px] text-text-muted">
                 Multiple units of existing products
               </p>
@@ -423,7 +423,7 @@ export function BulkOrderRequestForm() {
               <Wrench className="h-6 w-6 stroke-[1.8]" />
             </div>
             <div>
-              <h3 className="text-[15px] font-bold text-graphite">Custom UAV Build</h3>
+              <h3 className="text-[16px] font-bold text-graphite">Custom UAV Build</h3>
               <p className="mt-0.5 text-[14px] text-text-muted">
                 Tailored configuration for your needs
               </p>
@@ -455,7 +455,7 @@ export function BulkOrderRequestForm() {
               <Layers className="h-6 w-6 stroke-[1.8]" />
             </div>
             <div>
-              <h3 className="text-[15px] font-bold text-graphite">Bulk Custom Builds</h3>
+              <h3 className="text-[16px] font-bold text-graphite">Bulk Custom Builds</h3>
               <p className="mt-0.5 text-[14px] text-text-muted">
                 Multiple custom UAVs
               </p>
@@ -1128,8 +1128,8 @@ export function BulkOrderRequestForm() {
             </div>
 
             {/* Blue Info Callout Box matching mockup */}
-            <div className="mt-5 flex gap-2.5 rounded-lg border border-sky-100 bg-[#f0f7ff] p-3.5 text-[14px] leading-relaxed text-[#1e40af]">
-              <Info className="h-4 w-4 shrink-0 text-[#2563eb]" />
+            <div className="mt-5 flex gap-2.5 rounded-lg border border-sky-100 bg-brand-soft p-3.5 text-[14px] leading-relaxed text-brand">
+              <Info className="h-4 w-4 shrink-0 text-brand" />
               <span>
                 This is a request for quotation. Final pricing, tax, shipping and availability will be confirmed by our team.
               </span>
@@ -1138,7 +1138,7 @@ export function BulkOrderRequestForm() {
 
           {/* Card 2: Why Choose Bulk Orders? */}
           <div className="bg-white p-6">
-            <h3 className="text-[15px] font-bold text-graphite">
+            <h3 className="text-[16px] font-bold text-graphite">
               Why Choose Bulk Orders?
             </h3>
             <ul className="mt-4 space-y-3 text-[14px] text-text-secondary">
