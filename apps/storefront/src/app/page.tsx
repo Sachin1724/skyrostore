@@ -1,8 +1,10 @@
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { HeroCarousel } from "@/components/home/hero-carousel";
-import { BrandBar } from "@/components/home/brand-bar";
+import { BrandShowcase } from "@/components/home/brand-showcase";
 import { CategoryGrid } from "@/components/home/category-grid";
+import { TrustGrid } from "@/components/home/trust-grid";
+import { FeaturedTabs } from "@/components/home/featured-tabs";
 import { B2BBanner } from "@/components/home/b2b-banner";
 import { RecommendedForYou } from "@/components/home/recommended-for-you";
 import { ProductRail } from "@/components/home/product-rail";
@@ -22,9 +24,6 @@ export default async function HomePage() {
     getSiteContent(),
   ]);
 
-  const stock = (p: (typeof products)[number]) => p.variants?.[0]?.inventory_quantity ?? 0;
-  const bestSellers = [...products].sort((a, b) => stock(b) + (b.variants?.length ?? 1) * 10 - (stock(a) + (a.variants?.length ?? 1) * 10)).slice(0, 12);
-  const newArrivals = [...products].sort((a, b) => String(b.created_at ?? "").localeCompare(String(a.created_at ?? ""))).slice(0, 12);
   // A shelf per category, only where there is enough to fill one.
   const categoryShelves = tree
     .map((node) => ({ node, items: products.filter((p) => p.categories?.some((c) => c.handle === node.handle || node.children?.some((ch) => ch.handle === c.handle))) }))
@@ -36,7 +35,7 @@ export default async function HomePage() {
 
   const brandRow = brands
     .filter((b) => (index.byBrand.get(b.id) ?? 0) > 0)
-    .map((b) => ({ handle: b.handle, title: b.title, logo: b.logo }));
+    .map((b) => ({ handle: b.handle, title: b.title, logo: b.logo, count: index.byBrand.get(b.id) ?? 0 }));
 
   return (
     <>
@@ -45,13 +44,18 @@ export default async function HomePage() {
         <div className="mx-auto max-w-[1760px] space-y-14 px-4 pt-5 md:space-y-20 md:px-8 md:pt-6">
           {/* 1. Hero Overview */}
           <HeroCarousel slides={content.heroSlides} />
-          <BrandBar brands={brandRow} />
+
+          {/* 2. Certified brands */}
+          <BrandShowcase brands={brandRow} />
 
           {/* 3. Shop by Category Grid */}
           <CategoryGrid categories={categories} />
 
-          <ProductRail title="Best sellers" href="/parts?sort=best_selling" products={bestSellers} />
-          <ProductRail title="New arrivals" href="/parts?sort=newest" products={newArrivals} />
+          {/* 4. Trust & guarantees */}
+          <TrustGrid />
+
+          {/* 5. Featured hardware, tabbed */}
+          <FeaturedTabs products={products} />
           {categoryShelves.map(({ node, items }) => (
             <ProductRail key={node.id} title={`Top in ${node.name}`} href={`/parts?category=${node.handle}`} products={items.slice(0, 12)} />
           ))}
