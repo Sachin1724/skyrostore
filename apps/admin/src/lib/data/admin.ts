@@ -99,7 +99,7 @@ export async function getCustomers(token: string, params?: { limit?: number }) {
 
 export async function getInventoryItems(token: string, params?: { limit?: number }) {
   return adminFetch(
-    `/admin/inventory-items?limit=${params?.limit ?? 50}`,
+    `/admin/inventory-items?limit=${params?.limit ?? 50}&fields=id,sku,title,*location_levels`,
     { headers: authHeaders(token) }
   );
 }

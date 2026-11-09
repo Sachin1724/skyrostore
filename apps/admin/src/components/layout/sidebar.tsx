@@ -15,6 +15,7 @@ import {
   Tag,
   PenLine,
   Images,
+  ShieldCheck,
 } from "lucide-react";
 
 const NAV_ITEMS = [
@@ -32,6 +33,7 @@ const NAV_ITEMS = [
   { href: "/shipments", label: "Shipments", icon: Truck },
   { href: "/payments", label: "Payments", icon: CreditCard },
   { href: "/support", label: "Support", icon: MessageSquare },
+  { href: "/moderation", label: "Moderation", icon: ShieldCheck },
   { href: "/settings", label: "Settings", icon: Settings },
 ] as const;
 

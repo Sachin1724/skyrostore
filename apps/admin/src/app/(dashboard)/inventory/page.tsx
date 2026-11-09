@@ -1,6 +1,7 @@
 import { getAuthToken } from "@/lib/auth";
 import { getInventoryItems } from "@/lib/data/admin";
 import { redirect } from "next/navigation";
+import { StockCell } from "./stock-cell";
 
 export const metadata = { title: "Inventory" };
 
@@ -31,22 +32,29 @@ export default async function InventoryPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {inventory_items.map((item: Record<string, unknown>) => (
-                <tr key={item.id as string}>
-                  <td className="py-2.5 pr-4 font-mono text-xs">
-                    {(item.sku as string) || "—"}
-                  </td>
-                  <td className="py-2.5 pr-4 font-medium">
-                    {(item.title as string) || "—"}
-                  </td>
-                  <td className="py-2.5 pr-4">
-                    {(item.stocked_quantity as number) ?? "—"}
-                  </td>
-                  <td className="py-2.5 pr-4 text-gray-500">
-                    {(item.reserved_quantity as number) ?? 0}
-                  </td>
-                </tr>
-              ))}
+              {inventory_items.map((item: Record<string, unknown>) => {
+                const level = (item.location_levels as Array<Record<string, unknown>> | undefined)?.[0];
+                return (
+                  <tr key={item.id as string}>
+                    <td className="py-2.5 pr-4 font-mono text-xs">
+                      {(item.sku as string) || "—"}
+                    </td>
+                    <td className="py-2.5 pr-4 font-medium">
+                      {(item.title as string) || "—"}
+                    </td>
+                    <td className="py-2.5 pr-4">
+                      <StockCell
+                        itemId={item.id as string}
+                        locationId={(level?.location_id as string) ?? null}
+                        stockedQuantity={(level?.stocked_quantity as number) ?? 0}
+                      />
+                    </td>
+                    <td className="py-2.5 pr-4 text-gray-500">
+                      {(level?.reserved_quantity as number) ?? 0}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
