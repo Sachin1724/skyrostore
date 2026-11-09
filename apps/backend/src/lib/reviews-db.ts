@@ -32,6 +32,19 @@ export interface WishlistItem {
   created_at: Date;
 }
 
+export interface SavedCartItem {
+  id: string;
+  customer_id: string;
+  product_id: string;
+  variant_id: string;
+  title: string;
+  handle: string | null;
+  thumbnail: string | null;
+  unit_price: number;
+  currency_code: string;
+  created_at: Date;
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function ensureReviewsTables(db: any): Promise<void> {
   const hasReviews = await db.schema.hasTable("product_review");
@@ -78,6 +91,34 @@ export async function ensureReviewsTables(db: any): Promise<void> {
       t.string("product_id", 64).notNullable().index();
       t.timestamp("created_at", { useTz: true }).defaultTo(db.fn.now());
       t.unique(["customer_id", "product_id"]);
+    });
+  }
+
+  const hasNewsletter = await db.schema.hasTable("newsletter_subscriber");
+  if (!hasNewsletter) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await db.schema.createTable("newsletter_subscriber", (t: any) => {
+      t.string("id", 64).primary();
+      t.string("email", 255).notNullable().unique();
+      t.timestamp("created_at", { useTz: true }).defaultTo(db.fn.now());
+    });
+  }
+
+  const hasSavedCart = await db.schema.hasTable("saved_cart_item");
+  if (!hasSavedCart) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await db.schema.createTable("saved_cart_item", (t: any) => {
+      t.string("id", 64).primary();
+      t.string("customer_id", 64).notNullable().index();
+      t.string("product_id", 64).notNullable();
+      t.string("variant_id", 64).notNullable();
+      t.string("title", 255).notNullable();
+      t.string("handle", 255).nullable();
+      t.string("thumbnail", 500).nullable();
+      t.integer("unit_price").notNullable();
+      t.string("currency_code", 8).notNullable();
+      t.timestamp("created_at", { useTz: true }).defaultTo(db.fn.now());
+      t.unique(["customer_id", "variant_id"]);
     });
   }
 }

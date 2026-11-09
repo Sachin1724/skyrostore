@@ -83,9 +83,6 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
       fulfilment_state: "shipped",
       courier: tracking.details.courier,
       tracking_number: tracking.details.tracking_number,
-      // The shipment event is emitted for the customer notification. Whether an
-      // email actually goes out depends on a notification provider being
-      // configured; none is registered yet.
       notification_requested: true,
     });
   } catch (err: unknown) {

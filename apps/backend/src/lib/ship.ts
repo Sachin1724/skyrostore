@@ -3,6 +3,7 @@ import { ContainerRegistrationKeys, Modules } from "@medusajs/framework/utils";
 import { createOrderShipmentWorkflow } from "@medusajs/medusa/core-flows";
 import type { TrackingDetails } from "./fulfilment";
 import { recordEvent } from "./analytics";
+import { orderShippedEmail, sendEmail } from "./email";
 
 /**
  * Runs the shipment workflow for a packed fulfilment and records the courier.
@@ -67,4 +68,21 @@ export async function markShipped(
       tracking_number: details.tracking_number,
     },
   });
+
+  const query = scope.resolve(ContainerRegistrationKeys.QUERY);
+  const { data: orders } = await query.graph({
+    entity: "order",
+    fields: ["id", "email", "display_id"],
+    filters: { id },
+  });
+  const order = orders?.[0] as any;
+  if (order?.email) {
+    const { subject, html } = orderShippedEmail({
+      display_id: order.display_id,
+      courier: details.courier,
+      tracking_number: details.tracking_number,
+      tracking_url: details.tracking_url,
+    });
+    await sendEmail(order.email, subject, html);
+  }
 }

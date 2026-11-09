@@ -1,13 +1,7 @@
 import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http";
 import { ContainerRegistrationKeys } from "@medusajs/framework/utils";
 import { ensureReviewsTables, type WishlistItem } from "../../../lib/reviews-db";
-
-function getEffectiveCustomerId(req: MedusaRequest): string {
-  const actorId = (req as unknown as { auth_context?: { actor_id?: string } }).auth_context?.actor_id;
-  if (actorId) return actorId;
-  const headerId = req.headers["x-visitor-id"] as string | undefined;
-  return headerId || "guest_default";
-}
+import { getEffectiveCustomerId } from "../../../lib/customer-id";
 
 export async function GET(req: MedusaRequest, res: MedusaResponse) {
   const customerId = getEffectiveCustomerId(req);
@@ -17,13 +11,46 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
   try {
     await ensureReviewsTables(db);
 
-    const items: WishlistItem[] = await db("customer_wishlist")
+    const rows: WishlistItem[] = await db("customer_wishlist")
       .where({ customer_id: customerId })
       .orderBy("created_at", "desc");
 
+    const productIds = rows.map((r) => r.product_id);
+    let byId = new Map<string, { title: string; handle: string; thumbnail: string | null; inStock: boolean; variantId?: string }>();
+    if (productIds.length) {
+      const query = req.scope.resolve(ContainerRegistrationKeys.QUERY);
+      const { data: products } = await query.graph({
+        entity: "product",
+        fields: ["id", "title", "handle", "thumbnail", "variants.id", "variants.manage_inventory", "variants.inventory_quantity"],
+        filters: { id: productIds },
+      });
+      byId = new Map(
+        (products as any[]).map((p) => [
+          p.id,
+          {
+            title: (p.title as string)?.replace("[DEV] ", ""),
+            handle: p.handle,
+            thumbnail: p.thumbnail,
+            variantId: p.variants?.[0]?.id,
+            inStock: (p.variants ?? []).some((v: any) => !v.manage_inventory || (v.inventory_quantity ?? 0) > 0),
+          },
+        ])
+      );
+    }
+
+    // ponytail: price needs a region/currency context this route doesn't have;
+    // the storefront already shows live price on the product page it links to.
+    const items = rows
+      .map((r) => {
+        const p = byId.get(r.product_id);
+        if (!p) return null;
+        return { productId: r.product_id, variantId: p.variantId, title: p.title, handle: p.handle, thumbnail: p.thumbnail, price: null, currency: "inr", inStock: p.inStock };
+      })
+      .filter((i): i is NonNullable<typeof i> => i !== null);
+
     return res.status(200).json({
       customer_id: customerId,
-      product_ids: items.map((i: WishlistItem) => i.product_id),
+      product_ids: rows.map((i) => i.product_id),
       items,
     });
   } catch (error) {
