@@ -1,6 +1,7 @@
 import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http";
 import { ContainerRegistrationKeys } from "@medusajs/framework/utils";
-import { ensureReviewsTables } from "../../../../lib/reviews-db";
+import { ensureReviewsTables, type ProductReview } from "../../../../lib/reviews-db";
+import { lookupProducts } from "../../../../lib/product-lookup";
 
 export async function GET(req: MedusaRequest, res: MedusaResponse) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -15,8 +16,10 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
     if (status) q = q.where({ status });
     if (productId) q = q.where({ product_id: productId });
 
-    const reviews = await q;
-    return res.status(200).json({ count: reviews.length, reviews });
+    const reviews: ProductReview[] = await q;
+    const products = await lookupProducts(req, [...new Set(reviews.map((r) => r.product_id))]);
+    const enriched = reviews.map((r) => ({ ...r, product: products.get(r.product_id) ?? null }));
+    return res.status(200).json({ count: reviews.length, reviews: enriched });
   } catch (error) {
     console.error("Error fetching admin reviews:", error);
     return res.status(500).json({ error: "Failed to load reviews" });

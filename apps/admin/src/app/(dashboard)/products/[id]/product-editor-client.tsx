@@ -19,6 +19,7 @@ import {
   Cpu,
   ShieldAlert,
   Info,
+  ExternalLink,
 } from "lucide-react";
 
 import { VisibilityToggle } from "../visibility-toggle";
@@ -30,9 +31,10 @@ interface ProductEditorClientProps {
   initialProduct: Record<string, unknown>;
   categories: { id: string; name: string }[];
   brands: { id: string; name: string }[];
+  storefrontUrl: string;
 }
 
-export function ProductEditorClient({ initialProduct, categories, brands }: ProductEditorClientProps) {
+export function ProductEditorClient({ initialProduct, categories, brands, storefrontUrl }: ProductEditorClientProps) {
   const metadata = (initialProduct.metadata as Record<string, unknown>) || {};
   const existingSpecs = extractTechnicalSpecs(metadata);
 
@@ -232,6 +234,15 @@ export function ProductEditorClient({ initialProduct, categories, brands }: Prod
         </div>
 
         <div className="flex items-center gap-4">
+          <a
+            href={`${storefrontUrl}/products/${handle}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-gray-900"
+          >
+            View on live store
+            <ExternalLink className="h-3.5 w-3.5" aria-hidden />
+          </a>
           <VisibilityToggle id={initialProduct.id as string} status={initialProduct.status as string} />
           <button
             type="submit"

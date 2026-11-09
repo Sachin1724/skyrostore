@@ -1,6 +1,7 @@
 import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http";
 import { ContainerRegistrationKeys } from "@medusajs/framework/utils";
-import { ensureReviewsTables } from "../../../../lib/reviews-db";
+import { ensureReviewsTables, type ProductQuestion } from "../../../../lib/reviews-db";
+import { lookupProducts } from "../../../../lib/product-lookup";
 
 export async function GET(req: MedusaRequest, res: MedusaResponse) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -13,8 +14,10 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
     let q = db("product_question").select("*").orderBy("created_at", "desc");
     if (status) q = q.where({ status });
 
-    const questions = await q;
-    return res.status(200).json({ count: questions.length, questions });
+    const questions: ProductQuestion[] = await q;
+    const products = await lookupProducts(req, [...new Set(questions.map((r) => r.product_id))]);
+    const enriched = questions.map((r) => ({ ...r, product: products.get(r.product_id) ?? null }));
+    return res.status(200).json({ count: questions.length, questions: enriched });
   } catch (error) {
     console.error("Error fetching admin questions:", error);
     return res.status(500).json({ error: "Failed to load questions" });

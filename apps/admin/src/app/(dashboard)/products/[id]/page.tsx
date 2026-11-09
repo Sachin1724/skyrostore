@@ -30,7 +30,12 @@ export default async function EditProductPage({
 
   return (
     <div className="mx-auto max-w-5xl pb-16">
-      <ProductEditorClient initialProduct={product} categories={categories} brands={brands} />
+      <ProductEditorClient
+        initialProduct={product}
+        categories={categories}
+        brands={brands}
+        storefrontUrl={process.env.STOREFRONT_URL || "http://localhost:3000"}
+      />
     </div>
   );
 }

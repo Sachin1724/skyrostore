@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { UploadButton, uploadImages } from "../products/image-uploader";
+import { useConfirm } from "@/components/ui/confirm-dialog";
 
 type Item = { id: string; url: string; name: string; alt: string; created_at: string; used_by: string[] };
 
@@ -9,6 +10,7 @@ function MediaCard({ item, reload, setError }: { item: Item; reload: () => Promi
   const [alt, setAlt] = useState(item.alt);
   const [saved, setSaved] = useState(true);
   const inUse = item.used_by.length > 0;
+  const confirm = useConfirm();
 
   async function saveAlt() {
     if (saved) return;
@@ -22,7 +24,7 @@ function MediaCard({ item, reload, setError }: { item: Item; reload: () => Promi
   }
 
   async function remove() {
-    if (!window.confirm(`Delete "${item.name}" permanently?`)) return;
+    if (!(await confirm({ title: `Delete "${item.name}" permanently?`, confirmLabel: "Delete" }))) return;
     const res = await fetch(`/api/media?id=${encodeURIComponent(item.id)}`, { method: "DELETE" });
     if (!res.ok) setError((await res.json().catch(() => ({}))).error || "Could not delete");
     await reload();

@@ -39,4 +39,16 @@
   body {
     @apply bg-offwhite text-gray-900 font-sans;
   }
+
+  /* WCAG 2.2 AA: every interactive element gets a visible keyboard-focus ring,
+     even ones that don't declare their own focus-visible classes. */
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  [tabindex]:focus-visible {
+    outline: 2px solid var(--color-gray-900);
+    outline-offset: 2px;
+  }
 }

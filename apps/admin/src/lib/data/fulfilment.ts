@@ -41,7 +41,8 @@ export type FulfilmentOrder = {
   fulfilment_state: string;
   item_count: number;
   is_bulk_order: boolean;
-  shipping_address?: { city?: string; province?: string } | null;
+  shipping_address?: { city?: string; province?: string; phone?: string } | null;
+  items?: { id: string; title: string; quantity: number }[];
 };
 
 export function getFulfilmentOrders(

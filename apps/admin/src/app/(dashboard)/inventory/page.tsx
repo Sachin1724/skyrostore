@@ -5,18 +5,43 @@ import { StockCell } from "./stock-cell";
 
 export const metadata = { title: "Inventory" };
 
-export default async function InventoryPage() {
+const LOW_STOCK_THRESHOLD = 5;
+
+export default async function InventoryPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; low_stock?: string }>;
+}) {
   const token = await getAuthToken();
   if (!token) redirect("/login");
 
-  const { inventory_items, count } = await getInventoryItems(token);
+  const { q, low_stock } = await searchParams;
+  const { inventory_items, count } = await getInventoryItems(token, { limit: 200, q });
+
+  const stockOf = (item: Record<string, unknown>) =>
+    ((item.location_levels as Array<Record<string, unknown>> | undefined)?.[0]?.stocked_quantity as number) ?? 0;
+  const visible = low_stock ? inventory_items.filter((i: Record<string, unknown>) => stockOf(i) <= LOW_STOCK_THRESHOLD) : inventory_items;
 
   return (
     <div>
       <h1 className="text-xl font-semibold text-gray-900">Inventory</h1>
       <p className="mt-1 text-sm text-gray-500">{count} items</p>
 
-      {inventory_items.length === 0 ? (
+      <form method="get" className="mt-4 flex flex-wrap items-center gap-2">
+        <input name="q" defaultValue={q || ""} placeholder="Search SKU or title" className="w-64 rounded border border-gray-300 px-2.5 py-1.5 text-sm" />
+        {low_stock ? <input type="hidden" name="low_stock" value="1" /> : null}
+        <button type="submit" className="rounded bg-gray-900 px-3 py-1.5 text-xs font-semibold text-white">Search</button>
+        <a
+          href={low_stock ? (q ? `/inventory?q=${encodeURIComponent(q)}` : "/inventory") : `/inventory?low_stock=1${q ? `&q=${encodeURIComponent(q)}` : ""}`}
+          className={`rounded border px-2.5 py-1 text-xs font-medium ${
+            low_stock ? "border-amber-400 bg-amber-100 text-amber-900" : "border-gray-200 text-gray-600 hover:bg-gray-50"
+          }`}
+        >
+          Low stock (≤{LOW_STOCK_THRESHOLD})
+        </a>
+      </form>
+
+      {visible.length === 0 ? (
         <p className="mt-6 text-sm text-gray-500">
           No inventory data available.
         </p>
@@ -32,7 +57,7 @@ export default async function InventoryPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {inventory_items.map((item: Record<string, unknown>) => {
+              {visible.map((item: Record<string, unknown>) => {
                 const level = (item.location_levels as Array<Record<string, unknown>> | undefined)?.[0];
                 return (
                   <tr key={item.id as string}>

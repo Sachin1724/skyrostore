@@ -26,6 +26,44 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
+const MILESTONES = ["Paid", "Packed", "Courier booked", "Dispatched", "Delivered"] as const;
+
+/** Current milestone index for the stepper; -1 before payment, cancelled has no place on the line. */
+function milestoneIndex(state: string, booked: boolean): number {
+  if (state === "delivered") return 4;
+  if (state === "shipped") return 3;
+  if (state === "packed") return booked ? 2 : 1;
+  if (state === "paid_processing") return 0;
+  return -1;
+}
+
+function MilestoneStepper({ state, booked }: { state: string; booked: boolean }) {
+  if (state === "cancelled" || state === "payment_failed" || state === "awaiting_payment") return null;
+  const current = milestoneIndex(state, booked);
+  return (
+    <ol className="flex items-center gap-1.5" aria-label="Fulfilment progress">
+      {MILESTONES.map((label, i) => (
+        <li key={label} className="flex items-center gap-1.5">
+          <span
+            className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${
+              i <= current ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-500"
+            }`}
+          >
+            {label}
+          </span>
+          {i < MILESTONES.length - 1 ? <span className="h-px w-3 bg-gray-300" aria-hidden /> : null}
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+const PACKAGE_PRESETS = [
+  { label: "Component parcel", weight_g: "300", length_cm: "20", width_cm: "15", height_cm: "10" },
+  { label: "Quadcopter kit", weight_g: "1200", length_cm: "40", width_cm: "30", height_cm: "15" },
+  { label: "Heavy UAV box", weight_g: "4500", length_cm: "60", width_cm: "50", height_cm: "30" },
+] as const;
+
 export function FulfilmentWorkbench({
   orderId,
   order,
@@ -109,6 +147,8 @@ export function FulfilmentWorkbench({
           {STATE_LABELS[state] || state}
         </span>
       </div>
+
+      <MilestoneStepper state={state} booked={Boolean(booked)} />
 
       {message ? (
         <div
@@ -214,6 +254,18 @@ export function FulfilmentWorkbench({
                   Weigh and measure the packed box. Booking sends the order to Shipmozo, assigns the courier
                   (Delhivery, per your auto-assign rule), generates the label and notifies the customer.
                 </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {PACKAGE_PRESETS.map((preset) => (
+                    <button
+                      key={preset.label}
+                      type="button"
+                      onClick={() => setPkg({ weight_g: preset.weight_g, length_cm: preset.length_cm, width_cm: preset.width_cm, height_cm: preset.height_cm })}
+                      className="rounded border border-gray-300 px-2.5 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50"
+                    >
+                      {preset.label} ({preset.weight_g}g)
+                    </button>
+                  ))}
+                </div>
                 <div className="mt-3 grid gap-3 sm:grid-cols-4">
                   {(
                     [

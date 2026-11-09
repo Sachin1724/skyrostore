@@ -1,6 +1,7 @@
 import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http";
 import { ContainerRegistrationKeys } from "@medusajs/framework/utils";
 import { ensureReviewsTables, type ProductReview } from "../../../lib/reviews-db";
+import { lookupProducts } from "../../../lib/product-lookup";
 
 // The reviews a signed-in customer has written, across every product, with
 // its own status so a pending one still shows (unlike the public per-product list).
@@ -19,20 +20,7 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
       .where({ customer_id: customerId })
       .orderBy("created_at", "desc");
 
-    const productIds = [...new Set(reviews.map((r) => r.product_id))];
-    let byId = new Map<string, { title: string; handle: string; thumbnail: string | null }>();
-    if (productIds.length) {
-      const query = req.scope.resolve(ContainerRegistrationKeys.QUERY);
-      const { data: products } = await query.graph({
-        entity: "product",
-        fields: ["id", "title", "handle", "thumbnail"],
-        filters: { id: productIds },
-      });
-      byId = new Map(
-        (products as any[]).map((p) => [p.id, { title: (p.title as string)?.replace("[DEV] ", ""), handle: p.handle, thumbnail: p.thumbnail }])
-      );
-    }
-
+    const byId = await lookupProducts(req, [...new Set(reviews.map((r) => r.product_id))]);
     const enriched = reviews.map((r) => ({ ...r, product: byId.get(r.product_id) ?? null }));
     return res.status(200).json({ reviews: enriched });
   } catch (error) {

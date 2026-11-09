@@ -5,7 +5,14 @@ import { VisibilityToggle } from "./visibility-toggle";
 
 export const metadata = { title: "Products" };
 
-type Search = { category?: string; brand?: string; status?: string; q?: string };
+type Search = { category?: string; brand?: string; status?: string; q?: string; low_stock?: string };
+
+const LOW_STOCK_THRESHOLD = 5;
+
+function totalStock(product: Record<string, unknown>): number {
+  const variants = (product.variants as { inventory_quantity?: number }[]) || [];
+  return variants.reduce((sum, v) => sum + (v.inventory_quantity ?? 0), 0);
+}
 
 const SELECT = "rounded border border-gray-300 bg-white px-2 py-1 text-xs";
 
@@ -25,7 +32,8 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
     getCatalogOptions(token),
   ]);
   const categoryName = new Map(categories.map((c) => [c.id, c.name]));
-  const filtered = Boolean(filters.category || filters.brand || filters.status || filters.q);
+  const filtered = Boolean(filters.category || filters.brand || filters.status || filters.q || filters.low_stock);
+  const visible = filters.low_stock ? products.filter((p: Record<string, unknown>) => totalStock(p) <= LOW_STOCK_THRESHOLD) : products;
 
   return (
     <div>
@@ -61,7 +69,18 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         {filtered ? <a href="/products" className="text-xs text-gray-500 hover:underline">Clear</a> : null}
       </form>
 
-      {products.length === 0 ? (
+      <div className="mt-2 flex gap-2">
+        <a
+          href={filters.low_stock ? "/products" : "/products?low_stock=1"}
+          className={`rounded border px-2.5 py-1 text-xs font-medium ${
+            filters.low_stock ? "border-amber-400 bg-amber-100 text-amber-900" : "border-gray-200 text-gray-600 hover:bg-gray-50"
+          }`}
+        >
+          Low stock (≤{LOW_STOCK_THRESHOLD})
+        </a>
+      </div>
+
+      {visible.length === 0 ? (
         <p className="mt-6 text-sm text-gray-500">No products found.</p>
       ) : (
         <div className="mt-6 overflow-x-auto">
@@ -72,14 +91,16 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
                 <th className="pb-2 pr-4">Product</th>
                 <th className="pb-2 pr-4">Category</th>
                 <th className="pb-2 pr-4">Brand</th>
+                <th className="pb-2 pr-4 text-right">Stock</th>
                 <th className="pb-2 pr-4">Customer visibility</th>
                 <th className="pb-2 pr-4 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {products.map((product: Record<string, unknown>) => {
+              {visible.map((product: Record<string, unknown>) => {
                 const cats = (product.categories as { id: string }[]) || [];
                 const brand = (product.collection as { id: string; title: string } | null) || null;
+                const stock = totalStock(product);
                 return (
                   <tr key={product.id as string}>
                     <td className="py-2.5 pr-4">
@@ -101,6 +122,9 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
                     </td>
                     <td className="py-2.5 pr-4 text-xs text-gray-600">
                       {brand ? brand.title : <span className="text-gray-400">None</span>}
+                    </td>
+                    <td className={`py-2.5 pr-4 text-right font-medium ${stock <= LOW_STOCK_THRESHOLD ? "text-amber-700" : "text-gray-700"}`}>
+                      {stock}
                     </td>
                     <td className="py-2.5 pr-4">
                       <VisibilityToggle id={product.id as string} status={product.status as string} />
