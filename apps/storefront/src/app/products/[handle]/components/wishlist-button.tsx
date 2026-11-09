@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { Heart } from "lucide-react";
+import { getVisitorId } from "@/lib/analytics";
 
-const STORAGE_KEY = "skyro_wishlist_ids";
+const STORAGE_KEY = "skyro_wishlist_ids_v1";
 export const WISHLIST_EVENT = "skyro:wishlist_updated";
 
 interface WishlistButtonProps {
@@ -68,7 +69,7 @@ export function WishlistButton({
       // Asynchronously sync with backend
       fetch("/api/wishlist", {
         method: nextState ? "POST" : "DELETE",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "x-visitor-id": getVisitorId() },
         body: JSON.stringify({ product_id: productId }),
       }).catch(() => null);
     } catch {

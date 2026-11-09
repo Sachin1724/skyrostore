@@ -8,12 +8,15 @@ import {
   Layers,
   LogOut,
   User,
+  Star,
 } from "lucide-react";
 
 const NAV_ITEMS = [
   { href: "/account/orders", label: "Orders and tracking", icon: Package },
   { href: "/account/bulk-requests", label: "Bulk quotations", icon: Layers },
   { href: "/account/wishlist", label: "Saved parts", icon: Heart },
+  { href: "/account/builds", label: "Saved builds", icon: Layers },
+  { href: "/account/reviews", label: "My reviews", icon: Star },
   { href: "/account", label: "My details", icon: User },
 ];
 

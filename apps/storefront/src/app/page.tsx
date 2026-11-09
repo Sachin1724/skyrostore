@@ -7,6 +7,7 @@ import { B2BBanner } from "@/components/home/b2b-banner";
 import { RecommendedForYou } from "@/components/home/recommended-for-you";
 import { ProductRail } from "@/components/home/product-rail";
 import { HomeFaq } from "@/components/home/home-faq";
+import { NewsletterCard } from "@/components/home/newsletter-card";
 import { RecentlyViewed } from "@/components/product/recently-viewed";
 import { getProducts } from "@/lib/data/products";
 import { getBrands, getCatalogIndex, getCategoryTree, countForNode, cleanName } from "@/lib/data/catalog";
@@ -14,10 +15,10 @@ import { getSiteContent } from "@/lib/data/site-content";
 
 export default async function HomePage() {
   const [tree, brands, index, { products }, content] = await Promise.all([
-    getCategoryTree(),
-    getBrands(),
-    getCatalogIndex(),
-    getProducts({ limit: 40 }),
+    getCategoryTree().catch(() => []),
+    getBrands().catch(() => []),
+    getCatalogIndex().catch(() => ({ total: 0, byCategory: new Map(), byBrand: new Map() })),
+    getProducts({ limit: 40 }).catch(() => ({ products: [] })),
     getSiteContent(),
   ]);
 
@@ -64,6 +65,8 @@ export default async function HomePage() {
 
           {/* 10. Frequently Asked Questions */}
           <HomeFaq faq={content.faq} />
+
+          <NewsletterCard />
         </div>
       </main>
       <Footer />

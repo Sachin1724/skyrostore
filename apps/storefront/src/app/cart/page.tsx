@@ -4,13 +4,15 @@ import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { CartView } from "@/components/cart/cart-view";
 import { RecentlyViewed } from "@/components/product/recently-viewed";
+import { getSiteSettings } from "@/lib/data/site-settings";
 
 export const metadata = {
   title: "Shopping Cart — Skyrostore",
   description: "Review UAV components in your shopping cart, calculate shipping, and proceed to secure checkout.",
 };
 
-export default function CartPage() {
+export default async function CartPage() {
+  const { freeShippingThreshold } = await getSiteSettings();
   return (
     <>
       <Header />
@@ -30,7 +32,7 @@ export default function CartPage() {
             Shopping Cart
           </h1>
 
-          <CartView />
+          <CartView freeShippingThreshold={freeShippingThreshold} />
 
           <div className="mt-14">
             <RecentlyViewed title="You Might Also Need (Recently Viewed)" />

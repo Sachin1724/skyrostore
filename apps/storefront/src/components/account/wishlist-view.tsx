@@ -7,6 +7,7 @@ import Link from "next/link";
 import { Heart, Trash2, ShoppingCart, ArrowRight, CheckCircle2, Loader2 } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import { ProductMediaFallback } from "@/components/product/product-media-fallback";
+import { getVisitorId } from "@/lib/analytics";
 
 interface WishlistItem {
   productId: string;
@@ -31,7 +32,7 @@ export function WishlistView() {
     async function loadWishlist() {
       try {
         // Try backend first
-        const res = await fetch("/api/wishlist");
+        const res = await fetch("/api/wishlist", { headers: { "x-visitor-id": getVisitorId() } });
         if (res.ok) {
           const data = await res.json();
           if (Array.isArray(data.items) && data.items.length > 0) {
@@ -90,8 +91,10 @@ export function WishlistView() {
 
   async function handleRemove(productId: string) {
     try {
-      await fetch(`/api/wishlist?product_id=${encodeURIComponent(productId)}`, {
+      await fetch("/api/wishlist", {
         method: "DELETE",
+        headers: { "Content-Type": "application/json", "x-visitor-id": getVisitorId() },
+        body: JSON.stringify({ product_id: productId }),
       });
 
       const next = items.filter((i) => i.productId !== productId);

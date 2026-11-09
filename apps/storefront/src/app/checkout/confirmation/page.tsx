@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { OrderSuccess } from "@/components/checkout/order-success";
+import { getSiteSettings } from "@/lib/data/site-settings";
 
 export const metadata = { title: "Order confirmed" };
 
@@ -37,14 +38,17 @@ export default async function ConfirmationPage({
   searchParams: Promise<{ order_id?: string }>;
 }) {
   const { order_id } = await searchParams;
-  const summary = order_id ? await orderSummary(order_id) : null;
+  const [summary, { gstin }] = await Promise.all([
+    order_id ? orderSummary(order_id) : Promise.resolve(null),
+    getSiteSettings(),
+  ]);
 
   return (
     <>
       <Header />
       <main id="main" className="bg-surface-soft">
         <div className="mx-auto max-w-[1120px] px-5 py-16 md:px-10 md:py-24">
-          <OrderSuccess orderId={order_id} summary={summary} />
+          <OrderSuccess orderId={order_id} summary={summary} gstin={gstin} />
         </div>
       </main>
       <Footer />

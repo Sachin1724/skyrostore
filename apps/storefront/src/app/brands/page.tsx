@@ -13,9 +13,9 @@ export const metadata = {
 
 export default async function BrandsPage() {
   const [brands, index, { products }] = await Promise.all([
-    getBrands(),
-    getCatalogIndex(),
-    getProducts({ limit: 500 }),
+    getBrands().catch(() => []),
+    getCatalogIndex().catch(() => ({ total: 0, byCategory: new Map(), byBrand: new Map() })),
+    getProducts({ limit: 500 }).catch(() => ({ products: [] })),
   ]);
 
   // Derive categories per brand

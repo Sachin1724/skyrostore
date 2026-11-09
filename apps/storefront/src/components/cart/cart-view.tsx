@@ -17,15 +17,15 @@ import {
   Lock,
 } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
-import { track } from "@/lib/analytics";
+import { track, getVisitorId } from "@/lib/analytics";
 import { ProductMediaFallback } from "@/components/product/product-media-fallback";
 
-const FREE_SHIPPING_THRESHOLD = 500000; // Rs 5,000 in paise
-const SAVED_ITEMS_KEY = "skyro_saved_for_later_v1";
+const DEFAULT_FREE_SHIPPING_THRESHOLD = 500000; // Rs 5,000 in paise, used until the prop arrives
 
 type CartItem = {
   id: string;
   title: string;
+  product_id?: string | null;
   product_title?: string | null;
   product_handle?: string | null;
   quantity: number;
@@ -48,6 +48,7 @@ type Cart = {
 interface SavedItem {
   id: string;
   variantId: string;
+  productId: string;
   title: string;
   handle: string | null;
   unitPrice: number;
@@ -55,7 +56,13 @@ interface SavedItem {
   currency: string;
 }
 
-export function CartView() {
+/** Saved items persist per customer (or per-browser visitor id for guests) on the backend. */
+function savedItemsHeaders(): HeadersInit {
+  return { "Content-Type": "application/json", "x-visitor-id": getVisitorId() };
+}
+
+export function CartView({ freeShippingThreshold = DEFAULT_FREE_SHIPPING_THRESHOLD }: { freeShippingThreshold?: number } = {}) {
+  const FREE_SHIPPING_THRESHOLD = freeShippingThreshold;
   const [cart, setCart] = useState<Cart | null>(null);
   const [loading, setLoading] = useState(true);
   const [pendingItemId, setPendingItemId] = useState<string | null>(null);
@@ -91,12 +98,24 @@ export function CartView() {
       .finally(() => setLoading(false));
 
     // Load saved for later items
-    try {
-      const stored = localStorage.getItem(SAVED_ITEMS_KEY);
-      if (stored) setSavedItems(JSON.parse(stored));
-    } catch {
-      // Fallback
-    }
+    fetch("/api/saved-cart-items", { headers: { "x-visitor-id": getVisitorId() } })
+      .then((r) => (r.ok ? r.json() : { items: [] }))
+      .then((data) => {
+        type Row = { id: string; variant_id: string; product_id: string; title: string; handle: string | null; thumbnail: string | null; unit_price: number; currency_code: string };
+        setSavedItems(
+          (data.items ?? []).map((row: Row) => ({
+            id: row.id,
+            variantId: row.variant_id,
+            productId: row.product_id,
+            title: row.title,
+            handle: row.handle,
+            unitPrice: row.unit_price,
+            thumbnail: row.thumbnail,
+            currency: row.currency_code,
+          }))
+        );
+      })
+      .catch(() => null);
   }, []);
 
   async function removeItem(lineItemId: string) {
@@ -193,6 +212,7 @@ export function CartView() {
     const saved: SavedItem = {
       id: item.id,
       variantId,
+      productId: item.product_id ?? variantId,
       title: (item.product_title ?? item.title)?.replace("[DEV] ", ""),
       handle: item.product_handle ?? null,
       unitPrice: item.unit_price,
@@ -200,9 +220,20 @@ export function CartView() {
       currency: cart?.currency_code ?? "inr",
     };
 
-    const nextSaved = [saved, ...savedItems.filter((i) => i.variantId !== variantId)];
-    setSavedItems(nextSaved);
-    localStorage.setItem(SAVED_ITEMS_KEY, JSON.stringify(nextSaved));
+    setSavedItems([saved, ...savedItems.filter((i) => i.variantId !== variantId)]);
+    fetch("/api/saved-cart-items", {
+      method: "POST",
+      headers: savedItemsHeaders(),
+      body: JSON.stringify({
+        product_id: saved.productId,
+        variant_id: saved.variantId,
+        title: saved.title,
+        handle: saved.handle,
+        thumbnail: saved.thumbnail,
+        unit_price: saved.unitPrice,
+        currency_code: saved.currency,
+      }),
+    }).catch(() => null);
 
     await removeItem(item.id);
     setCartMessage(`${saved.title} moved to Saved for Later.`);
@@ -219,9 +250,12 @@ export function CartView() {
         if (res.ok) {
           const data = await res.json();
           if (data.cart) setCart(data.cart);
-          const nextSaved = savedItems.filter((i) => i.variantId !== saved.variantId);
-          setSavedItems(nextSaved);
-          localStorage.setItem(SAVED_ITEMS_KEY, JSON.stringify(nextSaved));
+          setSavedItems(savedItems.filter((i) => i.variantId !== saved.variantId));
+          fetch("/api/saved-cart-items", {
+            method: "DELETE",
+            headers: savedItemsHeaders(),
+            body: JSON.stringify({ variant_id: saved.variantId }),
+          }).catch(() => null);
           window.dispatchEvent(new CustomEvent("skyro:cart_updated"));
           setCartMessage(`${saved.title} moved back to cart.`);
         }
@@ -232,9 +266,12 @@ export function CartView() {
   }
 
   function removeSavedItem(variantId: string) {
-    const nextSaved = savedItems.filter((i) => i.variantId !== variantId);
-    setSavedItems(nextSaved);
-    localStorage.setItem(SAVED_ITEMS_KEY, JSON.stringify(nextSaved));
+    setSavedItems(savedItems.filter((i) => i.variantId !== variantId));
+    fetch("/api/saved-cart-items", {
+      method: "DELETE",
+      headers: savedItemsHeaders(),
+      body: JSON.stringify({ variant_id: variantId }),
+    }).catch(() => null);
   }
 
   async function handleApplyPromo(e: React.FormEvent) {

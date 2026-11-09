@@ -54,7 +54,7 @@ type Order = {
   }>;
 };
 
-export function OrderDetail({ orderId }: { orderId: string }) {
+export function OrderDetail({ orderId, gstin }: { orderId: string; gstin?: string }) {
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -329,12 +329,12 @@ export function OrderDetail({ orderId }: { orderId: string }) {
         <div
           role="dialog"
           aria-modal="true"
-          className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-navy/70"
+          className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-navy/70 print:static print:bg-white print:p-0"
         >
-          <div className="absolute inset-0" onClick={() => setShowInvoiceModal(false)} aria-hidden />
+          <div className="absolute inset-0 print:hidden" onClick={() => setShowInvoiceModal(false)} aria-hidden />
 
-          <div className="relative z-10 flex max-h-[90vh] w-full max-w-2xl flex-col card shadow-2xl overflow-hidden">
-            <div className="flex items-center justify-between border-b border-border px-6 py-4 bg-surface-soft">
+          <div className="relative z-10 flex max-h-[90vh] w-full max-w-2xl flex-col card shadow-2xl overflow-hidden print:static print:max-h-none print:w-full print:max-w-none print:shadow-none print:overflow-visible">
+            <div className="flex items-center justify-between border-b border-border px-6 py-4 bg-surface-soft print:hidden">
               <div className="flex items-center gap-2">
                 <FileText className="h-5 w-5 text-brand" aria-hidden />
                 <h2 className="text-[16px] font-extrabold text-navy">Tax Invoice #{order.display_id}</h2>
@@ -346,7 +346,7 @@ export function OrderDetail({ orderId }: { orderId: string }) {
                   className="inline-flex items-center gap-1.5 rounded-md border border-border bg-white px-3 py-1.5 text-[13px] font-bold text-navy hover:bg-surface-soft"
                 >
                   <Printer className="h-3.5 w-3.5" aria-hidden />
-                  <span>Print</span>
+                  <span>Print / Save as PDF</span>
                 </button>
                 <button
                   type="button"
@@ -358,7 +358,7 @@ export function OrderDetail({ orderId }: { orderId: string }) {
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-6 text-navy">
+            <div id="printable-invoice" className="flex-1 overflow-y-auto p-6 md:p-8 space-y-6 text-navy print:overflow-visible">
               <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 border-b border-border pb-6">
                 <div>
                   <span className="text-[18px] font-extrabold tracking-tight text-navy">
@@ -366,7 +366,7 @@ export function OrderDetail({ orderId }: { orderId: string }) {
                   </span>
                   <p className="mt-1 text-[13px] text-text-secondary leading-relaxed">
                     Infocity Complex, Bhubaneswar, Odisha 751024<br />
-                    <strong>GSTIN:</strong> 21AAECS9821R1ZM<br />
+                    <strong>GSTIN:</strong> {gstin || "21AAECS9821R1ZM"}<br />
                     <strong>State Code:</strong> 21 (Odisha)
                   </p>
                 </div>

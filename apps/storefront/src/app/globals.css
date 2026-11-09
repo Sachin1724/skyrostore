@@ -291,3 +291,11 @@ details[open]::details-content { block-size: auto; }
     .reveal { animation: reveal linear both; animation-timeline: view(); animation-range: entry 0% entry 28%; }
   }
 }
+
+/* GST invoice "Print / Save as PDF": print only the invoice, not the app shell.
+   The browser's own print-to-PDF is the PDF generator — no server renderer needed. */
+@media print {
+  body * { visibility: hidden; }
+  #printable-invoice, #printable-invoice * { visibility: visible; }
+  #printable-invoice { position: absolute; inset: 0; left: 0; top: 0; width: 100%; height: auto; }
+}
