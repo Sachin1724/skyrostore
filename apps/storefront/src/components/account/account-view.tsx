@@ -225,7 +225,14 @@ export function AccountView() {
         </div>
 
         <div>
-          <label className="block text-[13px] font-bold text-navy mb-1">Password</label>
+          <div className="mb-1 flex items-center justify-between">
+            <label className="block text-[13px] font-bold text-navy">Password</label>
+            {mode === "login" ? (
+              <Link href="/forgot-password" className="text-[12px] font-bold text-brand hover:underline">
+                Forgot password?
+              </Link>
+            ) : null}
+          </div>
           <input
             type="password"
             required

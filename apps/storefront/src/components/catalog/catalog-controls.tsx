@@ -3,23 +3,21 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { SlidersHorizontal, X } from "lucide-react";
+import { Select } from "@/components/ui/select";
 
 /** Sort select: navigates on change, so no Apply button is needed. */
 export function SortSelect({ value, options }: { value: string; options: { value: string; label: string; href: string }[] }) {
   const router = useRouter();
   return (
-    <label className="flex items-center gap-2 text-[14px] text-text-secondary">
+    <div className="flex items-center gap-2 text-[14px] text-text-secondary">
       Sort by
-      <select
+      <Select
         value={value}
-        onChange={(e) => router.push(options.find((o) => o.value === e.target.value)!.href, { scroll: false })}
-        className="h-10 rounded-md border border-border-strong bg-white px-2.5 text-[14px] font-semibold text-navy"
-      >
-        {options.map((o) => (
-          <option key={o.value} value={o.value}>{o.label}</option>
-        ))}
-      </select>
-    </label>
+        options={options}
+        ariaLabel="Sort by"
+        onChange={(v) => router.push(options.find((o) => o.value === v)!.href, { scroll: false })}
+      />
+    </div>
   );
 }
 

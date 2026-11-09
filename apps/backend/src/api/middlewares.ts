@@ -66,6 +66,14 @@ export default defineMiddlewares({
       ],
     },
     {
+      matcher: "/store/orders/:id/cancel",
+      method: ["POST"],
+      middlewares: [
+        authenticate("customer", ["bearer", "session"]),
+        requireOrderOwner,
+      ],
+    },
+    {
       // A registration token has no customer yet, so unregistered identities
       // must be allowed through to read their own pending profile.
       matcher: "/store/auth/pending-profile",

@@ -12,6 +12,7 @@ import {
   Clock,
   ArrowLeft,
   MapPin,
+  Ban,
 } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 
@@ -59,6 +60,8 @@ export function OrderDetail({ orderId, gstin }: { orderId: string; gstin?: strin
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
+  const [cancelError, setCancelError] = useState("");
 
   useEffect(() => {
     fetch(`/api/account/orders/${orderId}`)
@@ -108,6 +111,25 @@ export function OrderDetail({ orderId, gstin }: { orderId: string; gstin?: strin
   const shipments = (order.fulfillments || []).filter(
     (fulfillment) => fulfillment.shipped_at && !fulfillment.canceled_at
   );
+
+  // Matches the backend's own rule: once any (non-cancelled) fulfillment exists, the order is packed and can no longer be self-cancelled.
+  const cancellable = order.status !== "canceled" && (order.fulfillments ?? []).every((f) => f.canceled_at);
+
+  async function cancelOrder() {
+    if (!window.confirm("Cancel this order? This cannot be undone.")) return;
+    setCancelling(true);
+    setCancelError("");
+    try {
+      const res = await fetch(`/api/account/orders/${orderId}/cancel`, { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Could not cancel order.");
+      setOrder({ ...order!, status: "canceled" });
+    } catch (err: unknown) {
+      setCancelError(err instanceof Error ? err.message : "Could not cancel order.");
+    } finally {
+      setCancelling(false);
+    }
+  }
   const trackingNumber = shipments[0]?.labels?.[0]?.tracking_number;
   const isDelivered = order.status === "completed" || Boolean(shipments[0]?.delivered_at);
   const isShipped = Boolean(shipments[0]?.shipped_at);
@@ -157,6 +179,17 @@ export function OrderDetail({ orderId, gstin }: { orderId: string; gstin?: strin
         </div>
 
         <div className="flex items-center gap-3">
+          {cancellable ? (
+            <button
+              type="button"
+              onClick={cancelOrder}
+              disabled={cancelling}
+              className="inline-flex h-11 items-center gap-2 rounded-md border border-error/30 bg-white px-5 text-[13px] font-bold text-error hover:bg-error/5 transition-colors disabled:opacity-50"
+            >
+              <Ban className="h-4 w-4" aria-hidden />
+              <span>{cancelling ? "Cancelling…" : "Cancel Order"}</span>
+            </button>
+          ) : null}
           <button
             type="button"
             onClick={() => setShowInvoiceModal(true)}
@@ -167,6 +200,7 @@ export function OrderDetail({ orderId, gstin }: { orderId: string; gstin?: strin
           </button>
         </div>
       </div>
+      {cancelError ? <p className="text-[13px] font-semibold text-error">{cancelError}</p> : null}
 
       {/* Shipment & Tracking Card */}
       <div className="card p-6">

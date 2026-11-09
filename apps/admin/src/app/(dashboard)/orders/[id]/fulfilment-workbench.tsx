@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Package, Truck, CheckCircle2, AlertTriangle, Printer } from "lucide-react";
+import { Package, Truck, CheckCircle2, AlertTriangle, Printer, Ban, Undo2 } from "lucide-react";
+import { useConfirm } from "@/components/ui/confirm-dialog";
 import { STATE_LABELS } from "@/lib/data/fulfilment";
 
 type Props = {
@@ -85,8 +86,9 @@ export function FulfilmentWorkbench({
     width_cm: "",
     height_cm: "",
   });
-  const [busy, setBusy] = useState<"" | "pack" | "book" | "ship" | "deliver">("");
+  const [busy, setBusy] = useState<"" | "pack" | "book" | "ship" | "deliver" | "cancel" | "refund">("");
   const [message, setMessage] = useState<{ kind: "ok" | "error"; text: string } | null>(null);
+  const confirm = useConfirm();
 
   const state: string = order.fulfilment_state;
   const address = order.shipping_address || {};
@@ -94,6 +96,56 @@ export function FulfilmentWorkbench({
 
   const booked = fulfilments.find((f) => f.awb && !f.canceled_at);
   const pkgReady = Object.values(pkg).every((v) => Number(v) > 0);
+
+  // Medusa's cancel-order workflow refuses once any fulfillment exists, i.e. once packed.
+  const cancellable = ["awaiting_payment", "payment_failed", "paid_processing"].includes(state);
+  const payment = order.payment_collections?.[0]?.payments?.find((p: any) => p.captured_at && !p.canceled_at);
+  const [refundAmount, setRefundAmount] = useState(String(payment?.amount ?? order.total ?? ""));
+  const [refundNote, setRefundNote] = useState("");
+
+  async function cancelOrder() {
+    if (!(await confirm({ title: "Cancel this order?", description: "This cannot be undone. Any captured payment is not refunded automatically.", confirmLabel: "Cancel order" }))) return;
+    setBusy("cancel");
+    setMessage(null);
+    try {
+      const res = await fetch(`/api/orders/${orderId}/cancel`, { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error?.message || data.error || "Could not cancel order.");
+      setMessage({ kind: "ok", text: "Order cancelled." });
+      router.refresh();
+    } catch (err: unknown) {
+      setMessage({ kind: "error", text: err instanceof Error ? err.message : "Could not cancel order." });
+    } finally {
+      setBusy("");
+    }
+  }
+
+  async function issueRefund() {
+    if (!payment) return;
+    const amount = Number(refundAmount);
+    if (!Number.isFinite(amount) || amount <= 0) {
+      setMessage({ kind: "error", text: "Enter a refund amount greater than 0." });
+      return;
+    }
+    if (!(await confirm({ title: `Refund ${amount} ${order.currency_code?.toUpperCase()}?`, description: "Sent to the customer's original payment method via Razorpay.", confirmLabel: "Issue refund" }))) return;
+    setBusy("refund");
+    setMessage(null);
+    try {
+      const res = await fetch(`/api/payments/${payment.id}/refund`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount, note: refundNote || undefined }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error?.message || data.error || "Could not issue refund.");
+      setMessage({ kind: "ok", text: "Refund issued." });
+      router.refresh();
+    } catch (err: unknown) {
+      setMessage({ kind: "error", text: err instanceof Error ? err.message : "Could not issue refund." });
+    } finally {
+      setBusy("");
+    }
+  }
 
   async function run(action: "pack" | "book" | "ship" | "deliver", body: Record<string, unknown> = {}) {
     setBusy(action);
@@ -143,9 +195,22 @@ export function FulfilmentWorkbench({
             </span>
           ) : null}
         </h1>
-        <span className="rounded bg-gray-900 px-2.5 py-1 font-mono text-xs font-medium text-white">
-          {STATE_LABELS[state] || state}
-        </span>
+        <div className="flex items-center gap-2">
+          {cancellable ? (
+            <button
+              type="button"
+              onClick={cancelOrder}
+              disabled={busy !== ""}
+              className="inline-flex items-center gap-1.5 rounded border border-rose-200 px-2.5 py-1 text-xs font-semibold text-rose-700 hover:bg-rose-50 disabled:opacity-40"
+            >
+              <Ban className="h-3.5 w-3.5" />
+              {busy === "cancel" ? "Cancelling…" : "Cancel order"}
+            </button>
+          ) : null}
+          <span className="rounded bg-gray-900 px-2.5 py-1 font-mono text-xs font-medium text-white">
+            {STATE_LABELS[state] || state}
+          </span>
+        </div>
       </div>
 
       <MilestoneStepper state={state} booked={Boolean(booked)} />
@@ -460,6 +525,38 @@ export function FulfilmentWorkbench({
             ) : (
               <p className="mt-3 text-xs text-gray-500">No payment attempts recorded for this order.</p>
             )}
+
+            {payment ? (
+              <div className="mt-4 border-t border-gray-100 pt-4">
+                <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">Issue refund</p>
+                <div className="mt-2 flex items-center gap-2">
+                  <input
+                    type="number"
+                    min={0}
+                    step="any"
+                    value={refundAmount}
+                    onChange={(e) => setRefundAmount(e.target.value)}
+                    className="w-28 rounded border border-gray-300 px-2 py-1 text-sm"
+                  />
+                  <span className="text-xs text-gray-500">{order.currency_code?.toUpperCase()}</span>
+                </div>
+                <input
+                  value={refundNote}
+                  onChange={(e) => setRefundNote(e.target.value)}
+                  placeholder="Note (optional)"
+                  className="mt-2 w-full rounded border border-gray-300 px-2 py-1 text-sm"
+                />
+                <button
+                  type="button"
+                  onClick={issueRefund}
+                  disabled={busy !== ""}
+                  className="mt-2 inline-flex items-center gap-1.5 rounded bg-gray-900 px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-40"
+                >
+                  <Undo2 className="h-3.5 w-3.5" />
+                  {busy === "refund" ? "Refunding…" : "Issue refund via Razorpay"}
+                </button>
+              </div>
+            ) : null}
           </Section>
 
           {bulkRequest ? (

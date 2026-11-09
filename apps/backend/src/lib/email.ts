@@ -52,6 +52,20 @@ export function orderPlacedEmail(order: {
   };
 }
 
+export function passwordResetEmail(resetLink: string): { subject: string; html: string } {
+  return {
+    subject: "Reset your Skyrostore password",
+    html: `<p>Click the link below to set a new password. It expires in 15 minutes.</p><p><a href="${resetLink}">${resetLink}</a></p><p>If you didn't request this, ignore this email.</p>`,
+  };
+}
+
+export function orderCanceledEmail(order: { display_id: number | string }): { subject: string; html: string } {
+  return {
+    subject: `Order #${order.display_id} cancelled`,
+    html: `<p>Order <strong>#${order.display_id}</strong> has been cancelled.</p><p>If a payment was captured, it will be refunded to your original payment method — reach out to support if you don't see it within a few business days.</p>`,
+  };
+}
+
 export function orderShippedEmail(order: {
   display_id: number | string;
   courier: string;

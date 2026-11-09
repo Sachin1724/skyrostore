@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { Select } from "@/components/ui/select";
 import {
   Boxes,
   Wrench,
@@ -587,19 +588,21 @@ export function BulkOrderRequestForm() {
                     />
                   </div>
                   <div className="w-full sm:w-48">
-                    <select aria-label="Filter by category"
+                    <Select
+                      ariaLabel="Filter by category"
                       value={categoryFilter}
-                      onChange={(e) => setCategoryFilter(e.target.value)}
-                      className="w-full rounded-md border border-border bg-white px-3 py-2 text-[13px] font-medium text-graphite focus:border-graphite"
-                    >
-                      <option>All Categories</option>
-                      <option>Motors</option>
-                      <option>ESCs</option>
-                      <option>Frames</option>
-                      <option>Batteries</option>
-                      <option>Flight Controllers</option>
-                      <option>Propellers</option>
-                    </select>
+                      onChange={setCategoryFilter}
+                      className="w-full"
+                      options={[
+                        { value: "All Categories", label: "All Categories" },
+                        { value: "Motors", label: "Motors" },
+                        { value: "ESCs", label: "ESCs" },
+                        { value: "Frames", label: "Frames" },
+                        { value: "Batteries", label: "Batteries" },
+                        { value: "Flight Controllers", label: "Flight Controllers" },
+                        { value: "Propellers", label: "Propellers" },
+                      ]}
+                    />
                   </div>
                 </div>
 
