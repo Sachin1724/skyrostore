@@ -38,6 +38,10 @@ export async function sendEmail(to: string, subject: string, html: string): Prom
 const money = (cents: number, currency: string) =>
   new Intl.NumberFormat("en-IN", { style: "currency", currency: currency.toUpperCase() }).format(cents);
 
+/** HTML-escapes any value interpolated into an email body — admin_note, courier name etc. are free text, not system-generated. */
+const esc = (value: unknown): string =>
+  String(value).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
+
 export function orderPlacedEmail(order: {
   display_id: number | string;
   currency_code: string;
@@ -45,9 +49,8 @@ export function orderPlacedEmail(order: {
 }): { subject: string; html: string } {
   return {
     subject: `Order #${order.display_id} confirmed`,
-    html: `<p>Thanks for your order.</p><p><strong>Order #${order.display_id}</strong> — ${money(
-      order.total,
-      order.currency_code
+    html: `<p>Thanks for your order.</p><p><strong>Order #${esc(order.display_id)}</strong> — ${esc(
+      money(order.total, order.currency_code)
     )}</p><p>We'll email you again once it ships.</p>`,
   };
 }
@@ -55,7 +58,7 @@ export function orderPlacedEmail(order: {
 export function abandonedCartEmail(cartUrl: string, itemCount: number): { subject: string; html: string } {
   return {
     subject: `You left ${itemCount} ${itemCount === 1 ? "item" : "items"} in your cart`,
-    html: `<p>Your cart is still here, ready when you are.</p><p><a href="${cartUrl}">Resume checkout</a></p>`,
+    html: `<p>Your cart is still here, ready when you are.</p><p><a href="${esc(cartUrl)}">Resume checkout</a></p>`,
   };
 }
 
@@ -70,21 +73,21 @@ export function returnStatusEmail(
       : "Your return request was not approved.";
   return {
     subject: `Return request for order #${displayId} ${status === "APPROVED" ? "approved" : "declined"}`,
-    html: `<p>${body}</p>${note ? `<p>Note from our team: ${note}</p>` : ""}`,
+    html: `<p>${body}</p>${note ? `<p>Note from our team: ${esc(note)}</p>` : ""}`,
   };
 }
 
 export function passwordResetEmail(resetLink: string): { subject: string; html: string } {
   return {
     subject: "Reset your Skyrostore password",
-    html: `<p>Click the link below to set a new password. It expires in 15 minutes.</p><p><a href="${resetLink}">${resetLink}</a></p><p>If you didn't request this, ignore this email.</p>`,
+    html: `<p>Click the link below to set a new password. It expires in 15 minutes.</p><p><a href="${esc(resetLink)}">${esc(resetLink)}</a></p><p>If you didn't request this, ignore this email.</p>`,
   };
 }
 
 export function orderCanceledEmail(order: { display_id: number | string }): { subject: string; html: string } {
   return {
     subject: `Order #${order.display_id} cancelled`,
-    html: `<p>Order <strong>#${order.display_id}</strong> has been cancelled.</p><p>If a payment was captured, it will be refunded to your original payment method — reach out to support if you don't see it within a few business days.</p>`,
+    html: `<p>Order <strong>#${esc(order.display_id)}</strong> has been cancelled.</p><p>If a payment was captured, it will be refunded to your original payment method — reach out to support if you don't see it within a few business days.</p>`,
   };
 }
 
@@ -95,10 +98,10 @@ export function orderShippedEmail(order: {
   tracking_url?: string | null;
 }): { subject: string; html: string } {
   const trackLine = order.tracking_url
-    ? `<a href="${order.tracking_url}">${order.tracking_number}</a>`
-    : order.tracking_number;
+    ? `<a href="${esc(order.tracking_url)}">${esc(order.tracking_number)}</a>`
+    : esc(order.tracking_number);
   return {
     subject: `Order #${order.display_id} has shipped`,
-    html: `<p>Your order <strong>#${order.display_id}</strong> is on its way via ${order.courier}.</p><p>Tracking: ${trackLine}</p>`,
+    html: `<p>Your order <strong>#${esc(order.display_id)}</strong> is on its way via ${esc(order.courier)}.</p><p>Tracking: ${trackLine}</p>`,
   };
 }

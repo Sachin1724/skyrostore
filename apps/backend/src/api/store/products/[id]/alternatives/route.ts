@@ -52,14 +52,22 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
   const query = req.scope.resolve(ContainerRegistrationKeys.QUERY);
 
   try {
-    const { data: targets } = await query.graph({ entity: "product", fields: FIELDS, filters: { id } });
+    // query.graph bypasses the publishable-key/sales-channel scoping the store
+    // SDK applies — filter to published products explicitly, or a draft/unreleased
+    // product's title and thumbnail leak to an unauthenticated visitor by id.
+    const { data: targets } = await query.graph({ entity: "product", fields: FIELDS, filters: { id, status: "published" } });
     const target = targets?.[0];
     if (!target) return res.status(404).json({ error: "Product not found" });
 
     const targetSpec = parseSpec((target.metadata as Record<string, unknown>) || {});
     if (!targetSpec) return res.json({ alternatives: [] });
 
-    const { data: candidates } = await query.graph({ entity: "product", fields: FIELDS, pagination: { take: 500, skip: 0 } });
+    const { data: candidates } = await query.graph({
+      entity: "product",
+      fields: FIELDS,
+      filters: { status: "published" },
+      pagination: { take: 500, skip: 0 },
+    });
 
     const alternatives = (candidates || [])
       .filter((p: any) => p.id !== id && inStock(p))

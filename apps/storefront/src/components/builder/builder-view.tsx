@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Check, ChevronRight, ChevronLeft, AlertTriangle, XCircle, ShoppingCart } from "lucide-react";
+import { Check, ChevronRight, ChevronLeft, AlertTriangle, XCircle, ShoppingCart, Save } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import { cleanName } from "@/lib/data/catalog";
 import { ProductTile } from "@/components/product/product-tile";
@@ -58,6 +58,8 @@ export function BuilderView({
 
   const [frameFilter, setFrameFilter] = useState("all");
   const [cartAdding, setCartAdding] = useState(false);
+  const [savingConfig, setSavingConfig] = useState(false);
+  const [saveMessage, setSaveMessage] = useState<{ ok: boolean; text: string } | null>(null);
 
   const currentStep = BUILDER_STEPS[activeStepIdx] || BUILDER_STEPS[0];
 
@@ -292,6 +294,41 @@ export function BuilderView({
       console.error("Batch add to cart failed:", err);
     } finally {
       setCartAdding(false);
+    }
+  }
+
+  async function handleSaveConfiguration() {
+    setSavingConfig(true);
+    setSaveMessage(null);
+    try {
+      const body: Record<string, unknown> = {};
+      if (selectedParts.frame) body.frame_variant_id = selectedParts.frame.variant_id;
+      if (selectedParts.flight_controller) body.flight_controller_variant_id = selectedParts.flight_controller.variant_id;
+      if (selectedParts.esc) body.esc_variant_id = selectedParts.esc.variant_id;
+      if (selectedParts.motor) body.motor_variant_id = selectedParts.motor.variant_id;
+      if (selectedParts.propeller) body.propeller_variant_id = selectedParts.propeller.variant_id;
+      if (selectedParts.battery) body.battery_variant_id = selectedParts.battery.variant_id;
+      if (selectedParts.gps) body.gps_variant_id = selectedParts.gps.variant_id;
+
+      const res = await fetch("/api/uav/configurations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.status === 401) {
+        setSaveMessage({ ok: false, text: "Sign in to save this build to your account." });
+        return;
+      }
+      if (!res.ok) {
+        setSaveMessage({ ok: false, text: data.error || "Could not save this build." });
+        return;
+      }
+      setSaveMessage({ ok: true, text: "Saved — view it under Account > Saved builds." });
+    } catch {
+      setSaveMessage({ ok: false, text: "Could not save this build." });
+    } finally {
+      setSavingConfig(false);
     }
   }
 
@@ -530,6 +567,23 @@ export function BuilderView({
               "Review build"
             )}
           </button>
+
+          {isReview && bomLines.length > 0 && (
+            <>
+              <button
+                type="button"
+                disabled={savingConfig}
+                onClick={handleSaveConfiguration}
+                className="mt-2 flex w-full items-center justify-center gap-2 rounded-full border border-border py-3 text-[14px] font-medium text-navy hover:border-brand disabled:opacity-40"
+              >
+                <Save className="h-4 w-4" aria-hidden />
+                {savingConfig ? "Saving…" : "Save configuration"}
+              </button>
+              {saveMessage && (
+                <p className={`mt-2 text-[13px] ${saveMessage.ok ? "text-success" : "text-error"}`}>{saveMessage.text}</p>
+              )}
+            </>
+          )}
         </aside>
       </div>
     </div>
