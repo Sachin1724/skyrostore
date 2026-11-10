@@ -1,5 +1,6 @@
 import path from "path";
 import type { NextConfig } from "next";
+import { withSentryConfig } from "@sentry/nextjs";
 
 const medusaUrl = new URL(process.env.NEXT_PUBLIC_MEDUSA_URL || "http://localhost:9000");
 
@@ -56,4 +57,14 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+// Inert until SENTRY_DSN (and NEXT_PUBLIC_SENTRY_DSN for the browser) are set
+// — see sentry.*.config.ts. Sourcemap upload needs SENTRY_AUTH_TOKEN too; the
+// build still works fine without it, it just skips the upload.
+export default withSentryConfig(nextConfig, {
+  silent: true,
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+  disableLogger: true,
+  widenClientFileUpload: false,
+});

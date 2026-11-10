@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
+import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -83,8 +84,13 @@ export function CartView({ freeShippingThreshold = DEFAULT_FREE_SHIPPING_THRESHO
   const [savedItems, setSavedItems] = useState<SavedItem[]>([]);
   const [isPending, startTransition] = useTransition();
 
+  const cartIdFromLink = useSearchParams().get("cart_id");
+
   useEffect(() => {
-    const cartId = localStorage.getItem("cart_id");
+    // A recovery email link carries its own cart_id — it wins and replaces
+    // whatever (or nothing) is already saved for this browser.
+    if (cartIdFromLink) localStorage.setItem("cart_id", cartIdFromLink);
+    const cartId = cartIdFromLink || localStorage.getItem("cart_id");
     if (!cartId) {
       setLoading(false);
       return;

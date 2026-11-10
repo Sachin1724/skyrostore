@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getBrands, getCategoryTree, cleanName, type CategoryNode } from "@/lib/data/catalog";
+import { expandAcronyms, parseQuerySpecs } from "@/lib/search/domain-parser";
 
 const BASE = process.env.NEXT_PUBLIC_MEDUSA_URL || "http://localhost:9000";
 const PK = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "";
@@ -36,7 +37,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const fields =
-      "id,title,handle,thumbnail,+categories.name,+collection.title,+variants.calculated_price,+variants.inventory_quantity,+variants.manage_inventory";
+      "id,title,handle,thumbnail,metadata,+categories.name,+collection.title,+variants.calculated_price,+variants.inventory_quantity,+variants.manage_inventory";
     // Short shared cache: the same prefixes are typed constantly. Nothing private here.
     const find = async (term: string): Promise<any[]> => {
       const url = new URL(`${BASE}/store/products`);
@@ -56,6 +57,29 @@ export async function GET(request: NextRequest) {
       for (const list of await Promise.all(words.map(find)))
         for (const p of list) hits.set(p.id, { p, n: (hits.get(p.id)?.n ?? 0) + 1 });
       products = [...hits.values()].sort((a, b) => b.n - a.n).map((e) => e.p).slice(0, MAX_RESULTS);
+    }
+    // "fc", "esc" etc have no title match of their own — try the engineering phrase too.
+    if (products.length === 0) {
+      const expanded = expandAcronyms(query);
+      for (const term of expanded) {
+        products = await find(term);
+        if (products.length) break;
+      }
+    }
+
+    // Boost results whose own spec metadata matches what the query asked for
+    // (e.g. "6s 45a esc" ranks a 45A+ 6S-rated ESC above a 3S 20A one).
+    const parsedSpecs = parseQuerySpecs(query);
+    if (Object.keys(parsedSpecs).length) {
+      const specScore = (p: any) => {
+        const meta = p.metadata || {};
+        let score = 0;
+        if (parsedSpecs.kv != null && Number(meta.kv) === parsedSpecs.kv) score += 2;
+        if (parsedSpecs.cells != null && (Number(meta.cell_count) === parsedSpecs.cells || Number(meta.cell_count_max) >= parsedSpecs.cells)) score += 2;
+        if (parsedSpecs.amps != null && Number(meta.continuous_current_a) >= parsedSpecs.amps) score += 1;
+        return score;
+      };
+      products = [...products].sort((a, b) => specScore(b) - specScore(a));
     }
 
     const suggestions: Suggestion[] = products.map((product: any) => {

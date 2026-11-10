@@ -13,6 +13,10 @@ import {
   warehouseId,
 } from "../../../../../../lib/shipmozo";
 
+// GST Rule 138 (CGST Rules): an inter-state consignment over ₹50,000 needs an
+// e-Way Bill before transport, or the courier risks seizure + a 100% penalty.
+const EWAY_BILL_THRESHOLD = 50000;
+
 const FIELDS = [
   "id",
   "email",
@@ -20,6 +24,7 @@ const FIELDS = [
   "status",
   "payment_status",
   "fulfillment_status",
+  "total",
   "shipping_address.*",
   "items.id",
   "items.title",
@@ -28,6 +33,7 @@ const FIELDS = [
   "items.unit_price",
   "items.quantity",
   "items.metadata",
+  "items.product.metadata",
   "items.detail.quantity",
   "fulfillments.id",
   "fulfillments.canceled_at",
@@ -76,14 +82,34 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
       return res.status(400).json({ error: `Order must be packed before booking a courier (currently "${state}").` });
     }
 
+    // DGCA Class 9 dangerous goods (UN 3480/3481): standalone LiPo batteries can't
+    // go through standard air express. Arrange surface transport and ship manually.
+    const hasStandaloneBattery = (order.items || []).some((i: any) => i.product?.metadata?.component_type === "BATTERY");
+    if (hasStandaloneBattery) {
+      return res.status(400).json({
+        error: "This order contains a standalone LiPo battery (DGCA Class 9 dangerous goods). Air courier booking is disabled — arrange surface transport and enter tracking details manually.",
+        dangerous_goods: true,
+      });
+    }
+
     let awb: string = pending.metadata?.shipmozo_awb || "";
     let courier: string = pending.metadata?.courier || "";
 
     if (!awb) {
-      const parsed = validatePackage((req.body || {}) as Record<string, unknown>);
+      const reqBody = (req.body || {}) as Record<string, unknown>;
+      const parsed = validatePackage(reqBody);
       if ("error" in parsed) return res.status(400).json({ error: parsed.error });
 
-      const body = buildPushOrder(order, parsed.pkg, await warehouseId());
+      const ewayBillNumber = typeof reqBody.eway_bill_number === "string" ? reqBody.eway_bill_number.trim() : "";
+      const interState = (order.shipping_address?.province || "").trim().toLowerCase() !== "odisha";
+      if (Number(order.total || 0) >= EWAY_BILL_THRESHOLD && interState && !ewayBillNumber) {
+        return res.status(400).json({
+          error: `This order is ₹${Number(order.total).toLocaleString("en-IN")} and ships out of state — an e-Way Bill number is required before booking (GST Rule 138).`,
+          requires_eway_bill: true,
+        });
+      }
+
+      const body = buildPushOrder(order, parsed.pkg, await warehouseId(), ewayBillNumber);
       try {
         await pushOrder(body);
       } catch (err: unknown) {
@@ -96,7 +122,13 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
       courier = assigned.courier_company || "Courier";
       if (!awb) throw new Error("Shipmozo assigned a courier but returned no AWB number");
 
-      const metadata = { ...(pending.metadata || {}), shipmozo_awb: awb, courier, package: parsed.pkg };
+      const metadata = {
+        ...(pending.metadata || {}),
+        shipmozo_awb: awb,
+        courier,
+        package: parsed.pkg,
+        ...(ewayBillNumber ? { eway_bill_number: ewayBillNumber } : {}),
+      };
       await (req.scope.resolve(Modules.FULFILLMENT) as any).updateFulfillment(pending.id, { metadata });
       pending.metadata = metadata;
 

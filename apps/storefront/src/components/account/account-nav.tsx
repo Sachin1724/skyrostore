@@ -9,6 +9,7 @@ import {
   LogOut,
   User,
   Star,
+  MapPin,
 } from "lucide-react";
 
 const NAV_ITEMS = [
@@ -17,6 +18,7 @@ const NAV_ITEMS = [
   { href: "/account/wishlist", label: "Saved parts", icon: Heart },
   { href: "/account/builds", label: "Saved builds", icon: Layers },
   { href: "/account/reviews", label: "My reviews", icon: Star },
+  { href: "/account/addresses", label: "Address book", icon: MapPin },
   { href: "/account", label: "My details", icon: User },
 ];
 

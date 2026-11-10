@@ -117,10 +117,19 @@ export async function POST(request: NextRequest) {
       case "customer": {
         // Razorpay Magic Checkout collects the name, phone and address; the
         // country alone is enough for shipping options and tax here.
-        const { email } = body;
+        const { email, company_name, gstin } = body;
+        const GSTIN_RE = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
+        if (gstin && !GSTIN_RE.test(gstin)) {
+          return NextResponse.json({ error: "That GSTIN doesn't look valid. Check for typos." }, { status: 400 });
+        }
         const data = await storeApi(`/store/carts/${cart_id}`, "POST", {
           ...(typeof email === "string" && email ? { email } : {}),
           shipping_address: { country_code: "in" },
+          // Carried onto the order on completion, for the itemized GST tax invoice.
+          metadata: {
+            ...(company_name ? { company_name: String(company_name).trim().slice(0, 200) } : {}),
+            ...(gstin ? { gstin } : {}),
+          },
         });
         recordStep(journey, "checkout_step_completed", { cart_id, checkout_step: "customer" });
         return NextResponse.json({ cart: data.cart });
@@ -160,6 +169,23 @@ export async function POST(request: NextRequest) {
 
       case "payment": {
         const { provider_id: requestedProvider } = body;
+
+        // Hold stock before opening Razorpay — otherwise two shoppers can both
+        // pay for the last unit and the second one's money is taken with
+        // nothing to show for it. See backend lib/inventory-hold.ts.
+        const reserveRes = await fetch(`${BASE}/store/carts/${cart_id}/reserve`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "x-publishable-api-key": PK },
+        });
+        if (!reserveRes.ok) {
+          const reserveData = await reserveRes.json().catch(() => ({}));
+          recordStep(journey, "checkout_step_failed", {
+            cart_id,
+            checkout_step: "payment",
+            metadata: { reason: "inventory_hold_failed" },
+          });
+          return NextResponse.json({ error: reserveData.error || "Could not reserve stock for checkout." }, { status: 409 });
+        }
 
         // Create payment collection for this cart
         const pcData = await storeApi(

@@ -45,6 +45,20 @@ export interface SavedCartItem {
   created_at: Date;
 }
 
+export interface ReturnRequest {
+  id: string;
+  order_id: string;
+  customer_id: string;
+  display_id: string | null;
+  reason: string;
+  description: string;
+  resolution: "REFUND" | "REPLACEMENT";
+  status: "REQUESTED" | "APPROVED" | "REJECTED" | "COMPLETED";
+  admin_note: string | null;
+  created_at: Date;
+  resolved_at: Date | null;
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function ensureReviewsTables(db: any): Promise<void> {
   const hasReviews = await db.schema.hasTable("product_review");
@@ -119,6 +133,33 @@ export async function ensureReviewsTables(db: any): Promise<void> {
       t.string("currency_code", 8).notNullable();
       t.timestamp("created_at", { useTz: true }).defaultTo(db.fn.now());
       t.unique(["customer_id", "variant_id"]);
+    });
+  }
+
+  const hasReturnRequest = await db.schema.hasTable("return_request");
+  if (!hasReturnRequest) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await db.schema.createTable("return_request", (t: any) => {
+      t.string("id", 64).primary();
+      t.string("order_id", 64).notNullable().index();
+      t.string("customer_id", 64).notNullable().index();
+      t.string("display_id", 32).nullable();
+      t.string("reason", 32).notNullable();
+      t.text("description").notNullable();
+      t.string("resolution", 16).notNullable(); // REFUND | REPLACEMENT
+      t.string("status", 24).defaultTo("REQUESTED").index(); // REQUESTED | APPROVED | REJECTED | COMPLETED
+      t.text("admin_note").nullable();
+      t.timestamp("created_at", { useTz: true }).defaultTo(db.fn.now());
+      t.timestamp("resolved_at", { useTz: true }).nullable();
+    });
+  }
+
+  const hasAbandonedEmail = await db.schema.hasTable("abandoned_cart_email_sent");
+  if (!hasAbandonedEmail) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await db.schema.createTable("abandoned_cart_email_sent", (t: any) => {
+      t.string("cart_id", 64).primary();
+      t.timestamp("sent_at", { useTz: true }).defaultTo(db.fn.now());
     });
   }
 }

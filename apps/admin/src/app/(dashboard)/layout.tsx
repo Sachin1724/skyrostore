@@ -6,15 +6,17 @@ import { AdminSidebar, type NavCounts } from "@/components/layout/sidebar";
 import { AdminTopBar } from "@/components/layout/topbar";
 
 async function getNavCounts(token: string): Promise<NavCounts> {
-  const [orders, bulk, moderation] = await Promise.all([
+  const [orders, bulk, moderation, returns] = await Promise.all([
     getFulfilmentOrders(token, { limit: 1 }).catch(() => null),
     adminCall("GET", "/admin/bulk-orders?status=SUBMITTED&limit=1").catch(() => null),
     adminCall("GET", "/admin/moderation").catch(() => null),
+    adminCall("GET", "/admin/returns?status=REQUESTED").catch(() => null),
   ]);
   return {
     ordersAwaiting: orders?.counts_by_state?.paid_processing ?? 0,
     bulkSubmitted: bulk?.data?.count ?? 0,
     moderationPending: (moderation?.data?.pending_reviews ?? 0) + (moderation?.data?.pending_questions ?? 0),
+    returnsPending: returns?.data?.count ?? 0,
   };
 }
 

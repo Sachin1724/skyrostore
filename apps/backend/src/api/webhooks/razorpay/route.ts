@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import * as Sentry from "@sentry/node";
 import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http";
 import { ContainerRegistrationKeys } from "@medusajs/framework/utils";
 import { recordEvent, safeErrorCategory } from "../../../lib/analytics";
@@ -188,6 +189,7 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error("Razorpay webhook error:", msg);
+    Sentry.captureException(err);
     return res.status(500).json({ error: msg });
   }
 }

@@ -17,6 +17,7 @@ import { CompatibleParts } from "./components/compatible-parts";
 import { FrequentlyBoughtTogether } from "./components/frequently-bought-together";
 import { RecentlyViewed } from "./components/recently-viewed";
 import { WishlistButton } from "./components/wishlist-button";
+import { ProductAlternatives } from "@/components/product/product-alternatives";
 import type { CompatibleItem } from "@/lib/data/compatible-products";
 
 const LOW_STOCK = 5;
@@ -220,6 +221,8 @@ export function ProductDetailClient({
               {!inStock ? "Out of stock" : stock != null && stock <= LOW_STOCK ? `Only ${stock} left in stock` : "In stock"}
               {sku ? <span className="ml-3 font-normal text-text-secondary">SKU: {sku}</span> : null}
             </p>
+
+            {!inStock ? <ProductAlternatives productId={product.id} /> : null}
 
             {/* Fulfillment and Warranty Signals */}
             {listing.dispatch_days != null || listing.warranty || listing.gst_rate != null ? (

@@ -20,6 +20,7 @@ export async function GET(
     const fields = [
       "*",
       "items.*",
+      "items.product.metadata",
       "shipping_address.*",
       "fulfillments.id",
       "fulfillments.shipped_at",

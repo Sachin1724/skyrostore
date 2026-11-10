@@ -80,6 +80,8 @@ export function FulfilmentWorkbench({
   const [courier, setCourier] = useState("");
   const [trackingNumber, setTrackingNumber] = useState("");
   const [trackingUrl, setTrackingUrl] = useState("");
+  const [ewayBill, setEwayBill] = useState("");
+  const [serials, setSerials] = useState<Record<string, string>>({});
   const [pkg, setPkg] = useState({
     weight_g: suggestedWeightG ? String(suggestedWeightG) : "",
     length_cm: "",
@@ -96,6 +98,15 @@ export function FulfilmentWorkbench({
 
   const booked = fulfilments.find((f) => f.awb && !f.canceled_at);
   const pkgReady = Object.values(pkg).every((v) => Number(v) > 0);
+
+  // GST Rule 138: an inter-state consignment over ₹50,000 needs an e-Way Bill before transport.
+  const interState = (address.province || "").trim().toLowerCase() !== "odisha";
+  const ewayBillRequired = interState && Number(order.total || 0) >= 50000;
+
+  // LiPo batteries are DGCA Class 9 dangerous goods (UN 3480/3481) — standard air
+  // express refuses standalone battery parcels, so the one-click air-courier path
+  // is blocked here; ops must arrange surface transport and enter tracking manually.
+  const hasStandaloneBattery = (order.items || []).some((i: any) => i.product?.metadata?.component_type === "BATTERY");
 
   // Medusa's cancel-order workflow refuses once any fulfillment exists, i.e. once packed.
   const cancellable = ["awaiting_payment", "payment_failed", "paid_processing"].includes(state);
@@ -236,7 +247,8 @@ export function FulfilmentWorkbench({
                   <th className="pb-2 pr-4">Item</th>
                   <th className="pb-2 pr-4">SKU</th>
                   <th className="pb-2 pr-4 text-right">Qty</th>
-                  <th className="pb-2 text-right">Packed</th>
+                  <th className="pb-2 pr-4 text-right">Packed</th>
+                  <th className="pb-2">Serial # (optional)</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -260,7 +272,21 @@ export function FulfilmentWorkbench({
                     </td>
                     <td className="py-2 pr-4 font-mono text-xs text-gray-600">{item.sku || "—"}</td>
                     <td className="py-2 pr-4 text-right">{item.quantity}</td>
-                    <td className="py-2 text-right text-gray-600">{item.fulfilled_quantity}</td>
+                    <td className="py-2 pr-4 text-right text-gray-600">{item.fulfilled_quantity}</td>
+                    <td className="py-2">
+                      {state === "packed" || state === "shipped" || state === "delivered" ? (
+                        <span className="font-mono text-xs text-gray-700">
+                          {fulfilments.find((f) => !f.canceled_at)?.metadata?.serial_numbers?.[item.line_item_id] || "—"}
+                        </span>
+                      ) : (
+                        <input
+                          value={serials[item.line_item_id] || ""}
+                          onChange={(e) => setSerials({ ...serials, [item.line_item_id]: e.target.value })}
+                          placeholder="e.g. PX4-CUBEOR-00417"
+                          className="w-full rounded border border-gray-300 px-2 py-1 text-xs font-mono"
+                        />
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -269,7 +295,7 @@ export function FulfilmentWorkbench({
             <div className="mt-4 flex flex-wrap items-center gap-3">
               <button
                 type="button"
-                onClick={() => run("pack", isInvoiced ? { allow_unpaid: true } : {})}
+                onClick={() => run("pack", { ...(isInvoiced ? { allow_unpaid: true } : {}), serial_numbers: serials })}
                 disabled={busy !== "" || ["packed", "shipped", "delivered", "cancelled"].includes(state)}
                 className="inline-flex items-center gap-2 rounded bg-gray-900 px-3 py-2 text-xs font-semibold text-white disabled:opacity-40"
               >
@@ -313,6 +339,12 @@ export function FulfilmentWorkbench({
                 <span className="font-mono text-xs"> SHIPMOZO_PUBLIC_KEY</span> and
                 <span className="font-mono text-xs"> SHIPMOZO_PRIVATE_KEY</span> on the backend, or ship manually below.
               </p>
+            ) : hasStandaloneBattery ? (
+              <p className="rounded border border-amber-300 bg-amber-50 px-3 py-2.5 text-sm text-amber-900">
+                <strong>Contains a standalone LiPo battery</strong> — DGCA Class 9 dangerous goods (UN 3480/3481).
+                Standard air express refuses these. Arrange Surface Express transport with the courier directly,
+                then enter the tracking details in &quot;Ship manually&quot; below — one-click air booking is disabled for this order.
+              </p>
             ) : (
               <>
                 <p className="text-sm text-gray-600">
@@ -353,10 +385,31 @@ export function FulfilmentWorkbench({
                     </label>
                   ))}
                 </div>
+                {pkgReady ? (() => {
+                  const volumetricG = Math.round(((Number(pkg.length_cm) * Number(pkg.width_cm) * Number(pkg.height_cm)) / 5000) * 1000);
+                  const chargeableG = Math.max(Number(pkg.weight_g), volumetricG);
+                  return volumetricG > Number(pkg.weight_g) ? (
+                    <p className="mt-2 text-xs text-amber-700">
+                      Volumetric weight is {volumetricG}g (L×W×H ÷ 5000) — courier bills on the higher figure.
+                      Chargeable weight: <strong>{chargeableG}g</strong>.
+                    </p>
+                  ) : null;
+                })() : null}
+                {ewayBillRequired ? (
+                  <label className="mt-3 block text-xs font-medium text-gray-600">
+                    e-Way Bill number — required, order is ₹{Number(order.total).toLocaleString("en-IN")} shipping out of state (GST Rule 138)
+                    <input
+                      value={ewayBill}
+                      onChange={(e) => setEwayBill(e.target.value)}
+                      placeholder="12-digit e-Way Bill number"
+                      className="mt-1 w-full rounded border border-amber-300 bg-amber-50 px-2 py-1.5 text-sm"
+                    />
+                  </label>
+                ) : null}
                 <button
                   type="button"
-                  onClick={() => run("book", pkg)}
-                  disabled={busy !== "" || state !== "packed" || !pkgReady}
+                  onClick={() => run("book", { ...pkg, eway_bill_number: ewayBill || undefined })}
+                  disabled={busy !== "" || state !== "packed" || !pkgReady || (ewayBillRequired && !ewayBill.trim())}
                   className="mt-4 inline-flex items-center gap-2 rounded bg-gray-900 px-3 py-2 text-xs font-semibold text-white disabled:opacity-40"
                 >
                   <Printer className="h-4 w-4" />

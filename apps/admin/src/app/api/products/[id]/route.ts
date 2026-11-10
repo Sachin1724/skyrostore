@@ -135,7 +135,10 @@ export async function POST(
 
   try {
     const body = await request.json();
-    const { title, handle, description, technicalSpecs, customFields } = body;
+    const { title, handle, description, technicalSpecs, customFields, status } = body;
+    if (status !== undefined && status !== "published" && status !== "draft") {
+      return NextResponse.json({ error: "Invalid status" }, { status: 400 });
+    }
     // Read the stored metadata rather than trusting the copy the editor loaded:
     // other sections (listing details) save independently in between.
     const existingMetadata = await currentMetadata(id, token);
@@ -161,6 +164,14 @@ export async function POST(
     if (title) updatePayload.title = title;
     if (handle) updatePayload.handle = handle;
     if (description !== undefined) updatePayload.description = description;
+    if (status !== undefined) {
+      updatePayload.status = status;
+      // Publishing also repairs channel membership, so products created before this fix appear.
+      if (status === "published") {
+        const channelId = await storefrontChannelId();
+        if (channelId) updatePayload.sales_channels = [{ id: channelId }];
+      }
+    }
 
     const res = await fetch(`${BASE_URL}/admin/products/${id}`, {
       method: "POST",

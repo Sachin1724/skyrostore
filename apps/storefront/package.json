@@ -13,6 +13,7 @@
     "@animateicons/react": "^0.13.0",
     "@medusajs/js-sdk": "^2.8.0",
     "@medusajs/types": "^2.21.2",
+    "@sentry/nextjs": "^8.55.2",
     "animejs": "^4.5.0",
     "clsx": "^2.1.0",
     "firebase": "^11.10.0",

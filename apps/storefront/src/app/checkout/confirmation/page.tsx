@@ -14,8 +14,21 @@ async function orderSummary(orderId: string) {
   const token = (await cookies()).get("customer_token")?.value;
   if (!token) return null;
   try {
+    const fields = [
+      "display_id",
+      "email",
+      "total",
+      "currency_code",
+      "shipping_address.province",
+      "items.id",
+      "items.title",
+      "items.quantity",
+      "items.unit_price",
+      "items.total",
+      "items.product.metadata",
+    ].join(",");
     const res = await fetch(
-      `${BASE}/store/orders/${encodeURIComponent(orderId)}?fields=display_id,email,total,currency_code,items.quantity`,
+      `${BASE}/store/orders/${encodeURIComponent(orderId)}?fields=${encodeURIComponent(fields)}`,
       { headers: { Authorization: `Bearer ${token}`, "x-publishable-api-key": PK }, cache: "no-store" }
     );
     if (!res.ok) return null;
@@ -26,6 +39,14 @@ async function orderSummary(orderId: string) {
       total: order.total,
       currency_code: order.currency_code,
       item_count: (order.items || []).reduce((n: number, i: { quantity?: number }) => n + Number(i.quantity || 0), 0),
+      items: (order.items || []).map((i: any) => ({
+        id: i.id,
+        title: i.title,
+        quantity: i.quantity,
+        total: i.total,
+        hsn_component_type: i.product?.metadata?.component_type ?? null,
+      })),
+      shipping_province: order.shipping_address?.province ?? null,
     };
   } catch {
     return null;

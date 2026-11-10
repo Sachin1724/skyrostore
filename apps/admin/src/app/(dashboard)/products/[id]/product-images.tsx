@@ -1,22 +1,29 @@
 "use client";
 
-import { useState } from "react";
-import { Trash2, Star } from "lucide-react";
-import { UploadButton, LibraryButton } from "../image-uploader";
+import { useRef, useState } from "react";
+import { Trash2, Star, ImagePlus } from "lucide-react";
+import { LibraryButton, uploadImages } from "../image-uploader";
+import { ImageCropModal } from "../image-crop-modal";
 
 /** Gallery manager. Every change saves immediately; the first image is the main one. */
 export function ProductImages({
   productId,
   initialImages,
   initialThumbnail,
+  productTitle,
 }: {
   productId: string;
   initialImages: string[];
   initialThumbnail: string | null;
+  productTitle?: string;
 }) {
   const [images, setImages] = useState(initialImages);
   const [thumbnail, setThumbnail] = useState(initialThumbnail || initialImages[0] || null);
   const [error, setError] = useState("");
+  const [queue, setQueue] = useState<File[]>([]); // files still waiting to be cropped
+  const [cropping, setCropping] = useState(false);
+  const cropInput = useRef<HTMLInputElement>(null);
+  const cropFile = queue[0] ?? null;
 
   async function save(nextImages: string[], nextThumb: string | null) {
     setError("");
@@ -43,6 +50,21 @@ export function ProductImages({
     return save(next, thumbnail === url ? next[0] || null : thumbnail);
   };
 
+  async function uploadCropped(blob: Blob) {
+    setCropping(true);
+    setError("");
+    try {
+      const file = new File([blob], "product-image.png", { type: "image/png" });
+      const [url] = await uploadImages([file]);
+      await add([url]);
+      setQueue((q) => q.slice(1)); // next file in the queue, if any
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setCropping(false);
+    }
+  }
+
   return (
     <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-xs">
       <div className="flex items-center justify-between border-b border-gray-100 pb-3">
@@ -52,7 +74,26 @@ export function ProductImages({
         </div>
         <div className="flex items-start gap-2">
           <LibraryButton onPicked={add} />
-          <UploadButton onUploaded={add} />
+          <input
+            ref={cropInput}
+            type="file"
+            accept="image/png,image/jpeg,image/webp"
+            multiple
+            className="hidden"
+            onChange={(e) => {
+              const files = Array.from(e.target.files ?? []);
+              if (files.length) setQueue((q) => [...q, ...files]);
+              if (cropInput.current) cropInput.current.value = "";
+            }}
+          />
+          <button
+            type="button"
+            onClick={() => cropInput.current?.click()}
+            className="inline-flex items-center gap-1.5 rounded border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50"
+          >
+            <ImagePlus className="h-3.5 w-3.5" />
+            Upload images
+          </button>
         </div>
       </div>
       {error ? <p className="mt-3 text-xs text-rose-600">{error}</p> : null}
@@ -86,6 +127,16 @@ export function ProductImages({
           ))}
         </div>
       )}
+      {cropFile ? (
+        <ImageCropModal
+          file={cropFile}
+          productTitle={productTitle}
+          queueRemaining={queue.length - 1}
+          onCancel={() => setQueue((q) => q.slice(1))}
+          onSave={uploadCropped}
+        />
+      ) : null}
+      {cropping ? <p className="mt-2 text-xs text-gray-500">Uploading…</p> : null}
     </div>
   );
 }

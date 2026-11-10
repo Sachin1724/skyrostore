@@ -52,6 +52,28 @@ export function orderPlacedEmail(order: {
   };
 }
 
+export function abandonedCartEmail(cartUrl: string, itemCount: number): { subject: string; html: string } {
+  return {
+    subject: `You left ${itemCount} ${itemCount === 1 ? "item" : "items"} in your cart`,
+    html: `<p>Your cart is still here, ready when you are.</p><p><a href="${cartUrl}">Resume checkout</a></p>`,
+  };
+}
+
+export function returnStatusEmail(
+  displayId: string,
+  status: "APPROVED" | "REJECTED",
+  note?: string | null
+): { subject: string; html: string } {
+  const body =
+    status === "APPROVED"
+      ? "Your return request has been approved. We'll be in touch with next steps."
+      : "Your return request was not approved.";
+  return {
+    subject: `Return request for order #${displayId} ${status === "APPROVED" ? "approved" : "declined"}`,
+    html: `<p>${body}</p>${note ? `<p>Note from our team: ${note}</p>` : ""}`,
+  };
+}
+
 export function passwordResetEmail(resetLink: string): { subject: string; html: string } {
   return {
     subject: "Reset your Skyrostore password",

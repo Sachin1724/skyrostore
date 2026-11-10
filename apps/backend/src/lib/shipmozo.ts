@@ -48,6 +48,17 @@ export function validatePackage(input: Record<string, unknown>): { pkg: PackageD
   return { pkg: out as PackageDetails };
 }
 
+/**
+ * Couriers bill on max(dead weight, volumetric weight), where volumetric
+ * weight (kg) = L x W x H (cm) / 5000. A light-but-bulky box (carbon frames,
+ * propeller sets) declared at its dead weight gets silently re-billed higher
+ * by the courier later — declare the real chargeable weight upfront.
+ */
+export function chargeableWeightG(pkg: PackageDetails): number {
+  const volumetricKg = (pkg.length_cm * pkg.width_cm * pkg.height_cm) / 5000;
+  return Math.max(pkg.weight_g, Math.round(volumetricKg * 1000));
+}
+
 /** Indian mobile: last 10 digits, dropping +91 / leading 0. */
 export function normalisePhone(raw: unknown): number | null {
   const digits = String(raw ?? "").replace(/\D/g, "").slice(-10);
@@ -55,7 +66,7 @@ export function normalisePhone(raw: unknown): number | null {
 }
 
 /** Maps a Medusa order (with shipping_address and items) to the push-order body. */
-export function buildPushOrder(order: any, pkg: PackageDetails, warehouseId: string) {
+export function buildPushOrder(order: any, pkg: PackageDetails, warehouseId: string, ewayBillNumber = "") {
   const a = order.shipping_address || {};
   const phone = normalisePhone(a.phone);
   const pin = String(a.postal_code || "").replace(/\s/g, "");
@@ -90,12 +101,12 @@ export function buildPushOrder(order: any, pkg: PackageDetails, warehouseId: str
     // Checkout only takes Razorpay, so every order is prepaid.
     payment_type: "PREPAID",
     cod_amount: "",
-    weight: pkg.weight_g,
+    weight: chargeableWeightG(pkg),
     length: pkg.length_cm,
     width: pkg.width_cm,
     height: pkg.height_cm,
     warehouse_id: warehouseId,
-    gst_ewaybill_number: "",
+    gst_ewaybill_number: ewayBillNumber,
     gstin_number: process.env.SHIPMOZO_GSTIN || "",
   };
 }

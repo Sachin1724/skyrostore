@@ -3,6 +3,7 @@ import Razorpay from "razorpay";
 import type { MedusaContainer } from "@medusajs/framework/types";
 import { ContainerRegistrationKeys, Modules } from "@medusajs/framework/utils";
 import { completeCartWorkflow } from "@medusajs/medusa/core-flows";
+import { releaseCheckoutHold } from "./inventory-hold";
 
 let client: InstanceType<typeof Razorpay> | null = null;
 export function razorpay() {
@@ -128,5 +129,8 @@ export async function confirmRazorpayCart(
     const order = await existingOrderId(container, cart_id);
     if (order) return { order_id: order };
     throw err;
+  } finally {
+    // The order now holds its own reservation (on success) or none is needed (on failure).
+    await releaseCheckoutHold(container, cart_id).catch(() => null);
   }
 }

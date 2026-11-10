@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { BackLink } from "@/components/layout/back-link";
 import { Header } from "@/components/layout/header";
@@ -32,7 +33,9 @@ export default async function CartPage() {
             Shopping Cart
           </h1>
 
-          <CartView freeShippingThreshold={freeShippingThreshold} />
+          <Suspense>
+            <CartView freeShippingThreshold={freeShippingThreshold} />
+          </Suspense>
 
           <div className="mt-14">
             <RecentlyViewed title="You Might Also Need (Recently Viewed)" />

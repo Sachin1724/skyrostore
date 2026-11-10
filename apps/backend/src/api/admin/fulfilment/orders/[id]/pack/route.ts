@@ -82,6 +82,19 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
       return res.json({ ok: true, already_packed: true, fulfilment_state: state });
     }
 
+    // Optional { line_item_id: "SN1, SN2" } — traces high-value avionics (flight
+    // controllers, telemetry, motors) against the invoice if a "burnt and
+    // swapped for a refund" warranty claim ever needs checking against the manifest.
+    const rawSerials = (req.body as any)?.serial_numbers;
+    const serialNumbers: Record<string, string> =
+      rawSerials && typeof rawSerials === "object"
+        ? Object.fromEntries(
+            Object.entries(rawSerials)
+              .filter(([, v]) => typeof v === "string" && (v as string).trim())
+              .map(([k, v]) => [k, (v as string).trim()])
+          )
+        : {};
+
     const { result } = await createOrderFulfillmentWorkflow(req.scope).run({
       input: {
         order_id: id,
@@ -91,7 +104,10 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
         ...(typeof (req.body as any)?.location_id === "string"
           ? { location_id: (req.body as any).location_id }
           : {}),
-        metadata: { packed_by: actorId },
+        metadata: {
+          packed_by: actorId,
+          ...(Object.keys(serialNumbers).length ? { serial_numbers: serialNumbers } : {}),
+        },
       },
     });
 

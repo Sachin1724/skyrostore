@@ -35,6 +35,7 @@ const DETAIL_FIELDS = [
   "items.total",
   "items.thumbnail",
   "items.metadata",
+  "items.product.metadata",
   "items.detail.quantity",
   "items.detail.fulfilled_quantity",
   "items.detail.shipped_quantity",

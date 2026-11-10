@@ -19,10 +19,11 @@ import {
   PenLine,
   Images,
   ShieldCheck,
+  Undo2,
 } from "lucide-react";
 
 type NavItem = { href: string; label: string; icon: typeof LayoutDashboard; countKey?: keyof NavCounts };
-export type NavCounts = { ordersAwaiting: number; bulkSubmitted: number; moderationPending: number };
+export type NavCounts = { ordersAwaiting: number; bulkSubmitted: number; moderationPending: number; returnsPending: number };
 
 const GROUPS: { label: string; items: NavItem[] }[] = [
   {
@@ -32,6 +33,7 @@ const GROUPS: { label: string; items: NavItem[] }[] = [
       { href: "/orders", label: "Orders", icon: ShoppingCart, countKey: "ordersAwaiting" },
       { href: "/shipments", label: "Shipments", icon: Truck },
       { href: "/bulk-orders", label: "Bulk & Quotes", icon: FileText, countKey: "bulkSubmitted" },
+      { href: "/returns", label: "Returns", icon: Undo2, countKey: "returnsPending" },
       { href: "/support", label: "Support", icon: MessageSquare },
     ],
   },

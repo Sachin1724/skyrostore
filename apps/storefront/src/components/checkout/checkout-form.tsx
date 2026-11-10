@@ -72,6 +72,11 @@ export function CheckoutForm() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [isBusiness, setIsBusiness] = useState(false);
+  const [companyName, setCompanyName] = useState("");
+  const [gstin, setGstin] = useState("");
+  const GSTIN_RE = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
+  const gstinValid = !isBusiness || GSTIN_RE.test(gstin);
 
   useEffect(() => {
     const cartId = localStorage.getItem("cart_id");
@@ -103,6 +108,10 @@ export function CheckoutForm() {
   async function handlePay() {
     // Guard against a double click creating two payment sessions.
     if (!cart || submitting) return;
+    if (isBusiness && !gstinValid) {
+      setError("Enter a valid 15-character GSTIN, or uncheck the business purchase box.");
+      return;
+    }
     setSubmitting(true);
     setError("");
 
@@ -120,7 +129,7 @@ export function CheckoutForm() {
     };
 
     try {
-      await step("customer");
+      await step("customer", isBusiness ? { company_name: companyName, gstin: gstin.toUpperCase() } : {});
       await step("shipping");
       const payData = await step("payment");
       const sessionData = payData.payment_session?.data;
@@ -240,6 +249,46 @@ export function CheckoutForm() {
           </div>
         </dl>
         <p className="mt-1 text-right text-[13px] text-text-muted">Includes GST</p>
+
+        <div className="mt-4 border-t border-border pt-4">
+          <label className="flex items-start gap-2 text-[13px] text-text-secondary">
+            <input
+              type="checkbox"
+              checked={isBusiness}
+              onChange={(e) => setIsBusiness(e.target.checked)}
+              className="mt-0.5 h-4 w-4 rounded border-border-strong"
+            />
+            Purchasing for a business or registered institution? Claim 18% Input Tax Credit.
+          </label>
+          {isBusiness ? (
+            <div className="mt-3 space-y-2.5">
+              <input
+                type="text"
+                required
+                placeholder="Legal entity / company name"
+                value={companyName}
+                onChange={(e) => setCompanyName(e.target.value)}
+                className="h-10 w-full rounded-md border border-border bg-white px-3 text-[14px] text-navy focus:border-brand focus:outline-none"
+              />
+              <div>
+                <input
+                  type="text"
+                  required
+                  placeholder="GSTIN (15 characters)"
+                  value={gstin}
+                  onChange={(e) => setGstin(e.target.value.toUpperCase())}
+                  maxLength={15}
+                  className={`h-10 w-full rounded-md border bg-white px-3 font-mono text-[14px] uppercase text-navy focus:outline-none ${
+                    gstin && !gstinValid ? "border-error" : "border-border focus:border-brand"
+                  }`}
+                />
+                {gstin && !gstinValid ? (
+                  <p className="mt-1 text-[12px] text-error">Doesn&apos;t match the standard 15-character GSTIN format.</p>
+                ) : null}
+              </div>
+            </div>
+          ) : null}
+        </div>
 
         <button
           type="button"

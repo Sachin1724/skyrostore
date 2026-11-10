@@ -7,6 +7,7 @@ import { useIconHover } from "@animateicons/react";
 import { PackageCheckIcon, TruckIcon, ClipboardCheckIcon, ArrowRightIcon } from "@animateicons/react/lucide";
 import { Printer, FileText, CheckCircle2, ShieldCheck, MapPin } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
+import { hsnForItem, isIntraState, splitGst } from "@/lib/hsn";
 
 type Summary = {
   display_id?: number | string;
@@ -14,6 +15,8 @@ type Summary = {
   total?: number;
   currency_code?: string;
   item_count?: number;
+  items?: { id: string; title: string; quantity: number; total: number; hsn_component_type: string | null }[];
+  shipping_province?: string | null;
 };
 
 // A quad seen from above: four arms, four motors, four two-blade props, a body.
@@ -280,36 +283,59 @@ export function OrderSuccess({ orderId, summary, gstin }: { orderId?: string; su
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
-                    <tr>
-                      <td className="p-3">
-                        <span className="font-bold text-navy">UAV Components &amp; Avionics Hardware</span>
-                        <span className="block text-[13px] text-text-muted">Order Ref: #{summary?.display_id ?? orderId}</span>
-                      </td>
-                      <td className="p-3 text-center font-mono text-[13px]">88069000</td>
-                      <td className="p-3 text-center tabular-nums">{summary?.item_count ?? 1}</td>
-                      <td className="p-3 text-right font-bold tabular-nums">
-                        {summary?.total != null ? formatPrice(summary.total, currency) : "Paid"}
-                      </td>
-                    </tr>
+                    {summary?.items?.length ? (
+                      summary.items.map((item) => (
+                        <tr key={item.id}>
+                          <td className="p-3 font-bold text-navy">{item.title?.replace("[DEV] ", "")}</td>
+                          <td className="p-3 text-center font-mono text-[13px]">{hsnForItem(item.hsn_component_type)}</td>
+                          <td className="p-3 text-center tabular-nums">{item.quantity}</td>
+                          <td className="p-3 text-right font-bold tabular-nums">{formatPrice(item.total, currency)}</td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td className="p-3">
+                          <span className="font-bold text-navy">UAV Components &amp; Avionics Hardware</span>
+                          <span className="block text-[13px] text-text-muted">Order Ref: #{summary?.display_id ?? orderId}</span>
+                        </td>
+                        <td className="p-3 text-center font-mono text-[13px]">Confirm HSN</td>
+                        <td className="p-3 text-center tabular-nums">{summary?.item_count ?? 1}</td>
+                        <td className="p-3 text-right font-bold tabular-nums">
+                          {summary?.total != null ? formatPrice(summary.total, currency) : "Paid"}
+                        </td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
               </div>
 
               {/* Tax ITC Summary */}
-              <div className="flex justify-between items-center rounded-lg border border-border bg-surface-soft/40 p-4 text-[13px]">
-                <div>
-                  <span className="font-bold text-navy">Statutory GST 18% Included</span>
-                  <span className="block text-[13px] text-text-muted">
-                    Eligible for Input Tax Credit (ITC) under Section 16 of CGST Act
-                  </span>
-                </div>
-                <div className="text-right">
-                  <span className="text-[13px] uppercase text-text-muted">Total Paid</span>
-                  <span className="block text-[18px] font-extrabold tabular-nums text-navy">
-                    {summary?.total != null ? formatPrice(summary.total, currency) : "Paid in Full"}
-                  </span>
-                </div>
-              </div>
+              {(() => {
+                const intraState = isIntraState(summary?.shipping_province);
+                const { taxable, cgst, sgst, igst } = splitGst(summary?.total ?? 0, intraState);
+                return (
+                  <div className="rounded-lg border border-border bg-surface-soft/40 p-4 text-[13px]">
+                    <p className="text-[13px] text-text-muted">Eligible for Input Tax Credit (ITC) under Section 16 of CGST Act</p>
+                    <dl className="mt-2 space-y-1">
+                      <div className="flex justify-between"><dt className="text-text-muted">Taxable value</dt><dd className="tabular-nums text-navy">{formatPrice(taxable, currency)}</dd></div>
+                      {intraState ? (
+                        <>
+                          <div className="flex justify-between"><dt className="text-text-muted">CGST (9%)</dt><dd className="tabular-nums text-navy">{formatPrice(cgst, currency)}</dd></div>
+                          <div className="flex justify-between"><dt className="text-text-muted">SGST (9%)</dt><dd className="tabular-nums text-navy">{formatPrice(sgst, currency)}</dd></div>
+                        </>
+                      ) : (
+                        <div className="flex justify-between"><dt className="text-text-muted">IGST (18%)</dt><dd className="tabular-nums text-navy">{formatPrice(igst, currency)}</dd></div>
+                      )}
+                    </dl>
+                    <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
+                      <span className="text-[13px] uppercase text-text-muted">Total Paid</span>
+                      <span className="text-[18px] font-extrabold tabular-nums text-navy">
+                        {summary?.total != null ? formatPrice(summary.total, currency) : "Paid in Full"}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })()}
 
               <div className="border-t border-border pt-4 text-center text-[13px] text-text-muted">
                 Computer-generated tax invoice. No signature required. Skyrostore Systems Private Limited.

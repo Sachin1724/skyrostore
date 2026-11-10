@@ -22,7 +22,6 @@ import {
   ExternalLink,
 } from "lucide-react";
 
-import { VisibilityToggle } from "../visibility-toggle";
 import { ProductImages } from "./product-images";
 import { ProductClassification } from "./product-classification";
 import { ProductListingDetails } from "./product-listing-details";
@@ -40,6 +39,7 @@ export function ProductEditorClient({ initialProduct, categories, brands, storef
 
   // Basic Information
   const [title, setTitle] = useState((initialProduct.title as string) || "");
+  const [status, setStatus] = useState((initialProduct.status as string) || "draft");
   const [handle, setHandle] = useState((initialProduct.handle as string) || "");
   const [description, setDescription] = useState((initialProduct.description as string) || "");
 
@@ -144,9 +144,12 @@ export function ProductEditorClient({ initialProduct, categories, brands, storef
     setCustomSpecs((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleSave = async (e: React.FormEvent) => {
+  const [savingAs, setSavingAs] = useState<"draft" | "published" | null>(null);
+
+  const handleSave = async (e: React.FormEvent, publishAs: "draft" | "published") => {
     e.preventDefault();
     setIsSaving(true);
+    setSavingAs(publishAs);
     setErrorMessage(null);
     setSuccessMsg(null);
 
@@ -176,6 +179,7 @@ export function ProductEditorClient({ initialProduct, categories, brands, storef
         title,
         handle,
         description,
+        status: publishAs,
         technicalSpecs: {
           schemaVersion: 1,
           componentType,
@@ -195,20 +199,22 @@ export function ProductEditorClient({ initialProduct, categories, brands, storef
         throw new Error(data.error || "Failed to save product specifications");
       }
 
-      setSuccessMsg("Product specifications saved successfully to Medusa catalog.");
+      setStatus(publishAs);
+      setSuccessMsg(publishAs === "published" ? "Saved and published." : "Saved as draft.");
       setTimeout(() => setSuccessMsg(null), 4000);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       setErrorMessage(msg);
     } finally {
       setIsSaving(false);
+      setSavingAs(null);
     }
   };
 
   const variants = (initialProduct.variants as Record<string, unknown>[]) || [];
 
   return (
-    <form onSubmit={handleSave} className="space-y-6">
+    <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
       {/* Header & Actions */}
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-gray-200 pb-5">
         <div className="flex items-center gap-4">
@@ -243,15 +249,13 @@ export function ProductEditorClient({ initialProduct, categories, brands, storef
             View on live store
             <ExternalLink className="h-3.5 w-3.5" aria-hidden />
           </a>
-          <VisibilityToggle id={initialProduct.id as string} status={initialProduct.status as string} />
-          <button
-            type="submit"
-            disabled={isSaving}
-            className="inline-flex items-center gap-2 rounded-md bg-gray-900 px-4 py-2 text-sm font-semibold text-white shadow-xs hover:bg-gray-800 disabled:opacity-50"
+          <span
+            className={`rounded px-2 py-0.5 text-xs font-semibold ${
+              status === "published" ? "bg-emerald-100 text-emerald-700" : "bg-gray-100 text-gray-500"
+            }`}
           >
-            <Save className="h-4 w-4" />
-            {isSaving ? "Saving..." : "Save Product"}
-          </button>
+            {status === "published" ? "Published" : "Draft"}
+          </span>
         </div>
       </div>
 
@@ -334,6 +338,7 @@ export function ProductEditorClient({ initialProduct, categories, brands, storef
           productId={initialProduct.id as string}
           initialImages={((initialProduct.images as { url: string }[]) || []).map((i) => i.url)}
           initialThumbnail={(initialProduct.thumbnail as string) || null}
+          productTitle={title}
         />
       )}
 
@@ -631,7 +636,7 @@ export function ProductEditorClient({ initialProduct, categories, brands, storef
         </div>
       )}
 
-      {/* Bottom Save Bar */}
+      {/* Bottom Save Bar — exactly two actions: save without publishing, or save and publish */}
       <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200">
         <Link
           href="/products"
@@ -640,12 +645,22 @@ export function ProductEditorClient({ initialProduct, categories, brands, storef
           Cancel
         </Link>
         <button
-          type="submit"
+          type="button"
+          onClick={(e) => handleSave(e, "draft")}
+          disabled={isSaving}
+          className="inline-flex items-center gap-2 rounded-md border border-gray-300 bg-white px-5 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+        >
+          <Save className="h-4 w-4" />
+          {savingAs === "draft" ? "Saving…" : "Save Draft"}
+        </button>
+        <button
+          type="button"
+          onClick={(e) => handleSave(e, "published")}
           disabled={isSaving}
           className="inline-flex items-center gap-2 rounded-md bg-gray-900 px-5 py-2 text-sm font-semibold text-white shadow-xs hover:bg-gray-800 disabled:opacity-50"
         >
           <Save className="h-4 w-4" />
-          {isSaving ? "Saving Product..." : "Save Product"}
+          {savingAs === "published" ? "Saving…" : "Save & Publish"}
         </button>
       </div>
     </form>
