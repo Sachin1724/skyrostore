@@ -48,13 +48,38 @@ const BUILDER_STEPS: StepConfig[] = [
 
 export function BuilderView({
   components,
+  resumeItems,
 }: {
   components: Record<string, UAVComponent[]>;
+  resumeItems?: { product_variant_id: string; component_type: string }[] | null;
 }) {
   const router = useRouter();
-  const [activeStepIdx, setActiveStepIdx] = useState(0);
 
-  const [selectedParts, setSelectedParts] = useState<Record<string, UAVComponent | null>>({});
+  const resumedParts = useMemo<Record<string, UAVComponent | null>>(() => {
+    if (!resumeItems?.length) return {};
+    const out: Record<string, UAVComponent | null> = {};
+    for (const step of BUILDER_STEPS) {
+      const item = resumeItems.find((it) => it.component_type === step.componentType);
+      const match = item && components[step.componentType]?.find((c) => c.variant_id === item.product_variant_id);
+      if (match) out[step.id] = match;
+    }
+    return out;
+  }, [resumeItems, components]);
+
+  const firstIncompleteStepIdx = useMemo(() => {
+    if (!resumeItems?.length) return 0;
+    const idx = BUILDER_STEPS.findIndex((s) => s.required && !resumedParts[s.id]);
+    return idx === -1 ? BUILDER_STEPS.length - 1 : idx;
+  }, [resumeItems, resumedParts]);
+
+  const [activeStepIdx, setActiveStepIdx] = useState(firstIncompleteStepIdx);
+  const [stepDir, setStepDir] = useState<"fwd" | "back">("fwd");
+  const goToStep = (idx: number) => {
+    setStepDir(idx >= activeStepIdx ? "fwd" : "back");
+    setActiveStepIdx(idx);
+  };
+
+  const [selectedParts, setSelectedParts] = useState<Record<string, UAVComponent | null>>(resumedParts);
 
   const [frameFilter, setFrameFilter] = useState("all");
   const [cartAdding, setCartAdding] = useState(false);
@@ -357,7 +382,7 @@ export function BuilderView({
               key={step.id}
               type="button"
               aria-current={current ? "step" : undefined}
-              onClick={() => setActiveStepIdx(idx)}
+              onClick={() => goToStep(idx)}
               className={`flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 font-medium ${
                 current ? "bg-navy text-white" : "bg-white text-text-secondary hover:text-navy"
               }`}
@@ -371,7 +396,7 @@ export function BuilderView({
 
       <div className="mt-5 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
         {/* Main: one step at a time */}
-        <section key={currentStep.id} className="step-in rounded-xl bg-white p-6 md:p-8">
+        <section key={currentStep.id} className={`${stepDir === "back" ? "step-in-back" : "step-in"} rounded-xl bg-white p-6 md:p-8`}>
           <div className="flex items-start justify-between gap-4">
             <div>
               <h2 className="text-2xl font-semibold text-navy">
@@ -481,7 +506,7 @@ export function BuilderView({
             <button
               type="button"
               disabled={activeStepIdx === 0}
-              onClick={() => setActiveStepIdx(activeStepIdx - 1)}
+              onClick={() => goToStep(activeStepIdx - 1)}
               className="flex items-center gap-1 text-[14px] font-medium text-text-secondary hover:text-navy disabled:opacity-0"
             >
               <ChevronLeft className="h-4 w-4" aria-hidden /> Back
@@ -489,7 +514,7 @@ export function BuilderView({
             {!isLast && (
               <button
                 type="button"
-                onClick={() => setActiveStepIdx(activeStepIdx + 1)}
+                onClick={() => goToStep(activeStepIdx + 1)}
                 className="flex items-center gap-1 rounded-full bg-navy px-5 py-2 text-[14px] font-medium text-white hover:bg-brand"
               >
                 {!hasPart && !currentStep.required ? "Skip" : "Next"} <ChevronRight className="h-4 w-4" aria-hidden />
@@ -555,7 +580,7 @@ export function BuilderView({
           <button
             type="button"
             disabled={bomLines.length === 0 || cartAdding || (isReview && hasBlockingErrors)}
-            onClick={() => (isReview ? handleBatchAddToCart() : setActiveStepIdx(BUILDER_STEPS.length - 1))}
+            onClick={() => (isReview ? handleBatchAddToCart() : goToStep(BUILDER_STEPS.length - 1))}
             className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-navy py-3 text-[14px] font-medium text-white hover:bg-brand disabled:opacity-40"
           >
             {isReview ? (

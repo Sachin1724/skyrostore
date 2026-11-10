@@ -21,6 +21,7 @@ export function WishlistButton({
 }: WishlistButtonProps) {
   const [isSaved, setIsSaved] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [pulse, setPulse] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -52,6 +53,8 @@ export function WishlistButton({
 
     const nextState = !isSaved;
     setIsSaved(nextState);
+    setPulse(true);
+    setTimeout(() => setPulse(false), 180);
 
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
@@ -86,7 +89,8 @@ export function WishlistButton({
       className={`inline-flex items-center justify-center transition-colors ${className}`}
     >
       <Heart
-        className={`h-5 w-5 transition-colors ${
+        data-pulse={pulse}
+        className={`heart-pop h-5 w-5 transition-colors ${
           mounted && isSaved
             ? "fill-error text-error"
             : "text-text-muted hover:text-error"

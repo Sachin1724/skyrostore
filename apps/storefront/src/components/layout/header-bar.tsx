@@ -3,7 +3,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Headset, Menu, ShoppingCart, User, X } from "lucide-react";
+import { Menu, ShoppingCart, X } from "lucide-react";
+import { useIconHover } from "@animateicons/react";
+import { HeadsetIcon, UserIcon } from "@animateicons/react/lucide";
 import { SearchAutocomplete } from "@/components/layout/search-autocomplete";
 import { SkyroLogo } from "@/components/brand/logo";
 import { CartDrawer, cartCount, cartTotal, type DrawerCart } from "@/components/cart/cart-drawer";
@@ -21,6 +23,8 @@ export function HeaderBar({ categories }: { categories: Cat[] }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [bump, setBump] = useState(0);
   const menuRef = useRef<HTMLDialogElement>(null);
+  const { ref: headsetRef, triggerProps: headsetTrigger } = useIconHover();
+  const { ref: userRef, triggerProps: userTrigger } = useIconHover();
 
   const refresh = useCallback(async () => {
     const id = localStorage.getItem("cart_id");
@@ -75,15 +79,14 @@ export function HeaderBar({ categories }: { categories: Cat[] }) {
         <div role="search" className="hidden h-11 min-w-0 flex-1 overflow-hidden rounded-full bg-surface-soft focus-within:bg-white focus-within:ring-2 focus-within:ring-brand/40 md:flex md:max-w-[720px]">
           <SearchAutocomplete className="min-w-0 flex-1" browse={categories} />
         </div>
-        <span className="hidden flex-1 md:block" />
 
         <nav aria-label="Account" className="ml-auto flex items-center gap-1 md:ml-0 md:gap-3">
-          <Link href="/support" className="hidden min-w-11 flex-col items-center gap-0.5 text-[13px] font-medium text-navy hover:text-brand lg:flex">
-            <Headset className="h-[22px] w-[22px]" strokeWidth={1.8} aria-hidden />
+          <Link href="/support" {...headsetTrigger} className="hidden min-w-11 flex-col items-center gap-0.5 text-[13px] font-medium text-navy hover:text-brand lg:flex">
+            <HeadsetIcon ref={headsetRef} size={22} aria-hidden />
             Support
           </Link>
-          <Link href="/account" aria-label="Account" className="flex h-11 min-w-11 flex-col items-center justify-center gap-0.5 text-[13px] font-medium text-navy hover:text-brand">
-            <User className="h-[22px] w-[22px]" strokeWidth={1.8} aria-hidden />
+          <Link href="/account" aria-label="Account" {...userTrigger} className="flex h-11 min-w-11 flex-col items-center justify-center gap-0.5 text-[13px] font-medium text-navy hover:text-brand">
+            <UserIcon ref={userRef} size={22} aria-hidden />
             <span className="hidden lg:block">Account</span>
           </Link>
           <button

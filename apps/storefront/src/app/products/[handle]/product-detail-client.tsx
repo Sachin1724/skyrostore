@@ -6,6 +6,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { HttpTypes } from "@medusajs/types";
 import { Clock, CreditCard, FileText, RotateCcw, Share2, ShieldCheck, Truck } from "lucide-react";
+import { useIconHover } from "@animateicons/react";
+import { ShoppingCartIcon, CheckIcon } from "@animateicons/react/lucide";
 import { CART_ADDED } from "@/components/layout/header-bar";
 import { formatPrice } from "@/lib/utils";
 import { extractTechnicalSpecs, getProductTechnicalHighlights } from "@/lib/technical-specs";
@@ -142,6 +144,7 @@ export function ProductDetailClient({
   };
 
   const addLabel = cartState === "adding" ? "Adding…" : cartState === "added" ? "Added to Cart" : "Add to Cart";
+  const { ref: cartIconRef, triggerProps: cartIconTrigger } = useIconHover({ trigger: "click" });
   const priceText = amount != null ? formatPrice(amount, currency) : null;
 
   return (
@@ -308,10 +311,18 @@ export function ProductDetailClient({
             <div className="grid gap-3 sm:grid-cols-2">
               <button
                 type="button"
-                onClick={() => addToCart(true)}
+                onClick={(e) => {
+                  cartIconTrigger.onClick?.(e);
+                  addToCart(true);
+                }}
                 disabled={!inStock || cartState === "adding"}
-                className="btn btn-primary"
+                className="btn btn-primary inline-flex items-center justify-center gap-2"
               >
+                {cartState === "added" ? (
+                  <CheckIcon size={18} aria-hidden />
+                ) : (
+                  <ShoppingCartIcon ref={cartIconRef} size={18} aria-hidden />
+                )}
                 {addLabel}
               </button>
               <button

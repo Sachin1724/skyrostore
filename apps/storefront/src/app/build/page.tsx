@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { cookies } from "next/headers";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { BuilderView } from "@/components/builder/builder-view";
@@ -9,8 +10,33 @@ export const metadata = {
   description: "Select components, validate propulsion compatibility, and configure a custom aerial platform with automated spec validation.",
 };
 
-export default async function BuildPage() {
-  const components = await getUAVComponents();
+async function getResumeItems(configId: string | undefined) {
+  if (!configId) return null;
+  const cookieStore = await cookies();
+  const token = cookieStore.get("customer_token")?.value;
+  if (!token) return null;
+  try {
+    const base = process.env.NEXT_PUBLIC_MEDUSA_URL || "http://localhost:9000";
+    const pk = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "";
+    const res = await fetch(`${base}/store/uav/configurations/${configId}`, {
+      headers: { "x-publishable-api-key": pk, Authorization: `Bearer ${token}` },
+      cache: "no-store",
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return (data.configuration?.items as { product_variant_id: string; component_type: string }[]) ?? null;
+  } catch {
+    return null;
+  }
+}
+
+export default async function BuildPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ configId?: string }>;
+}) {
+  const [components, { configId }] = await Promise.all([getUAVComponents(), searchParams]);
+  const resumeItems = await getResumeItems(configId);
 
   return (
     <>
@@ -31,7 +57,7 @@ export default async function BuildPage() {
 
           {/* Main Builder View */}
           <section className="mt-6">
-            <BuilderView components={components} />
+            <BuilderView components={components} resumeItems={resumeItems} />
           </section>
         </div>
       </main>

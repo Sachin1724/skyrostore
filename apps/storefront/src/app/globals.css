@@ -136,6 +136,10 @@
   .font-mono, .tabular-nums { font-variant-numeric: tabular-nums; }
 }
 
+/* Wishlist heart: pop feedback on toggle. Transition (not keyframes) so a fast re-click retargets smoothly instead of restarting from zero. */
+.heart-pop { transition: transform 180ms var(--ease-out); }
+.heart-pop[data-pulse="true"] { transform: scale(1.18); }
+
 /* Route skeletons: one slow tone pulse. Reduced motion stops it via the rule above. */
 @keyframes tone-pulse { 50% { opacity: 0.55; } }
 .skeleton {
@@ -278,7 +282,9 @@ details[open]::details-content { block-size: auto; }
 
   /* Builder steps and filter groups ease in instead of snapping. */
   @keyframes step { from { opacity: 0; transform: translateX(14px); } }
+  @keyframes step-back { from { opacity: 0; transform: translateX(-14px); } }
   .step-in { animation: step 260ms var(--ease-out) both; }
+  .step-in-back { animation: step-back 260ms var(--ease-out) both; }
   details[open] > :not(summary) { animation: rise 220ms var(--ease-out) both; }
 
   /* First screen of a page rises into place. */

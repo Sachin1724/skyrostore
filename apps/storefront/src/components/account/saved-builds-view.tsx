@@ -82,6 +82,9 @@ export function SavedBuildsView() {
               {b.estimated_weight_g != null && <span>{b.estimated_weight_g} g</span>}
               {b.estimated_flight_time_min != null && <span>{b.estimated_flight_time_min} min flight</span>}
               {b.estimated_cost != null && <span className="font-bold text-navy">{formatPrice(Number(b.estimated_cost), "inr")}</span>}
+              <Link href={`/build?configId=${b.id}`} className="btn btn-secondary btn-sm shrink-0">
+                Resume
+              </Link>
             </div>
           </li>
         );
