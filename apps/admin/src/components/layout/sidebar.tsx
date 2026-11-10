@@ -20,6 +20,7 @@ import {
   Images,
   ShieldCheck,
   Undo2,
+  Percent,
 } from "lucide-react";
 
 type NavItem = { href: string; label: string; icon: typeof LayoutDashboard; countKey?: keyof NavCounts };
@@ -51,6 +52,7 @@ const GROUPS: { label: string; items: NavItem[] }[] = [
     label: "Merchandising",
     items: [
       { href: "/content", label: "Homepage", icon: PenLine },
+      { href: "/promotions", label: "Promotions", icon: Percent },
       { href: "/moderation", label: "Moderation", icon: ShieldCheck, countKey: "moderationPending" },
       { href: "/analytics", label: "Analytics", icon: BarChart3 },
       { href: "/customers", label: "Customers", icon: Users },

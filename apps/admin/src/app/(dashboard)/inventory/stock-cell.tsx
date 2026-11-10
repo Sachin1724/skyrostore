@@ -44,7 +44,7 @@ export function StockCell({ itemId, locationId, stockedQuantity }: { itemId: str
   }
 
   return (
-    <div className="flex items-center gap-1.5">
+    <div className="flex items-center gap-1.5 transition-[opacity,transform] duration-150 ease-out starting:scale-95 starting:opacity-0">
       <input
         type="number"
         min={0}

@@ -132,7 +132,7 @@ export function ModerationView() {
         <div className="mt-4 space-y-3">
           {reviews?.length === 0 && <p className="text-sm text-gray-500">Nothing pending.</p>}
           {reviews?.map((r) => (
-            <div key={r.id} className={card}>
+            <div key={r.id} className={`${card} transition-opacity duration-150 ease-out ${busy === r.id ? "opacity-40" : ""}`}>
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="text-sm font-semibold text-gray-900">
@@ -160,7 +160,7 @@ export function ModerationView() {
         <div className="mt-4 space-y-3">
           {questions?.length === 0 && <p className="text-sm text-gray-500">Nothing pending.</p>}
           {questions?.map((q) => (
-            <div key={q.id} className={card}>
+            <div key={q.id} className={`${card} transition-opacity duration-150 ease-out ${busy === q.id ? "opacity-40" : ""}`}>
               <p className="text-sm font-semibold text-gray-900">{q.question}</p>
               <p className="mt-1 flex items-center gap-1.5 text-xs text-gray-400">
                 {q.author_name} ·

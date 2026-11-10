@@ -34,8 +34,13 @@ export function ConfirmDialogProvider({ children }: { children: React.ReactNode 
     <ConfirmContext.Provider value={confirm}>
       {children}
       {options ? (
-        <div role="alertdialog" aria-modal="true" aria-labelledby="confirm-title" className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="w-full max-w-sm rounded-md bg-white p-5 shadow-lg">
+        <div
+          role="alertdialog"
+          aria-modal="true"
+          aria-labelledby="confirm-title"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 transition-opacity duration-[180ms] ease-out starting:opacity-0"
+        >
+          <div className="w-full max-w-sm rounded-md bg-white p-5 shadow-lg transition-[opacity,transform] duration-[180ms] ease-out starting:scale-95 starting:opacity-0">
             <h2 id="confirm-title" className="text-sm font-semibold text-gray-900">{options.title}</h2>
             {options.description ? <p className="mt-1.5 text-sm text-gray-600">{options.description}</p> : null}
             <div className="mt-4 flex justify-end gap-2">

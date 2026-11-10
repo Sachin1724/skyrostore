@@ -29,6 +29,20 @@
   --radius-sm: 4px;
   --radius-md: 6px;
   --radius-lg: 8px;
+
+  /* Motion. Same curve as the storefront's --ease-out token. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 @layer base {
@@ -50,5 +64,13 @@
   [tabindex]:focus-visible {
     outline: 2px solid var(--color-gray-900);
     outline-offset: 2px;
+  }
+
+  /* Press feedback on every button, site-wide — one rule instead of a per-component class. */
+  button:not(:disabled) {
+    transition: transform 120ms var(--ease-out);
+  }
+  button:not(:disabled):active {
+    transform: scale(0.97);
   }
 }
