@@ -161,7 +161,10 @@ export function HeaderBar({ categories }: { categories: Cat[] }) {
           </button>
         </div>
         <nav aria-label="Main" className="overflow-y-auto px-4 py-2" onClick={(e) => (e.target as HTMLElement).closest("a") && setMenuOpen(false)}>
-          <p className="pb-1 pt-3 text-[13px] font-semibold text-text-secondary">Shop</p>
+          <Link href="/" className="flex min-h-12 items-center border-b border-surface-muted text-[16px] font-semibold">
+            Home
+          </Link>
+          <p className="pb-1 pt-4 text-[13px] font-semibold text-text-secondary">Shop</p>
           <ul>
             {categories.map((c) => (
               <li key={c.handle}>
@@ -171,7 +174,6 @@ export function HeaderBar({ categories }: { categories: Cat[] }) {
               </li>
             ))}
             <li><Link href="/parts" className="flex min-h-12 items-center border-b border-surface-muted text-[16px] font-semibold text-brand">All parts</Link></li>
-            <li><Link href="/uavs" className="flex min-h-12 items-center border-b border-surface-muted text-[16px] font-semibold">Drones</Link></li>
           </ul>
           <p className="pb-1 pt-5 text-[13px] font-semibold text-text-secondary">More</p>
           <ul>
