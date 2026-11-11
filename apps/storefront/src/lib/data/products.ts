@@ -151,8 +151,12 @@ async function searchProducts(params: ProductListParams & { q: string }) {
 }
 
 export async function getProducts(params?: ProductListParams): Promise<Awaited<ReturnType<typeof fetchProducts>> & { note?: SearchNote }> {
-  // A search query is per-visitor and long-tail, so it is not worth caching.
-  if (params?.q?.trim()) return searchProducts(params as ProductListParams & { q: string });
+  // Searches fan out (word forms, typo correction), and the header asks on every keystroke, where the
+  // same prefixes repeat across visitors: a short shared cache keeps that off the backend.
+  if (params?.q?.trim()) {
+    const search = params as ProductListParams & { q: string };
+    return unstable_cache(() => searchProducts(search), ["search", JSON.stringify(search)], { revalidate: 60, tags: ["products"] })();
+  }
 
   return unstable_cache(
     () => fetchProducts(params),

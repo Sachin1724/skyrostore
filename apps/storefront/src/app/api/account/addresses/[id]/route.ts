@@ -15,7 +15,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   if (!headers) return NextResponse.json({ error: "Authentication required" }, { status: 401 });
 
   const body = await request.json().catch(() => ({}));
-  const res = await fetch(`${BASE}/store/customers/me/addresses/${id}`, {
+  const res = await fetch(`${BASE}/store/customers/me/addresses/${encodeURIComponent(id)}`, {
     method: "POST",
     headers: { ...headers, "Content-Type": "application/json" },
     body: JSON.stringify(body),
@@ -29,7 +29,7 @@ export async function DELETE(_request: NextRequest, { params }: { params: Promis
   const headers = await authHeaders();
   if (!headers) return NextResponse.json({ error: "Authentication required" }, { status: 401 });
 
-  const res = await fetch(`${BASE}/store/customers/me/addresses/${id}`, { method: "DELETE", headers });
+  const res = await fetch(`${BASE}/store/customers/me/addresses/${encodeURIComponent(id)}`, { method: "DELETE", headers });
   const data = await res.json().catch(() => ({}));
   return NextResponse.json(data, { status: res.status });
 }

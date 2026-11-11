@@ -2,6 +2,9 @@ import type { MedusaContainer } from "@medusajs/framework/types";
 import { ContainerRegistrationKeys, Modules } from "@medusajs/framework/utils";
 
 const HOLD_MINUTES = 15;
+// Retail checkout holds at most this many units of one line. Larger quantities go through a bulk
+// quotation, and the cap stops a script from locking a product's whole stock with one guest cart.
+const MAX_HOLD_PER_LINE = 20;
 
 /**
  * Pre-payment inventory hold. Medusa only reserves stock when the order is
@@ -42,15 +45,15 @@ async function firstStockLocationId(container: MedusaContainer): Promise<string 
 
 export type ReserveResult = { ok: true } | { ok: false; error: string };
 
-/** Idempotent: a second call for the same cart (e.g. a retried checkout step) is a no-op. */
+/**
+ * Replaces any earlier hold for this cart with one for its current contents, so a retry after the
+ * shopper changed quantities holds what they are now buying (not what they had before).
+ */
 export async function reserveCartForCheckout(container: MedusaContainer, cartId: string): Promise<ReserveResult> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const db = container.resolve(ContainerRegistrationKeys.PG_CONNECTION) as any;
   await ensureHoldTable(db);
-
-  const existing = await db("checkout_inventory_hold").where({ cart_id: cartId }).where("expires_at", ">", new Date()).first();
-  if (existing) return { ok: true };
-  await db("checkout_inventory_hold").where({ cart_id: cartId }).delete(); // stale/expired rows for this cart, if any
+  await releaseCheckoutHold(container, cartId);
 
   const locationId = await firstStockLocationId(container);
   if (!locationId) return { ok: true }; // no stock location configured — nothing to reserve against
@@ -73,6 +76,10 @@ export async function reserveCartForCheckout(container: MedusaContainer, cartId:
 
   const inventoryService = container.resolve(Modules.INVENTORY) as any;
   const created: { reservationId: string }[] = [];
+
+  if ((cart.items || []).some((item: any) => Number(item.quantity ?? 1) > MAX_HOLD_PER_LINE)) {
+    return { ok: false, error: `For more than ${MAX_HOLD_PER_LINE} of one part, please request a bulk quote.` };
+  }
 
   try {
     for (const item of cart.items || []) {

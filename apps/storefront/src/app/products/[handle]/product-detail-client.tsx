@@ -20,6 +20,7 @@ import { CompatibleParts } from "./components/compatible-parts";
 import { FrequentlyBoughtTogether } from "./components/frequently-bought-together";
 import { RecentlyViewed } from "./components/recently-viewed";
 import { WishlistButton } from "./components/wishlist-button";
+import { loadReviews } from "./components/product-reviews";
 import { ProductAlternatives } from "@/components/product/product-alternatives";
 import type { CompatibleItem } from "@/lib/data/compatible-products";
 import type { Offer } from "@/lib/data/site-settings";
@@ -573,8 +574,7 @@ function DeliveryCheck() {
 function RatingSummary({ productId }: { productId: string }) {
   const [summary, setSummary] = useState<{ average: number; total: number } | null>(null);
   useEffect(() => {
-    fetch(`/api/products/${productId}/reviews`)
-      .then((r) => (r.ok ? r.json() : null))
+    loadReviews(productId)
       .then((d) => d?.total_reviews > 0 && setSummary({ average: Number(d.average_rating) || 0, total: d.total_reviews }))
       .catch(() => null);
   }, [productId]);

@@ -1,6 +1,17 @@
 import { defineMiddlewares, authenticate } from "@medusajs/framework/http";
 import { requireOrderOwner } from "./middlewares/require-order-owner";
 import { rateLimit } from "./middlewares/rate-limit";
+import { releaseCheckoutHold } from "../lib/inventory-hold";
+
+/**
+ * Medusa's own cart completion reserves stock for the order and checks availability, so this cart's
+ * checkout hold must be handed back first or completion fails for the held units. The Razorpay path
+ * does the same in lib/razorpay-checkout.ts.
+ */
+async function releaseHoldBeforeComplete(req: any, _res: any, next: any) {
+  await releaseCheckoutHold(req.scope, req.params.id).catch(() => null);
+  next();
+}
 
 function captureRawBody(req: any, _res: any, next: any) {
   const chunks: Buffer[] = [];
@@ -29,6 +40,9 @@ export default defineMiddlewares({
     { matcher: "/store/bulk-orders", method: ["POST"], middlewares: [rateLimit("bulk-orders", 10, 3600)] },
     { matcher: "/store/delivery-check", method: ["GET"], middlewares: [rateLimit("delivery-check", 30, 60)] },
     { matcher: "/store/customers", method: ["POST"], middlewares: [rateLimit("customer-create", 10, 3600)] },
+    // A stock hold per checkout attempt: a real shopper needs a few, a script locking stock needs many.
+    { matcher: "/store/carts/:id/reserve", method: ["POST"], middlewares: [rateLimit("cart-reserve", 8, 900)] },
+    { matcher: "/store/carts/:id/complete", method: ["POST"], middlewares: [releaseHoldBeforeComplete] },
     {
       matcher: "/webhooks/razorpay",
       method: ["POST"],

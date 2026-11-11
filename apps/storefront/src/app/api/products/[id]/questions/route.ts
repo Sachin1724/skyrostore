@@ -9,7 +9,7 @@ export async function GET(
 ) {
   const { id } = await params;
   try {
-    const res = await fetch(`${BASE}/store/products/${id}/questions`, {
+    const res = await fetch(`${BASE}/store/products/${encodeURIComponent(id)}/questions`, {
       headers: {
         "x-publishable-api-key": PK,
       },
@@ -34,7 +34,7 @@ export async function POST(
   const { id } = await params;
   try {
     const body = await request.json();
-    const res = await fetch(`${BASE}/store/products/${id}/questions`, {
+    const res = await fetch(`${BASE}/store/products/${encodeURIComponent(id)}/questions`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -31,7 +31,7 @@ export async function GET(
       "fulfillments.labels.tracking_url",
     ].join(",");
 
-    const res = await fetch(`${BASE}/store/orders/${id}?fields=${encodeURIComponent(fields)}`, {
+    const res = await fetch(`${BASE}/store/orders/${encodeURIComponent(id)}?fields=${encodeURIComponent(fields)}`, {
       headers: {
         "x-publishable-api-key": PK,
         Authorization: `Bearer ${token}`,

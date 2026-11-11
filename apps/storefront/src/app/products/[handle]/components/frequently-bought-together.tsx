@@ -50,6 +50,7 @@ export function FrequentlyBoughtTogether({
   );
   const [adding, setAdding] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [addedNote, setAddedNote] = useState("");
 
   const toggleVariant = (id: string) => {
     setSelectedVariants((prev) => {
@@ -72,7 +73,10 @@ export function FrequentlyBoughtTogether({
     try {
       // One request for the whole bundle.
       const items = selectedProducts.filter((p) => p.variantId).map((p) => ({ variant_id: p.variantId!, quantity: 1 }));
-      if (await addToCart(items, { pending: { title: `${items.length} items` } })) {
+      const result = await addToCart(items, { pending: { title: `${items.length} items` } });
+      if (result) {
+        // Say exactly what went in: one part may have sold out since the page loaded.
+        setAddedNote(result.failed.length ? `Added ${result.added} of ${items.length}; one or more just sold out` : `Added ${result.added} items to cart`);
         setSuccess(true);
         setTimeout(() => setSuccess(false), 3000);
       }
@@ -202,7 +206,7 @@ export function FrequentlyBoughtTogether({
               >
                 {success ? (
                   <>
-                    <Check className="h-5 w-5" /> Added {selectedProducts.length} items to cart
+                    <Check className="h-5 w-5" /> {addedNote}
                   </>
                 ) : adding ? (
                   "Adding…"

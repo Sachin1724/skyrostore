@@ -18,7 +18,7 @@ async function getResumeItems(configId: string | undefined) {
   try {
     const base = process.env.NEXT_PUBLIC_MEDUSA_URL || "http://localhost:9000";
     const pk = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "";
-    const res = await fetch(`${base}/store/uav/configurations/${configId}`, {
+    const res = await fetch(`${base}/store/uav/configurations/${encodeURIComponent(configId)}`, {
       headers: { "x-publishable-api-key": pk, Authorization: `Bearer ${token}` },
       cache: "no-store",
     });

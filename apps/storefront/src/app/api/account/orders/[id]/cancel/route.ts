@@ -9,7 +9,7 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
   const token = (await cookies()).get("customer_token")?.value;
   if (!token) return NextResponse.json({ error: "Authentication required" }, { status: 401 });
 
-  const res = await fetch(`${BASE}/store/orders/${id}/cancel`, {
+  const res = await fetch(`${BASE}/store/orders/${encodeURIComponent(id)}/cancel`, {
     method: "POST",
     headers: { "x-publishable-api-key": PK, Authorization: `Bearer ${token}` },
   });

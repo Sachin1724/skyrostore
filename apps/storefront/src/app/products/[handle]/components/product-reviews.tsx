@@ -14,6 +14,18 @@ interface Review {
   created_at: string;
 }
 
+// One request per product page: the rating line under the title and this section share it.
+const reviewsRequests = new Map<string, Promise<any>>(); // eslint-disable-line @typescript-eslint/no-explicit-any
+export function loadReviews(productId: string) {
+  if (!reviewsRequests.has(productId)) {
+    reviewsRequests.set(
+      productId,
+      fetch(`/api/products/${productId}/reviews`).then((r) => (r.ok ? r.json() : null)).catch(() => null)
+    );
+  }
+  return reviewsRequests.get(productId)!;
+}
+
 interface ProductReviewsProps {
   productId: string;
   productTitle: string;
@@ -38,8 +50,7 @@ export function ProductReviews({ productId, productTitle }: ProductReviewsProps)
   const modalRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
-    fetch(`/api/products/${productId}/reviews`)
-      .then((r) => (r.ok ? r.json() : null))
+    loadReviews(productId)
       .then((data) => {
         if (data) {
           setReviews(data.reviews || []);

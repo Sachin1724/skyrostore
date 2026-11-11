@@ -12,7 +12,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
     return NextResponse.json({ error: "Authentication required" }, { status: 401 });
   }
 
-  const res = await fetch(`${BASE}/store/uav/configurations/${id}`, {
+  const res = await fetch(`${BASE}/store/uav/configurations/${encodeURIComponent(id)}`, {
     headers: {
       "x-publishable-api-key": PK,
       Authorization: `Bearer ${token}`,

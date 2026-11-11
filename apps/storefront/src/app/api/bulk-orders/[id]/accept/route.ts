@@ -16,7 +16,7 @@ export async function POST(
       return NextResponse.json({ error: "Authentication required" }, { status: 401 });
     }
 
-    const res = await fetch(`${BASE}/store/bulk-orders/${id}/accept`, {
+    const res = await fetch(`${BASE}/store/bulk-orders/${encodeURIComponent(id)}/accept`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

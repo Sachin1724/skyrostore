@@ -121,6 +121,9 @@ export async function confirmRazorpayCart(
     },
   });
 
+  // Hand the held units back first: completeCartWorkflow reserves stock for the order itself and checks
+  // what is available, so a hold still in place would make it fail after the customer has paid.
+  await releaseCheckoutHold(container, cart_id).catch(() => null);
   try {
     const { result } = await completeCartWorkflow(container).run({ input: { id: cart_id } });
     return { order_id: (result as any).id };
@@ -129,8 +132,5 @@ export async function confirmRazorpayCart(
     const order = await existingOrderId(container, cart_id);
     if (order) return { order_id: order };
     throw err;
-  } finally {
-    // The order now holds its own reservation (on success) or none is needed (on failure).
-    await releaseCheckoutHold(container, cart_id).catch(() => null);
   }
 }

@@ -122,13 +122,15 @@ export async function POST(request: NextRequest) {
         if (gstin && !GSTIN_RE.test(gstin)) {
           return NextResponse.json({ error: "That GSTIN doesn't look valid. Check for typos." }, { status: 400 });
         }
-        const data = await storeApi(`/store/carts/${cart_id}`, "POST", {
+        const data = await storeApi(`/store/carts/${encodeURIComponent(cart_id)}`, "POST", {
           ...(typeof email === "string" && email ? { email } : {}),
           shipping_address: { country_code: "in" },
-          // Carried onto the order on completion, for the itemized GST tax invoice.
+          // Carried onto the order on completion, for the itemized GST tax invoice. Always sent: Medusa
+          // merges metadata and drops a key set to "", so an unticked "business purchase" clears a GSTIN
+          // left by an earlier attempt instead of carrying it onto this order.
           metadata: {
-            ...(company_name ? { company_name: String(company_name).trim().slice(0, 200) } : {}),
-            ...(gstin ? { gstin } : {}),
+            company_name: company_name ? String(company_name).trim().slice(0, 200) : "",
+            gstin: gstin || "",
           },
         });
         recordStep(journey, "checkout_step_completed", { cart_id, checkout_step: "customer" });
@@ -137,7 +139,7 @@ export async function POST(request: NextRequest) {
 
       case "shipping": {
         const { shipping_options } = await storeApi(
-          `/store/shipping-options?cart_id=${cart_id}`
+          `/store/shipping-options?cart_id=${encodeURIComponent(cart_id)}`
         );
 
         if (!shipping_options?.length) {
@@ -154,7 +156,7 @@ export async function POST(request: NextRequest) {
 
         const option = shipping_options[0];
         const data = await storeApi(
-          `/store/carts/${cart_id}/shipping-methods`,
+          `/store/carts/${encodeURIComponent(cart_id)}/shipping-methods`,
           "POST",
           { option_id: option.id }
         );
@@ -173,9 +175,10 @@ export async function POST(request: NextRequest) {
         // Hold stock before opening Razorpay — otherwise two shoppers can both
         // pay for the last unit and the second one's money is taken with
         // nothing to show for it. See backend lib/inventory-hold.ts.
-        const reserveRes = await fetch(`${BASE}/store/carts/${cart_id}/reserve`, {
+        // Visitor headers so the backend's per-visitor limit applies to this shopper, not to this server.
+        const reserveRes = await fetch(`${BASE}/store/carts/${encodeURIComponent(cart_id)}/reserve`, {
           method: "POST",
-          headers: { "Content-Type": "application/json", "x-publishable-api-key": PK },
+          headers: { "Content-Type": "application/json", "x-publishable-api-key": PK, ...visitorHeaders(request) },
         });
         if (!reserveRes.ok) {
           const reserveData = await reserveRes.json().catch(() => ({}));
@@ -199,7 +202,7 @@ export async function POST(request: NextRequest) {
         let providerId = requestedProvider || "pp_system_default";
         try {
           const { payment_providers } = await storeApi(
-            `/store/payment-providers?region_id=${(await storeApi(`/store/carts/${cart_id}`)).cart.region_id}`
+            `/store/payment-providers?region_id=${(await storeApi(`/store/carts/${encodeURIComponent(cart_id)}`)).cart.region_id}`
           );
           const available = (payment_providers || []).map((p: any) => p.id);
           if (available.includes("pp_razorpay") && !requestedProvider) {
@@ -215,7 +218,7 @@ export async function POST(request: NextRequest) {
         // and the provider re-checks the paid amount against the cart total.
         let data: Record<string, unknown> = { cart_id };
         if (providerId === "pp_razorpay") {
-          const { cart } = await storeApi(`/store/carts/${cart_id}`);
+          const { cart } = await storeApi(`/store/carts/${encodeURIComponent(cart_id)}`);
           data = { cart_id, line_items: buildLineItems(cart) };
         }
 
@@ -241,7 +244,7 @@ export async function POST(request: NextRequest) {
           visitor_id: journey.visitor_id,
         });
 
-        const { cart } = await storeApi(`/store/carts/${cart_id}`);
+        const { cart } = await storeApi(`/store/carts/${encodeURIComponent(cart_id)}`);
         return NextResponse.json({
           cart,
           payment_collection_id: pcId,
@@ -255,7 +258,7 @@ export async function POST(request: NextRequest) {
         if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
           return NextResponse.json({ error: "Missing Razorpay verification fields" }, { status: 400 });
         }
-        const { cart: preCart } = await storeApi(`/store/carts/${cart_id}`);
+        const { cart: preCart } = await storeApi(`/store/carts/${encodeURIComponent(cart_id)}`);
 
         const res = await fetch(`${BASE}/store/razorpay/confirm`, {
           method: "POST",
@@ -294,7 +297,7 @@ export async function POST(request: NextRequest) {
 
       case "complete": {
         // Re-validate UAV components in cart before completing
-        const { cart: preCart } = await storeApi(`/store/carts/${cart_id}`);
+        const { cart: preCart } = await storeApi(`/store/carts/${encodeURIComponent(cart_id)}`);
         if (preCart?.items?.length) {
           try {
             const variantIds = preCart.items.map((i: any) => i.variant_id).filter(Boolean);
@@ -344,7 +347,7 @@ export async function POST(request: NextRequest) {
         }
 
         const result = await storeApi(
-          `/store/carts/${cart_id}/complete`,
+          `/store/carts/${encodeURIComponent(cart_id)}/complete`,
           "POST"
         );
 

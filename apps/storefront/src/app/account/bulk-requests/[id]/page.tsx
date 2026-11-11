@@ -25,7 +25,7 @@ export default async function CustomerRequestDetailPage({
 
   let requestData: any = null;
   try {
-    const res = await fetch(`${BASE}/store/bulk-orders/${id}`, {
+    const res = await fetch(`${BASE}/store/bulk-orders/${encodeURIComponent(id)}`, {
       headers: {
         "x-publishable-api-key": PK,
         Authorization: `Bearer ${token}`,

@@ -1,13 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
+import { passwordProblem } from "@/lib/password";
 
 const BASE = process.env.NEXT_PUBLIC_MEDUSA_URL || "http://localhost:9000";
 const PK = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "";
 
 export async function POST(request: NextRequest) {
   const { token, password } = await request.json().catch(() => ({}));
-  if (!token || !password) {
-    return NextResponse.json({ error: "Missing token or password" }, { status: 400 });
+  if (typeof token !== "string" || !token) {
+    return NextResponse.json({ error: "That reset link is invalid or has expired." }, { status: 400 });
   }
+  const problem = passwordProblem(password);
+  if (problem) return NextResponse.json({ error: problem }, { status: 400 });
 
   const res = await fetch(`${BASE}/auth/customer/emailpass/update`, {
     method: "POST",
