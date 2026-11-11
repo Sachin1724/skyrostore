@@ -38,10 +38,11 @@ export function productSummary(product: HttpTypes.StoreProduct) {
   };
 }
 
+// Silent when there is plenty: "In stock" on every card is noise. Only scarcity and absence are news.
 function StockLine({ inStock, lowStock }: { inStock: boolean; lowStock: number | null }) {
   if (!inStock) return <span className="text-[13px] font-medium text-text-muted">Out of stock</span>;
   if (lowStock) return <span className="text-[13px] font-semibold text-warning-strong">Only {lowStock} left</span>;
-  return <span className="text-[13px] font-semibold text-success">In stock</span>;
+  return null;
 }
 
 function PriceLine({ s }: { s: ReturnType<typeof productSummary> }) {
@@ -60,15 +61,15 @@ function PriceLine({ s }: { s: ReturnType<typeof productSummary> }) {
   );
 }
 
-function AddButton({ product, s }: { product: HttpTypes.StoreProduct; s: ReturnType<typeof productSummary> }) {
+function AddButton({ product, s, label = false }: { product: HttpTypes.StoreProduct; s: ReturnType<typeof productSummary>; label?: boolean }) {
   if (s.multipleVariants) {
     return (
-      <Link href={s.href} className="btn btn-secondary shrink-0">
-        Choose Options
+      <Link href={s.href} className={`btn btn-secondary shrink-0 ${label ? "btn-sm w-full" : ""}`}>
+        See options
       </Link>
     );
   }
-  return <QuickAdd productId={product.id} variantId={s.variantId} inStock={s.inStock} title={s.title} />;
+  return <QuickAdd productId={product.id} variantId={s.variantId} inStock={s.inStock} title={s.title} thumbnail={product.thumbnail} label={label} />;
 }
 
 /** Grid card: the shared tile, fed from a Medusa product. */
@@ -85,7 +86,7 @@ export function ProductCard({ product, priority = false }: { product: HttpTypes.
       spec={s.spec || undefined}
       price={<PriceLine s={s} />}
       status={<StockLine inStock={s.inStock} lowStock={s.lowStock} />}
-      action={<AddButton product={product} s={s} />}
+      footer={<AddButton product={product} s={s} label />}
       badge={
         s.original ? (
           <span className="absolute left-0 top-3 z-10 rounded-r-full bg-error py-1 pl-2.5 pr-3 text-[13px] font-semibold text-white">

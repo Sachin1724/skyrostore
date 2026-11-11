@@ -22,8 +22,8 @@ type RawCategory = {
   category_children?: RawCategory[] | null;
 };
 
-/** Strips the seed marker so it never reaches customers. */
-export const cleanName = (name: string) => name.replace("[DEV] ", "");
+import { cleanName } from "@/lib/utils";
+export { cleanName };
 
 function toNode(raw: RawCategory): CategoryNode {
   return {

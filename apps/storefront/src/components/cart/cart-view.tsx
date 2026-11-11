@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import { track, getVisitorId } from "@/lib/analytics";
+import { addToCart } from "@/lib/cart-client";
 import { ProductMediaFallback } from "@/components/product/product-media-fallback";
 
 const DEFAULT_FREE_SHIPPING_THRESHOLD = 500000; // Rs 5,000 in paise, used until the prop arrives
@@ -62,7 +63,10 @@ function savedItemsHeaders(): HeadersInit {
   return { "Content-Type": "application/json", "x-visitor-id": getVisitorId() };
 }
 
-export function CartView({ freeShippingThreshold = DEFAULT_FREE_SHIPPING_THRESHOLD }: { freeShippingThreshold?: number } = {}) {
+export function CartView({
+  freeShippingThreshold = DEFAULT_FREE_SHIPPING_THRESHOLD,
+  deliveryCharge = null,
+}: { freeShippingThreshold?: number; deliveryCharge?: number | null } = {}) {
   const FREE_SHIPPING_THRESHOLD = freeShippingThreshold;
   const [cart, setCart] = useState<Cart | null>(null);
   const [loading, setLoading] = useState(true);
@@ -162,25 +166,12 @@ export function CartView({ freeShippingThreshold = DEFAULT_FREE_SHIPPING_THRESHO
     if (!cart || !lastRemovedItem?.variantId || isPending) return;
 
     startTransition(async () => {
-      try {
-        const res = await fetch("/api/cart/add", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            variantId: lastRemovedItem.variantId,
-            quantity: lastRemovedItem.quantity,
-          }),
-        });
-        if (res.ok) {
-          const data = await res.json();
-          if (data.cart) setCart(data.cart);
-          setLastRemovedItem(null);
-          setCartMessage("Item restored to cart.");
-          window.dispatchEvent(new CustomEvent("skyro:cart_updated"));
-        }
-      } catch {
-        // Fallback
-      }
+      const data = await addToCart([{ variant_id: lastRemovedItem.variantId!, quantity: lastRemovedItem.quantity }], { open: false });
+      if (data?.cart) setCart(data.cart);
+      if (data) {
+        setLastRemovedItem(null);
+        setCartMessage("Item restored to cart.");
+      } else setCartMessage("The item could not be restored. Try again.");
     });
   }
 
@@ -247,27 +238,16 @@ export function CartView({ freeShippingThreshold = DEFAULT_FREE_SHIPPING_THRESHO
 
   async function moveToCart(saved: SavedItem) {
     startTransition(async () => {
-      try {
-        const res = await fetch("/api/cart/add", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ variantId: saved.variantId, quantity: 1 }),
-        });
-        if (res.ok) {
-          const data = await res.json();
-          if (data.cart) setCart(data.cart);
-          setSavedItems(savedItems.filter((i) => i.variantId !== saved.variantId));
-          fetch("/api/saved-cart-items", {
-            method: "DELETE",
-            headers: savedItemsHeaders(),
-            body: JSON.stringify({ variant_id: saved.variantId }),
-          }).catch(() => null);
-          window.dispatchEvent(new CustomEvent("skyro:cart_updated"));
-          setCartMessage(`${saved.title} moved back to cart.`);
-        }
-      } catch {
-        // Fallback
-      }
+      const data = await addToCart([{ variant_id: saved.variantId, quantity: 1 }], { open: false });
+      if (!data) return setCartMessage(`${saved.title} could not be moved. Try again.`);
+      if (data.cart) setCart(data.cart);
+      setSavedItems(savedItems.filter((i) => i.variantId !== saved.variantId));
+      fetch("/api/saved-cart-items", {
+        method: "DELETE",
+        headers: savedItemsHeaders(),
+        body: JSON.stringify({ variant_id: saved.variantId }),
+      }).catch(() => null);
+      setCartMessage(`${saved.title} moved back to cart.`);
     });
   }
 
@@ -323,12 +303,11 @@ export function CartView({ freeShippingThreshold = DEFAULT_FREE_SHIPPING_THRESHO
   const currency = cart?.region?.currency_code || cart?.currency_code || "INR";
   const itemsTotal = items.reduce((s, it) => s + it.total, 0);
   const units = items.reduce((s, it) => s + it.quantity, 0);
-  const qualifiesForFreeShipping = itemsTotal >= FREE_SHIPPING_THRESHOLD;
+  // When delivery already costs nothing, there is no threshold to reach and no bar to show.
+  const alwaysFree = deliveryCharge === 0;
+  const qualifiesForFreeShipping = alwaysFree || itemsTotal >= FREE_SHIPPING_THRESHOLD;
   const shippingRemaining = Math.max(0, FREE_SHIPPING_THRESHOLD - itemsTotal);
   const shippingPercent = Math.min(100, Math.round((itemsTotal / FREE_SHIPPING_THRESHOLD) * 100));
-
-  // 18% GST calculation on tax-inclusive pricing
-  const estimatedGstPaise = Math.round((itemsTotal * 18) / 118);
 
   if (items.length === 0) {
     return (
@@ -338,24 +317,24 @@ export function CartView({ freeShippingThreshold = DEFAULT_FREE_SHIPPING_THRESHO
             <Truck className="h-8 w-8" aria-hidden />
           </div>
           <h2 className="mt-4 text-[22px] md:text-[28px] font-extrabold text-navy">
-            Your shopping cart is currently empty
+            Your cart is empty
           </h2>
           <p className="mt-2 text-[16px] text-text-secondary max-w-[48ch] mx-auto">
-            Browse our catalogue of verified brushless motors, digital autopilots, and airframes to build your fleet.
+            Find motors, flight controllers, frames and complete drones.
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-3">
             <Link
               href="/parts"
               className="btn btn-primary"
             >
-              Shop UAV Parts
+              Shop parts
               <ArrowRight className="h-4 w-4" aria-hidden />
             </Link>
             <Link
               href="/build"
               className="btn btn-secondary"
             >
-              Launch Build Configurator
+              Build your drone
             </Link>
           </div>
         </div>
@@ -364,7 +343,7 @@ export function CartView({ freeShippingThreshold = DEFAULT_FREE_SHIPPING_THRESHO
         {savedItems.length > 0 ? (
           <section aria-labelledby="saved-for-later-empty-heading" className="card p-6">
             <h3 id="saved-for-later-empty-heading" className="text-[18px] font-extrabold text-navy">
-              Saved for Later ({savedItems.length})
+              Saved for later ({savedItems.length})
             </h3>
             <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
               {savedItems.map((saved) => (
@@ -386,7 +365,7 @@ export function CartView({ freeShippingThreshold = DEFAULT_FREE_SHIPPING_THRESHO
                       onClick={() => moveToCart(saved)}
                       className="flex-1 rounded bg-navy py-1.5 text-[13px] font-bold text-white hover:bg-brand"
                     >
-                      Move to Cart
+                      Move to cart
                     </button>
                     <button
                       type="button"
@@ -409,8 +388,8 @@ export function CartView({ freeShippingThreshold = DEFAULT_FREE_SHIPPING_THRESHO
   return (
     <div className="space-y-6">
       {/* Free Shipping Progress Indicator */}
-      <section
-        aria-label="Shipping threshold tracker"
+      {alwaysFree ? null : <section
+        aria-label="Free delivery"
         className="card p-4 md:p-5"
       >
         <div className="flex items-center justify-between gap-4">
@@ -418,23 +397,18 @@ export function CartView({ freeShippingThreshold = DEFAULT_FREE_SHIPPING_THRESHO
             <Truck className={`h-5 w-5 ${qualifiesForFreeShipping ? "text-success" : "text-brand"}`} aria-hidden />
             <span className="text-[14px] font-bold text-navy">
               {qualifiesForFreeShipping ? (
-                <span className="text-success font-extrabold">
-                  You have unlocked FREE Tracked Air Express Shipping across India!
-                </span>
+                <span className="font-semibold text-success">Your order gets free delivery.</span>
               ) : (
                 <span>
-                  Add <strong className="text-brand tabular-nums">{formatPrice(shippingRemaining, currency)}</strong> more to unlock <strong className="text-navy">FREE Air Express Shipping</strong>
+                  Add <strong className="text-brand tabular-nums">{formatPrice(shippingRemaining, currency)}</strong> more for free delivery
                 </span>
               )}
             </span>
           </div>
-          <span className="text-[13px] font-bold tabular-nums text-text-muted">
-            {shippingPercent}%
-          </span>
         </div>
 
         {/* Progress Bar Track */}
-        <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-surface-soft border border-border/60">
+        <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-surface-soft">
           <div
             className={`h-full transition-all duration-300 ease-out ${
               qualifiesForFreeShipping ? "bg-success" : "bg-brand"
@@ -442,11 +416,11 @@ export function CartView({ freeShippingThreshold = DEFAULT_FREE_SHIPPING_THRESHO
             style={{ width: `${shippingPercent}%` }}
           />
         </div>
-      </section>
+      </section>}
 
       {/* Undo Notification Banner */}
       {lastRemovedItem ? (
-        <div className="flex items-center justify-between rounded-lg border border-border bg-brand-soft px-4 py-3 text-[13px] text-navy">
+        <div className="flex items-center justify-between rounded-lg bg-brand-soft px-4 py-3 text-[14px] text-navy">
           <span>
             Removed <strong>{lastRemovedItem.title}</strong> from your cart.
           </span>
@@ -561,7 +535,7 @@ export function CartView({ freeShippingThreshold = DEFAULT_FREE_SHIPPING_THRESHO
                           className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-text-secondary hover:text-brand transition-colors"
                         >
                           <Bookmark className="h-3.5 w-3.5" aria-hidden />
-                          <span>Save for Later</span>
+                          <span>Save for later</span>
                         </button>
                         <button
                           type="button"
@@ -584,7 +558,7 @@ export function CartView({ freeShippingThreshold = DEFAULT_FREE_SHIPPING_THRESHO
           {savedItems.length > 0 ? (
             <section aria-labelledby="saved-for-later-heading" className="card p-5 md:p-6">
               <h3 id="saved-for-later-heading" className="text-[16px] font-extrabold text-navy">
-                Saved for Later ({savedItems.length})
+                Saved for later ({savedItems.length})
               </h3>
               <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {savedItems.map((saved) => (
@@ -608,7 +582,7 @@ export function CartView({ freeShippingThreshold = DEFAULT_FREE_SHIPPING_THRESHO
                         onClick={() => moveToCart(saved)}
                         className="flex-1 rounded bg-navy py-1.5 text-[13px] font-bold text-white hover:bg-brand transition-colors"
                       >
-                        Move to Cart
+                        Move to cart
                       </button>
                       <button
                         type="button"
@@ -629,33 +603,24 @@ export function CartView({ freeShippingThreshold = DEFAULT_FREE_SHIPPING_THRESHO
         {/* Order Summary Sidebar */}
         <div className="card p-6 lg:sticky lg:top-[120px]">
           <h2 className="text-[18px] font-extrabold text-navy border-b border-border pb-3">
-            Order Summary
+            Order summary
           </h2>
 
           <dl className="mt-4 space-y-2.5 text-[14px] text-text-secondary">
             <div className="flex justify-between gap-4">
-              <dt>Items Subtotal ({units} {units === 1 ? "unit" : "units"})</dt>
+              <dt>Items ({units})</dt>
               <dd className="tabular-nums font-semibold text-navy">{formatPrice(itemsTotal, currency)}</dd>
             </div>
 
             <div className="flex justify-between gap-4">
-              <dt className="flex items-center gap-1">
-                <span>Estimated 18% GST</span>
-              </dt>
-              <dd className="tabular-nums text-text-secondary font-medium">
-                {formatPrice(estimatedGstPaise, currency)}
-              </dd>
-            </div>
-
-            <div className="flex justify-between gap-4">
-              <dt>Tracked Delhivery Shipping</dt>
-              <dd className="text-right font-bold text-success">
-                {qualifiesForFreeShipping ? "FREE" : "Flat Rate"}
+              <dt>Delivery</dt>
+              <dd className={`text-right font-semibold ${qualifiesForFreeShipping ? "text-success" : "text-navy"}`}>
+                {qualifiesForFreeShipping ? "Free" : "Calculated at checkout"}
               </dd>
             </div>
 
             <div className="flex items-baseline justify-between gap-4 border-t border-border pt-3">
-              <dt className="text-[16px] font-extrabold text-navy">Order Total</dt>
+              <dt className="text-[16px] font-extrabold text-navy">Total</dt>
               <dd className="text-[24px] font-extrabold tabular-nums text-navy">
                 {formatPrice(itemsTotal, currency)}
               </dd>
@@ -663,7 +628,7 @@ export function CartView({ freeShippingThreshold = DEFAULT_FREE_SHIPPING_THRESHO
           </dl>
 
           <p className="mt-1 text-[13px] text-text-muted">
-            Includes all statutory Indian GST taxes. ITC tax invoice generated upon confirmation.
+            Prices include GST. Your GST invoice shows the tax for each item.
           </p>
 
           {/* Promo code coupon input */}
@@ -711,7 +676,7 @@ export function CartView({ freeShippingThreshold = DEFAULT_FREE_SHIPPING_THRESHO
             href="/checkout"
             className="btn btn-primary mt-6 flex w-full"
           >
-            <span>Proceed to Checkout</span>
+            <span>Check out</span>
             <ArrowRight className="h-4 w-4" aria-hidden />
           </Link>
 
@@ -719,15 +684,15 @@ export function CartView({ freeShippingThreshold = DEFAULT_FREE_SHIPPING_THRESHO
           <div className="mt-5 space-y-2 border-t border-border pt-4 text-[13px] text-text-secondary">
             <div className="flex items-center gap-2">
               <Lock className="h-3.5 w-3.5 text-brand shrink-0" aria-hidden />
-              <span>Razorpay Secured · UPI, Cards, NetBanking</span>
+              <span>Pay by UPI, card or netbanking, secured by Razorpay</span>
             </div>
             <div className="flex items-center gap-2">
               <Truck className="h-3.5 w-3.5 text-brand shrink-0" aria-hidden />
-              <span>Orders before 2 PM dispatch same business day</span>
+              <span>Tracked delivery, tracking number by email</span>
             </div>
             <div className="flex items-center gap-2">
               <FileText className="h-3.5 w-3.5 text-brand shrink-0" aria-hidden />
-              <span>Full GST Tax Invoices for ITC Claims</span>
+              <span>GST invoice with every order</span>
             </div>
           </div>
 
@@ -736,7 +701,7 @@ export function CartView({ freeShippingThreshold = DEFAULT_FREE_SHIPPING_THRESHO
               href="/parts"
               className="text-[13px] font-semibold text-brand hover:text-navy transition-colors"
             >
-              &larr; Continue Shopping UAV Parts
+              Continue shopping
             </Link>
           </div>
         </div>

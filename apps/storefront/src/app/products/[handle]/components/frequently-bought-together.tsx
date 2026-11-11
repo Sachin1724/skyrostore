@@ -7,7 +7,7 @@ import { Check, Plus, ShoppingCart } from "lucide-react";
 import type { HttpTypes } from "@medusajs/types";
 import type { CompatibleItem } from "@/lib/data/compatible-products";
 import { formatPrice } from "@/lib/utils";
-import { CART_ADDED } from "@/components/layout/header-bar";
+import { addToCart } from "@/lib/cart-client";
 import { ProductMediaFallback } from "@/components/product/product-media-fallback";
 
 interface FrequentlyBoughtTogetherProps {
@@ -33,7 +33,7 @@ export function FrequentlyBoughtTogether({
       variantId: currentVariant?.id ?? "",
       price: currentPrice,
       isCurrent: true,
-      role: "Main Product",
+      role: "This item",
     },
     ...bundleCompanions.map((c) => ({
       product: c.product,
@@ -70,31 +70,12 @@ export function FrequentlyBoughtTogether({
     if (adding || selectedProducts.length === 0) return;
     setAdding(true);
     try {
-      const cartId = localStorage.getItem("cart_id");
-      let activeCartId = cartId;
-
-      for (const item of selectedProducts) {
-        if (!item.variantId) continue;
-        const res = await fetch("/api/cart/add", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            cart_id: activeCartId,
-            variant_id: item.variantId,
-            quantity: 1,
-          }),
-        });
-
-        if (res.ok) {
-          const data = await res.json();
-          activeCartId = data.cart_id;
-          localStorage.setItem("cart_id", data.cart_id);
-        }
+      // One request for the whole bundle.
+      const items = selectedProducts.filter((p) => p.variantId).map((p) => ({ variant_id: p.variantId!, quantity: 1 }));
+      if (await addToCart(items, { pending: { title: `${items.length} items` } })) {
+        setSuccess(true);
+        setTimeout(() => setSuccess(false), 3000);
       }
-
-      window.dispatchEvent(new Event(CART_ADDED));
-      setSuccess(true);
-      setTimeout(() => setSuccess(false), 3000);
     } catch {
       // Ignored
     } finally {
@@ -105,10 +86,10 @@ export function FrequentlyBoughtTogether({
   return (
     <section aria-labelledby="bundle-heading" className="mt-12">
       <h2 id="bundle-heading" className="text-[22px] font-extrabold tracking-[-0.02em] text-navy">
-        Frequently Bought Together
+        Buy it with
       </h2>
       <p className="mt-1 text-[14px] text-text-secondary">
-        Pair this component with matching propulsion and power hardware.
+        Parts that fit this one, checked by our compatibility rules.
       </p>
 
       <div className="mt-6 card p-5 lg:p-7">
@@ -169,7 +150,7 @@ export function FrequentlyBoughtTogether({
           <div className="flex flex-col justify-between border-t border-border pt-5 lg:border-l lg:border-t-0 lg:pl-8 lg:pt-0">
             <div>
               <span className="text-[13px] font-semibold text-text-secondary">
-                Bundle Price ({selectedProducts.length} items)
+                Total for {selectedProducts.length} items
               </span>
               <div className="mt-1.5 flex items-baseline gap-2">
                 <span className="text-[28px] font-extrabold tabular-nums text-navy">
@@ -227,7 +208,7 @@ export function FrequentlyBoughtTogether({
                   "Adding Bundle..."
                 ) : (
                   <>
-                    <ShoppingCart className="h-4 w-4" /> Add All {selectedProducts.length} to Cart
+                    <ShoppingCart className="h-4 w-4" /> Add all {selectedProducts.length} to cart
                   </>
                 )}
               </button>

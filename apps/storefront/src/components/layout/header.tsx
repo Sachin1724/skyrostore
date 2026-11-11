@@ -4,8 +4,9 @@ import { HeaderBar } from "./header-bar";
 import { CategoryMenu } from "./category-menu";
 import { Ticker } from "./ticker";
 import { NavLink } from "./nav-link";
+import { categoryHref } from "@/lib/category-art";
 
-const BAR_LIMIT = 7;
+const BAR_LIMIT = 8;
 
 /** Site header: facts strip, logo + search + account + cart, then the category bar. */
 export async function Header() {
@@ -21,7 +22,7 @@ export async function Header() {
       <header className="sticky top-0 z-50 bg-white/85 backdrop-blur-xl backdrop-saturate-150">
         <HeaderBar categories={tree.map((c) => ({ name: c.name, handle: c.handle }))} />
         <nav aria-label="Categories" className="hidden pb-2.5 lg:block">
-          <div className="mx-auto flex h-10 max-w-[1760px] items-center gap-7 px-8 text-[14px] font-medium text-text-secondary">
+          <div className="mx-auto flex h-10 max-w-[1760px] items-center gap-5 px-8 text-[14px] font-medium text-text-secondary xl:gap-7">
             <CategoryMenu tree={tree} />
             <Suspense fallback={null}>
               {tree.length === 0 ? (
@@ -30,13 +31,14 @@ export async function Header() {
                   <NavLink href="/parts">Parts</NavLink>
                 </>
               ) : (
-                tree.slice(0, BAR_LIMIT).map((c) => (
-                  <NavLink key={c.id} href={`/parts?category=${c.handle}`}>{c.name}</NavLink>
+                // Below xl the last categories give way so Bulk orders always fits; all stay in "All categories".
+                tree.slice(0, BAR_LIMIT).map((c, i) => (
+                  <NavLink key={c.id} href={categoryHref(c)} className={i >= 6 ? "hidden xl:block" : ""}>{c.name}</NavLink>
                 ))
               )}
               <span className="flex-1" />
-              <NavLink href="/build" className="font-semibold text-brand">Build your drone</NavLink>
-              <NavLink href="/bulk-orders">Bulk orders</NavLink>
+              <NavLink href="/build" className="hidden font-semibold text-brand xl:block">Build your drone</NavLink>
+              <NavLink href="/bulk-orders" className="font-semibold text-navy">Bulk orders</NavLink>
             </Suspense>
           </div>
         </nav>

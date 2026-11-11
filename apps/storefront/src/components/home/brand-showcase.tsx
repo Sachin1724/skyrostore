@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, ShieldCheck } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { BrandBar } from "./brand-bar";
 
 interface BrandItem {
@@ -13,56 +13,43 @@ interface BrandShowcaseProps {
 }
 
 export function BrandShowcase({ brands }: BrandShowcaseProps) {
-  if (brands.length === 0) return null;
+  // One brand is not a choice; the section appears once a second brand has products.
+  if (brands.length < 2) return null;
 
   const topBrands = brands.slice(0, 6);
 
   return (
-    <section aria-labelledby="brand-showcase-heading" className="space-y-6">
-      <div className="flex items-end justify-between border-b border-border pb-3.5">
-        <div>
-          <div className="flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-wider text-brand">
-            <ShieldCheck className="h-3.5 w-3.5" aria-hidden />
-            Authorized Supply Chain
-          </div>
-          <h2
-            id="brand-showcase-heading"
-            className="text-[clamp(1.4rem,1.1rem+1vw,1.75rem)] font-extrabold tracking-[-0.02em] text-navy"
-          >
-            Certified Component Manufacturers
-          </h2>
-        </div>
-        <Link
-          href="/brands"
-          className="inline-flex items-center gap-1 text-[13px] font-bold text-brand hover:text-navy transition-colors"
-        >
-          View All {brands.length} Brands
+    <section aria-labelledby="brand-showcase-heading" className="space-y-5">
+      <div className="flex items-baseline justify-between">
+        <h2 id="brand-showcase-heading" className="text-[clamp(1.4rem,1.1rem+1vw,1.75rem)] font-extrabold tracking-[-0.02em] text-navy">
+          Shop by brand
+        </h2>
+        <Link href="/brands" className="inline-flex items-center gap-1 text-[14px] font-semibold text-brand transition-colors hover:text-navy">
+          All {brands.length} brands
           <ArrowRight className="h-3.5 w-3.5" aria-hidden />
         </Link>
       </div>
 
-      {/* Brand Cards Grid */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-6">
         {topBrands.map((b) => (
           <Link
             key={b.handle}
             href={`/brands/${b.handle}`}
-            className="group flex flex-col items-center justify-center rounded-lg border border-border bg-white p-4 text-center transition-all duration-200 hover:-translate-y-0.5 hover:border-brand hover:shadow-sm"
+            className="group flex flex-col items-center justify-center rounded-lg bg-white p-4 text-center transition-colors"
           >
-            <span className="text-[15px] font-extrabold tracking-tight text-navy group-hover:text-brand transition-colors">
-              {b.title}
-            </span>
-            <span className="mt-1 rounded bg-surface-soft px-2 py-0.5 text-[11px] font-semibold tabular-nums text-text-muted">
+            <span className="text-[15px] font-extrabold tracking-tight text-navy transition-colors group-hover:text-brand">{b.title}</span>
+            <span className="mt-1 text-[13px] tabular-nums text-text-secondary">
               {b.count} {b.count === 1 ? "part" : "parts"}
             </span>
           </Link>
         ))}
       </div>
 
-      {/* Marquee Strip */}
-      <div className="overflow-hidden rounded-xl border border-brand/20">
-        <BrandBar brands={brands} />
-      </div>
+      {brands.length > 6 ? (
+        <div className="overflow-hidden rounded-xl">
+          <BrandBar brands={brands} />
+        </div>
+      ) : null}
     </section>
   );
 }

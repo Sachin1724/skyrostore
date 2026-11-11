@@ -8,7 +8,7 @@ import { BulkRequestsDashboard } from "@/components/account/bulk-requests-dashbo
 import { Plus } from "lucide-react";
 
 export const metadata = {
-  title: "B2B & Bulk UAV Quotations — Skyrostore",
+  title: "Quotations",
   description: "Track enterprise purchase requests, review formal engineering quotations, and manage institutional build orders.",
 };
 
@@ -27,7 +27,7 @@ export default async function CustomerBulkRequestsPage() {
             <span aria-hidden="true">/</span>
             <Link href="/account" className="hover:text-brand">Account</Link>
             <span aria-hidden="true">/</span>
-            <span className="font-semibold text-navy">Bulk Quotations</span>
+            <span className="font-semibold text-navy">Quotations</span>
           </nav>
         </div>
 
@@ -38,7 +38,7 @@ export default async function CustomerBulkRequestsPage() {
                 Institutional Procurement Portal
               </span>
               <h1 className="mt-1 text-[clamp(1.6rem,1.2rem+1.4vw,2.1rem)] font-extrabold tracking-[-0.03em] text-navy">
-                B2B &amp; Bulk UAV Quotations
+                Quotations
               </h1>
             </div>
 

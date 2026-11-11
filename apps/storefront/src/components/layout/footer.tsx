@@ -8,7 +8,7 @@ const COLUMNS = [
       { href: "/account/orders", label: "Track an order" },
       { href: "/policies/shipping", label: "Shipping" },
       { href: "/policies/refunds", label: "Returns and refunds" },
-      { href: "/support", label: "Contact support" },
+      { href: "/support", label: "Help and support" },
     ],
   },
   {
@@ -17,7 +17,7 @@ const COLUMNS = [
       { href: "/parts", label: "All parts" },
       { href: "/uavs", label: "Drones" },
       { href: "/brands", label: "Brands" },
-      { href: "/build", label: "Build checker" },
+      { href: "/build", label: "Build your drone" },
     ],
   },
   {
@@ -25,22 +25,41 @@ const COLUMNS = [
     links: [
       { href: "/bulk-orders", label: "Bulk orders" },
       { href: "/bulk-orders/request", label: "Request a quote" },
-      { href: "/account/bulk-requests", label: "My quotations" },
+      { href: "/account/bulk-requests", label: "Your quotations" },
     ],
   },
 ];
 
-const PAYMENT_METHODS = ["UPI", "Cards", "Netbanking", "Razorpay"];
+// Phone, WhatsApp, registered address and social links join this block once the owner confirms them.
+const CONTACT = [
+  { label: "Orders and products", email: "support@skyrostore.com" },
+  { label: "Bulk orders", email: "bulk@skyrostore.com" },
+];
+
+const POLICIES = [
+  { href: "/policies/shipping", label: "Shipping" },
+  { href: "/policies/refunds", label: "Returns" },
+  { href: "/policies/terms", label: "Terms" },
+  { href: "/policies/privacy", label: "Privacy" },
+];
 
 export function Footer() {
   return (
     <footer className="bg-navy text-on-dark">
       <div className="mx-auto grid max-w-[1760px] gap-10 px-4 pb-10 pt-14 sm:grid-cols-2 md:px-8 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
-        <div className="space-y-3">
+        <div className="space-y-4">
           <SkyroLogo light />
           <p className="max-w-[34ch] text-[14px] leading-relaxed text-on-dark">
             Drone parts and complete UAVs, checked for compatibility before they ship from Odisha.
           </p>
+          <ul className="space-y-2 text-[14px]">
+            {CONTACT.map((c) => (
+              <li key={c.email}>
+                <span className="block text-[13px] text-on-dark-muted">{c.label}</span>
+                <a href={`mailto:${c.email}`} className="text-white hover:underline">{c.email}</a>
+              </li>
+            ))}
+          </ul>
         </div>
         {COLUMNS.map((col) => (
           <div key={col.title}>
@@ -59,16 +78,13 @@ export function Footer() {
       </div>
       <div className="bg-graphite-soft/30">
         <div className="mx-auto flex max-w-[1760px] flex-wrap items-center justify-between gap-4 px-4 py-5 text-[13px] text-on-dark-muted md:px-8">
-          <p>
-            &copy; {new Date().getFullYear()} Skyrostore ·{" "}
-            <Link href="/policies/terms" className="hover:text-white">Terms</Link> ·{" "}
-            <Link href="/policies/privacy" className="hover:text-white">Privacy</Link>
-          </p>
-          <ul aria-label="Payment methods" className="flex flex-wrap gap-2">
-            {PAYMENT_METHODS.map((m) => (
-              <li key={m} className="rounded border border-graphite-soft px-2.5 py-1 text-on-dark">{m}</li>
+          <p className="flex flex-wrap gap-x-3 gap-y-1">
+            <span>&copy; {new Date().getFullYear()} Skyrostore</span>
+            {POLICIES.map((p) => (
+              <Link key={p.href} href={p.href} className="hover:text-white">{p.label}</Link>
             ))}
-          </ul>
+          </p>
+          <p>Payments by UPI, cards and netbanking, secured by Razorpay</p>
         </div>
       </div>
     </footer>

@@ -8,12 +8,12 @@ import { RecentlyViewed } from "@/components/product/recently-viewed";
 import { getSiteSettings } from "@/lib/data/site-settings";
 
 export const metadata = {
-  title: "Shopping Cart — Skyrostore",
+  title: "Cart",
   description: "Review UAV components in your shopping cart, calculate shipping, and proceed to secure checkout.",
 };
 
 export default async function CartPage() {
-  const { freeShippingThreshold } = await getSiteSettings();
+  const { freeShippingThreshold, deliveryCharge } = await getSiteSettings();
   return (
     <>
       <Header />
@@ -25,20 +25,20 @@ export default async function CartPage() {
           <nav aria-label="Breadcrumb" className="flex items-center gap-1.5  text-[13px] text-text-secondary">
             <Link href="/" className="hover:text-brand">Home</Link>
             <span aria-hidden>/</span>
-            <span className="font-semibold text-navy">Shopping Cart</span>
+            <span className="font-semibold text-navy">Cart</span>
           </nav>
         </div>
 
           <h1 className="pb-5 pt-4 text-[clamp(1.6rem,1.2rem+1.4vw,2.1rem)] font-extrabold tracking-[-0.03em] text-navy">
-            Shopping Cart
+            Your cart
           </h1>
 
           <Suspense>
-            <CartView freeShippingThreshold={freeShippingThreshold} />
+            <CartView freeShippingThreshold={freeShippingThreshold} deliveryCharge={deliveryCharge} />
           </Suspense>
 
           <div className="mt-14">
-            <RecentlyViewed title="You Might Also Need (Recently Viewed)" />
+            <RecentlyViewed title="Recently viewed" />
           </div>
         </div>
       </main>

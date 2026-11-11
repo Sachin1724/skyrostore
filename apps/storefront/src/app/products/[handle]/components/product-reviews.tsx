@@ -105,23 +105,15 @@ export function ProductReviews({ productId, productTitle }: ProductReviewsProps)
 
   return (
     <section id="reviews" aria-labelledby="reviews-heading" className="scroll-mt-36 pt-4">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border pb-6">
-        <div>
-          <h2 id="reviews-heading" className="text-[22px] font-extrabold tracking-[-0.02em] text-navy">
-            Verified Builder Reviews
-          </h2>
-          <p className="mt-1 text-[14px] text-text-secondary">
-            Authentic feedback from pilots and engineers testing on bench and field.
-          </p>
-        </div>
-
-        <button
-          type="button"
-          onClick={() => setIsModalOpen(true)}
-          className="self-start sm:self-auto rounded-md bg-navy px-5 py-2.5 text-[14px] font-bold text-white transition-colors hover:bg-brand"
-        >
-          Write a Review
-        </button>
+      <div className="flex items-center justify-between gap-4">
+        <h2 id="reviews-heading" className="text-[22px] font-extrabold tracking-[-0.02em] text-navy">
+          Customer reviews
+        </h2>
+        {total > 0 ? (
+          <button type="button" onClick={() => setIsModalOpen(true)} className="btn btn-secondary btn-sm">
+            Write a review
+          </button>
+        ) : null}
       </div>
 
       {total > 0 ? (
@@ -217,7 +209,7 @@ export function ProductReviews({ productId, productTitle }: ProductReviewsProps)
 
                 {r.hardware_setup ? (
                   <div className="mt-3 inline-flex items-center gap-1.5 rounded bg-surface-soft px-2.5 py-1 text-[13px] font-semibold text-text-secondary">
-                    <span className="font-bold text-navy">Hardware Setup:</span> {r.hardware_setup}
+                    <span className="font-bold text-navy">Setup:</span> {r.hardware_setup}
                   </div>
                 ) : null}
               </article>
@@ -242,7 +234,7 @@ export function ProductReviews({ productId, productTitle }: ProductReviewsProps)
         className="pop m-auto w-[min(92vw,560px)] card p-6 shadow-2xl backdrop:bg-navy/70"
       >
         <div className="flex items-center justify-between border-b border-border pb-3">
-          <h3 className="text-[18px] font-bold text-navy">Write a Review</h3>
+          <h3 className="text-[18px] font-bold text-navy">Write a review</h3>
           <button
             type="button"
             onClick={() => setIsModalOpen(false)}
@@ -317,7 +309,7 @@ export function ProductReviews({ productId, productTitle }: ProductReviewsProps)
 
             <div>
               <label htmlFor="rev-setup" className="block text-[13px] font-bold text-navy">
-                Hardware Setup (Optional)
+                Your setup (optional)
               </label>
               <input
                 id="rev-setup"

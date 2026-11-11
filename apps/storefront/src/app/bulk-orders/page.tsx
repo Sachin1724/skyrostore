@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 
 export const metadata = {
-  title: "Institutional Supply & Bulk UAV Orders — Skyrostore",
+  title: "Bulk orders",
   description:
     "Institutional procurement, volume component supply, and custom aerial platform engineering with bench validation and GST tax invoicing across India.",
 };

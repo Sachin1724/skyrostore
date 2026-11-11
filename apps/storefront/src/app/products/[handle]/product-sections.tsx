@@ -192,7 +192,7 @@ function CopySpecs({ specs }: { specs: TechnicalSpecificationField[] }) {
       className="inline-flex h-9 items-center gap-1.5 rounded-md border border-border-strong px-3 text-[13px] font-semibold text-navy hover:border-brand hover:text-brand"
     >
       {copied ? <Check className="fade-in h-4 w-4 text-success" aria-hidden /> : <Copy className="h-4 w-4" aria-hidden />}
-      <span aria-live="polite">{copied ? "Copied" : "Copy Specs"}</span>
+      <span aria-live="polite">{copied ? "Copied" : "Copy specs"}</span>
     </button>
   );
 }

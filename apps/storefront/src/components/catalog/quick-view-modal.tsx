@@ -188,11 +188,11 @@ export function QuickViewModal() {
             <div className="mt-4 grid grid-cols-2 gap-2 text-[13px] text-text-secondary border-t border-border pt-3">
               <div className="flex items-center gap-1.5">
                 <Truck className="h-3.5 w-3.5 text-brand" aria-hidden />
-                <span>Delhivery Air Express</span>
+                <span>Tracked delivery</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <ShieldCheck className="h-3.5 w-3.5 text-brand" aria-hidden />
-                <span>Genuine Hardware</span>
+                <span>GST invoice</span>
               </div>
             </div>
           </div>

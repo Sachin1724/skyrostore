@@ -1,8 +1,7 @@
 /**
  * UAV engineering shorthand a product title never spells out, so a plain
  * substring search for "fc" or "esc" misses everything. Expand the acronym
- * into the phrase actual titles use, and let the existing multi-word search
- * (already in /api/search/suggest) try both.
+ * into the phrase actual titles use; lib/data/products.ts searches every form.
  */
 const ACRONYM_MAP: Record<string, string> = {
   fc: "flight controller",
@@ -18,20 +17,30 @@ const ACRONYM_MAP: Record<string, string> = {
   bec: "battery eliminator circuit",
   elrs: "expresslrs receiver",
   fpv: "fpv",
+  // Everyday words for what the catalogue calls something else.
+  drone: "quadcopter",
+  drones: "quadcopter",
+  uav: "quadcopter",
+  quad: "quadcopter",
+  prop: "propeller",
+  props: "propeller",
+  autopilot: "flight controller",
+  battery: "lipo",
+  batteries: "lipo",
 };
 
-/** The query itself, plus any acronym it contains expanded to the full phrase — not a replacement, an addition. */
-export function expandAcronyms(query: string): string[] {
-  const lower = query.toLowerCase().trim();
-  const words = lower.split(/\s+/);
-  const expansions = new Set<string>();
-  for (const w of words) {
-    const expansion = ACRONYM_MAP[w];
-    if (expansion && expansion !== w) {
-      expansions.add(lower.replace(new RegExp(`\\b${w}\\b`), expansion));
-    }
-  }
-  return [...expansions];
+/** "motors" -> "motor", "batteries" -> "battery"; spec tokens like "6s" and short words stay as typed. */
+export function singular(word: string): string {
+  if (word.length < 4 || /\d/.test(word)) return word;
+  if (word.endsWith("ies")) return word.slice(0, -3) + "y";
+  if (word.endsWith("ss")) return word;
+  return word.endsWith("s") ? word.slice(0, -1) : word;
+}
+
+/** Every way to look one query word up: as typed, singular, and its catalogue synonym. */
+export function wordForms(word: string): string[] {
+  const w = word.toLowerCase();
+  return [...new Set([w, singular(w), ACRONYM_MAP[w], ACRONYM_MAP[singular(w)]].filter((x): x is string => Boolean(x)))];
 }
 
 export interface ParsedSpecs {

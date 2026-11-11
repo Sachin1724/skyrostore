@@ -9,9 +9,9 @@ interface HomeFaqProps {
   faq: FAQItem[];
 }
 
-const SHOWN = 6;
+const SHOWN = 4;
 
-/** Six questions in two columns, all closed. The rest live on the support page. */
+/** Four questions in two columns, all closed. The rest live on the support page. */
 export function HomeFaq({ faq }: HomeFaqProps) {
   if (faq.length === 0) return null;
   const shown = faq.slice(0, SHOWN);

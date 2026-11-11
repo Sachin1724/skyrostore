@@ -5,10 +5,11 @@ import { BackLink } from "@/components/layout/back-link";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { HttpTypes } from "@medusajs/types";
-import { Clock, CreditCard, FileText, RotateCcw, Share2, ShieldCheck, Truck } from "lucide-react";
+import { Clock, FileText, Share2, ShieldCheck, Star, Truck } from "lucide-react";
 import { useIconHover } from "@animateicons/react";
 import { ShoppingCartIcon, CheckIcon } from "@animateicons/react/lucide";
-import { CART_ADDED } from "@/components/layout/header-bar";
+import { addToCart as addItems } from "@/lib/cart-client";
+import { saveDeliveryPin, useDeliveryPin } from "@/lib/delivery-pin";
 import { formatPrice } from "@/lib/utils";
 import { extractTechnicalSpecs, getProductTechnicalHighlights } from "@/lib/technical-specs";
 import { track } from "@/lib/analytics";
@@ -21,14 +22,16 @@ import { RecentlyViewed } from "./components/recently-viewed";
 import { WishlistButton } from "./components/wishlist-button";
 import { ProductAlternatives } from "@/components/product/product-alternatives";
 import type { CompatibleItem } from "@/lib/data/compatible-products";
+import type { Offer } from "@/lib/data/site-settings";
 
 const LOW_STOCK = 5;
 
-const TRUST = [
-  { icon: Truck, title: "Tracked delivery", text: "Courier tracking number on every parcel" },
-  { icon: CreditCard, title: "Secure payment", text: "UPI, cards and netbanking via Razorpay" },
-  { icon: FileText, title: "GST invoice", text: "Included with every order" },
-  { icon: RotateCcw, title: "Damaged on arrival?", text: "Replaced or refunded", href: "/policies/refunds" },
+// True for every order; shown beside the buttons, where the decision is made.
+const POLICY = [
+  { text: "Tracked delivery, tracking number by email", href: "/policies/shipping" },
+  { text: "Pay by UPI, card or netbanking through Razorpay" },
+  { text: "GST invoice with every order" },
+  { text: "Damaged on arrival? Replaced or refunded", href: "/policies/refunds" },
 ];
 
 interface ProductDetailClientProps {
@@ -36,6 +39,7 @@ interface ProductDetailClientProps {
   trail?: { name: string; handle: string }[];
   brand?: { title: string; handle: string } | null;
   compatibleItems?: CompatibleItem[];
+  offers?: Offer[];
 }
 
 export function ProductDetailClient({
@@ -43,6 +47,7 @@ export function ProductDetailClient({
   trail = [],
   brand = null,
   compatibleItems = [],
+  offers = [],
 }: ProductDetailClientProps) {
   const router = useRouter();
   const variants = product.variants ?? [];
@@ -102,48 +107,32 @@ export function ProductDetailClient({
   async function addToCart(openCart: boolean): Promise<boolean> {
     if (!variant?.id || !inStock || cartState === "adding") return false;
     setCartState("adding");
-    try {
-      const res = await fetch("/api/cart/add", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          cart_id: localStorage.getItem("cart_id"),
-          variant_id: variant.id,
-          quantity,
-        }),
-      });
-
-      if (!res.ok) {
-        setCartState("failed");
-        return false;
-      }
-
-      const data = await res.json();
-      localStorage.setItem("cart_id", data.cart_id);
-      window.dispatchEvent(new Event(openCart ? CART_ADDED : "storage"));
-      track("product_added_to_cart", {
-        cart_id: data.cart_id,
-        product_id: product.id,
-        variant_id: variant.id,
-        quantity,
-        value: amount,
-        currency_code: currency,
-      });
-
-      setCartState("added");
-      setTimeout(() => setCartState("idle"), 2000);
-      return true;
-    } catch {
+    const data = await addItems([{ variant_id: variant.id, quantity }], {
+      open: openCart,
+      pending: { title, thumbnail: images[0] ?? null },
+    });
+    if (!data) {
       setCartState("failed");
       return false;
     }
+    track("product_added_to_cart", {
+      cart_id: data.cart_id,
+      product_id: product.id,
+      variant_id: variant.id,
+      quantity,
+      value: amount,
+      currency_code: currency,
+    });
+    setCartState("added");
+    setTimeout(() => setCartState("idle"), 2000);
+    return true;
   }
 
   const buyNow = async () => {
     if (await addToCart(false)) router.push("/checkout");
   };
 
-  const addLabel = cartState === "adding" ? "Adding…" : cartState === "added" ? "Added to Cart" : "Add to Cart";
+  const addLabel = cartState === "adding" ? "Adding…" : cartState === "added" ? "Added to cart" : "Add to cart";
   const { ref: cartIconRef, triggerProps: cartIconTrigger } = useIconHover({ trigger: "click" });
   const priceText = amount != null ? formatPrice(amount, currency) : null;
 
@@ -170,15 +159,18 @@ export function ProductDetailClient({
       {/* Main PDP Grid: Gallery (Left) and Buy Box (Right) */}
       <section className="mt-4 grid gap-8 lg:grid-cols-[minmax(0,6fr)_minmax(0,5fr)] lg:gap-12">
         {/* Product Gallery Island */}
-        <ProductGallery
-          title={title}
-          images={images}
-          thumbnail={product.thumbnail ?? null}
-          videoUrl={listing.video_url ?? (metadata.video_url as string | null | undefined)}
-          componentType={metadata.component_type as string | undefined}
-          category={category}
-          discountPercent={discountPercent}
-        />
+        {/* The picture stays in view while the taller buy box scrolls past it. */}
+        <div className="lg:sticky lg:top-[150px] lg:self-start">
+          <ProductGallery
+            title={title}
+            images={images}
+            thumbnail={product.thumbnail ?? null}
+            videoUrl={listing.video_url ?? (metadata.video_url as string | null | undefined)}
+            componentType={metadata.component_type as string | undefined}
+            category={category}
+            discountPercent={discountPercent}
+          />
+        </div>
 
         {/* Buy Box Information */}
         <div>
@@ -195,6 +187,7 @@ export function ProductDetailClient({
           <h1 className="mt-1.5 text-[clamp(1.6rem,1.2rem+1.6vw,2.4rem)] font-extrabold leading-tight tracking-[-0.03em] text-balance text-navy">
             {title}
           </h1>
+          <RatingSummary productId={product.id} />
 
           {highlights.length ? (
             <ul className="mt-3 flex flex-wrap gap-1.5">
@@ -211,7 +204,7 @@ export function ProductDetailClient({
             <p className="flex flex-wrap items-baseline gap-x-3 tabular-nums">
               <span className="text-[30px] font-extrabold text-navy">{priceText ?? "Price on request"}</span>
               {original ? <s className="text-[16px] text-text-muted">{formatPrice(original, currency)}</s> : null}
-              {priceText ? <span className="text-[14px] text-text-secondary">incl. GST</span> : null}
+              {priceText ? <span className="text-[14px] text-text-secondary">Inclusive of all taxes</span> : null}
             </p>
             {discountPercent ? (
               <p className="text-[14px] font-semibold text-success">
@@ -255,7 +248,7 @@ export function ProductDetailClient({
           {/* Variants Selector */}
           {variants.length > 1 ? (
             <fieldset className="mt-5">
-              <legend className="text-[14px] font-bold text-navy">Select Specification</legend>
+              <legend className="text-[14px] font-bold text-navy">Option</legend>
               <div className="mt-2 flex flex-wrap gap-2">
                 {variants.map((v) => (
                   <button
@@ -278,6 +271,11 @@ export function ProductDetailClient({
               </div>
             </fieldset>
           ) : null}
+
+          {offers.length ? <Offers offers={offers} /> : null}
+
+          {/* Delivery first, as large stores do: the buyer knows it reaches them before pressing buy. */}
+          <DeliveryCheck />
 
           {/* Quantity Stepper and Actions */}
           <div ref={buyBoxRef} className="mt-5 space-y-3">
@@ -329,19 +327,25 @@ export function ProductDetailClient({
                 type="button"
                 onClick={buyNow}
                 disabled={!inStock || cartState === "adding"}
-                className="btn btn-secondary"
+                className="btn btn-brand"
               >
-                Buy Now
+                Buy now
               </button>
             </div>
 
             <p aria-live="polite" className="min-h-5 text-[14px] text-error">
               {cartState === "failed" ? "Could not add to cart. Check your connection and try again." : ""}
             </p>
-          </div>
 
-          {/* Postal Delivery PIN Code Verification */}
-          <DeliveryCheck />
+            <ul className="space-y-1 text-[13px] text-text-secondary">
+              {POLICY.map((p) => (
+                <li key={p.text} className="flex items-center gap-2">
+                  <span aria-hidden className="h-1 w-1 shrink-0 rounded-full bg-text-muted" />
+                  {p.href ? <Link href={p.href} className="hover:text-brand">{p.text}</Link> : p.text}
+                </li>
+              ))}
+            </ul>
+          </div>
 
           {/* Institutional / Compatibility Helpers */}
           <div className="mt-4 flex flex-wrap items-center gap-2 text-[14px] text-text-secondary">
@@ -382,39 +386,6 @@ export function ProductDetailClient({
         </div>
       </section>
 
-      {/* 4-Column Trust Guarantee Strip */}
-      <ul className="mt-10 grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-border bg-border lg:grid-cols-4">
-        {TRUST.map(({ icon: Icon, title: t, text, href }) => {
-          const body = (
-            <>
-              <Icon className="h-6 w-6 shrink-0 text-brand" strokeWidth={1.6} aria-hidden />
-              <span>
-                <span className="block text-[14px] font-bold text-navy">{t}</span>
-                <span className="block text-[13px] text-text-secondary">{text}</span>
-              </span>
-            </>
-          );
-          return (
-            <li key={t} className="bg-white">
-              {href ? (
-                <Link href={href} className="flex h-full items-center gap-3 p-4 hover:bg-surface-soft">{body}</Link>
-              ) : (
-                <div className="flex h-full items-center gap-3 p-4">{body}</div>
-              )}
-            </li>
-          );
-        })}
-      </ul>
-
-      {/* Frequently Bought Together Bundle */}
-      <FrequentlyBoughtTogether
-        currentProduct={product}
-        compatibleItems={compatibleItems}
-      />
-
-      {/* "Works With" Verified Compatible Parts */}
-      <CompatibleParts items={compatibleItems} />
-
       {/* Deep Technical Specifications, Overview, Documents, Reviews, Q&A */}
       <ProductSections
         productId={product.id}
@@ -424,19 +395,29 @@ export function ProductDetailClient({
         listing={listing}
       />
 
+      {/* Buy it with: parts the compatibility rules pair with this one */}
+      <FrequentlyBoughtTogether
+        currentProduct={product}
+        compatibleItems={compatibleItems}
+      />
+
+      {/* Works with this part */}
+      <CompatibleParts items={compatibleItems} />
+
       {/* Recently Viewed Products History */}
       <RecentlyViewed currentProduct={product} className="mt-12" />
 
       {/* Mobile Sticky Buy Bar */}
       <div
-        className={`fixed inset-x-0 bottom-0 z-30 flex items-center gap-2 border-t border-border bg-white px-4 py-2.5 pb-[max(0.625rem,env(safe-area-inset-bottom))] transition-transform duration-300 ease-drawer lg:hidden ${
+        className={`fixed inset-x-0 bottom-0 z-30 flex items-center gap-2 border-t border-border bg-white px-4 py-2.5 pb-[max(0.625rem,env(safe-area-inset-bottom))] transition-transform duration-300 ease-drawer ${
           buyBoxVisible ? "translate-y-full" : "translate-y-0"
         }`}
         aria-hidden={buyBoxVisible}
         inert={buyBoxVisible}
       >
-        <p className="min-w-0 flex-1 truncate text-[16px] font-extrabold tabular-nums text-navy">
-          {priceText ?? "Price on request"}
+        <p className="flex min-w-0 flex-1 items-baseline gap-3">
+          <span className="hidden truncate text-[15px] font-semibold text-navy lg:block">{title}</span>
+          <span className="shrink-0 text-[16px] font-extrabold tabular-nums text-navy">{priceText ?? "Price on request"}</span>
         </p>
         <button
           type="button"
@@ -444,15 +425,15 @@ export function ProductDetailClient({
           disabled={!inStock || cartState === "adding"}
           className="btn btn-secondary btn-sm"
         >
-          {cartState === "added" ? "Added" : "Add"}
+          {cartState === "added" ? "Added" : "Add to cart"}
         </button>
         <button
           type="button"
           onClick={buyNow}
           disabled={!inStock || cartState === "adding"}
-          className="btn btn-primary btn-sm"
+          className="btn btn-brand btn-sm"
         >
-          Buy Now
+          Buy now
         </button>
       </div>
     </div>
@@ -474,63 +455,143 @@ function ShareButton({ title }: { title: string }) {
       className="btn btn-secondary btn-sm mr-3"
     >
       <Share2 className="h-4 w-4" aria-hidden />
-      <span aria-live="polite">{copied ? "Link Copied" : "Share"}</span>
+      <span aria-live="polite">{copied ? "Link copied" : "Share"}</span>
     </button>
   );
 }
 
-function DeliveryCheck() {
-  const [pin, setPin] = useState("");
-  const [state, setState] = useState<{ kind: "idle" | "checking" | "yes" | "no" | "unknown" | "error"; pin?: string }>({ kind: "idle" });
+/** Coupon codes the admin chose to show here; each copies with one tap for checkout. */
+function Offers({ offers }: { offers: Offer[] }) {
+  const [copied, setCopied] = useState<string | null>(null);
+  return (
+    <section aria-labelledby="offers-heading" className="mt-5">
+      <h2 id="offers-heading" className="text-[14px] font-semibold text-navy">Available offers</h2>
+      <ul className="mt-2 space-y-1.5">
+        {offers.map((o) => (
+          <li key={o.code} className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[14px] text-navy">
+            <span className="text-success">{o.label}</span>
+            <span className="text-text-secondary">with code</span>
+            <button
+              type="button"
+              onClick={async () => {
+                await navigator.clipboard?.writeText(o.code).catch(() => undefined);
+                setCopied(o.code);
+                setTimeout(() => setCopied(null), 1600);
+              }}
+              className="rounded border border-dashed border-border-strong px-2 py-0.5 text-[13px] font-semibold tracking-wide hover:border-brand"
+            >
+              {o.code}
+            </button>
+            <span aria-live="polite" className="text-[13px] text-text-secondary">{copied === o.code ? "Copied" : ""}</span>
+          </li>
+        ))}
+      </ul>
+      <p className="mt-1 text-[13px] text-text-secondary">Enter the code in your cart before checkout.</p>
+    </section>
+  );
+}
 
-  async function check(e: React.FormEvent) {
+type DeliveryState = { kind: "idle" | "checking" | "yes" | "no" | "unknown" | "error"; pin?: string };
+
+/** Delivery to the buyer's PIN. A PIN saved from the header (or an earlier product) is checked on arrival. */
+function DeliveryCheck() {
+  const saved = useDeliveryPin();
+  const [pin, setPin] = useState("");
+  const [editing, setEditing] = useState(false);
+  const [state, setState] = useState<DeliveryState>({ kind: "idle" });
+
+  async function run(value: string) {
+    if (!/^\d{6}$/.test(value)) return setState({ kind: "error" });
+    setState({ kind: "checking", pin: value });
+    const res = await fetch(`/api/delivery-check?pin=${value}`).catch(() => null);
+    const { serviceable } = res?.ok ? ((await res.json()) as { serviceable: boolean | null }) : { serviceable: null };
+    setState({ kind: serviceable === null ? "unknown" : serviceable ? "yes" : "no", pin: value });
+  }
+
+  useEffect(() => {
+    if (saved && saved !== state.pin) {
+      setPin(saved);
+      void run(saved);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- re-check only when the saved PIN changes
+  }, [saved]);
+
+  function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!/^\d{6}$/.test(pin)) return setState({ kind: "error" });
-    setState({ kind: "checking" });
-    const res = await fetch(`/api/delivery-check?pin=${pin}`).catch(() => null);
-    if (!res?.ok) return setState({ kind: "unknown", pin });
-    const { serviceable } = (await res.json()) as { serviceable: boolean | null };
-    setState({ kind: serviceable === null ? "unknown" : serviceable ? "yes" : "no", pin });
+    setEditing(false);
+    saveDeliveryPin(pin); // the effect above runs the check
+    if (pin === saved) void run(pin);
   }
 
   const message = {
-    idle: "",
-    checking: "Checking courier serviceability…",
-    yes: `Delivery available to ${state.pin}. Same-day dispatch from Odisha.`,
-    no: `Courier direct routes do not reach ${state.pin} yet. Contact support for freight options.`,
-    unknown: "Serviceability confirmed at checkout based on destination.",
-    error: "Enter a valid 6-digit Indian PIN code.",
+    idle: "Enter your PIN code to check delivery.",
+    checking: "Checking…",
+    yes: `Delivers to ${state.pin}.`,
+    no: `Couriers do not reach ${state.pin} yet. Contact support for other options.`,
+    unknown: `We confirm delivery to ${state.pin} at checkout.`,
+    error: "Enter a valid 6-digit PIN code.",
   }[state.kind];
 
+  const showForm = editing || !saved;
+
   return (
-    <form onSubmit={check} className="mt-5 rounded-lg border border-border bg-surface-soft p-4">
-      <label htmlFor="pin" className="flex items-center gap-2 text-[14px] font-bold text-navy">
-        <Truck className="h-4 w-4 text-brand" aria-hidden /> Check Delivery &amp; Pin Code
-      </label>
-      <div className="mt-2 flex gap-2">
-        <input
-          id="pin"
-          name="pin"
-          inputMode="numeric"
-          autoComplete="postal-code"
-          maxLength={6}
-          value={pin}
-          onChange={(e) => setPin(e.target.value.replace(/\D/g, ""))}
-          placeholder="e.g. 751024…"
-          aria-describedby="pin-result"
-          className="h-11 min-w-0 flex-1 rounded-md border border-border-strong bg-white px-3 text-[16px] tabular-nums text-navy focus:border-brand"
-        />
-        <button
-          type="submit"
-          disabled={state.kind === "checking"}
-          className="btn btn-secondary"
-        >
-          Check
-        </button>
-      </div>
-      <p id="pin-result" aria-live="polite" className={`mt-2 min-h-5 text-[14px] ${state.kind === "yes" ? "text-success" : state.kind === "no" || state.kind === "error" ? "text-error" : "text-text-secondary"}`}>
+    <div className="mt-5 rounded-lg bg-surface-soft p-4">
+      <p className="flex items-center gap-2 text-[14px] font-semibold text-navy">
+        <Truck className="h-4 w-4 text-brand" aria-hidden /> Delivery
+        {!showForm ? (
+          <button type="button" onClick={() => setEditing(true)} className="ml-auto text-[13px] font-semibold text-brand hover:text-navy">
+            Change
+          </button>
+        ) : null}
+      </p>
+      {showForm ? (
+        <form onSubmit={submit} className="mt-2 flex gap-2">
+          <label htmlFor="pin" className="sr-only">Delivery PIN code</label>
+          <input
+            id="pin"
+            name="pin"
+            inputMode="numeric"
+            autoComplete="postal-code"
+            maxLength={6}
+            value={pin}
+            onChange={(e) => setPin(e.target.value.replace(/\D/g, ""))}
+            placeholder="PIN code, e.g. 751024"
+            aria-describedby="pin-result"
+            className="h-11 min-w-0 flex-1 rounded-md border border-border-strong bg-white px-3 text-[16px] tabular-nums text-navy focus:border-brand"
+          />
+          <button type="submit" disabled={state.kind === "checking"} className="btn btn-secondary">
+            Check
+          </button>
+        </form>
+      ) : null}
+      <p id="pin-result" aria-live="polite" className={`mt-2 text-[14px] ${state.kind === "yes" ? "font-medium text-success" : state.kind === "no" || state.kind === "error" ? "text-error" : "text-text-secondary"}`}>
         {message}
       </p>
-    </form>
+    </div>
+  );
+}
+
+/** Stars and count under the title, linking to the reviews. Nothing at all until the first review. */
+function RatingSummary({ productId }: { productId: string }) {
+  const [summary, setSummary] = useState<{ average: number; total: number } | null>(null);
+  useEffect(() => {
+    fetch(`/api/products/${productId}/reviews`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => d?.total_reviews > 0 && setSummary({ average: Number(d.average_rating) || 0, total: d.total_reviews }))
+      .catch(() => null);
+  }, [productId]);
+  if (!summary) return null;
+  return (
+    <a href="#reviews" className="mt-2 inline-flex items-center gap-1.5 text-[14px] text-navy hover:text-brand">
+      <span className="flex" aria-hidden>
+        {[1, 2, 3, 4, 5].map((s) => (
+          <Star key={s} className={`h-4 w-4 ${s <= Math.round(summary.average) ? "fill-brand text-brand" : "fill-border text-border-strong"}`} />
+        ))}
+      </span>
+      <span className="tabular-nums">
+        {summary.average.toFixed(1)} · {summary.total} {summary.total === 1 ? "review" : "reviews"}
+      </span>
+    </a>
   );
 }

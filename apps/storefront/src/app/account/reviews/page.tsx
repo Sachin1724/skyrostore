@@ -7,7 +7,7 @@ import { AccountNav } from "@/components/account/account-nav";
 import { MyReviewsView } from "@/components/account/my-reviews-view";
 
 export const metadata = {
-  title: "My Reviews — Skyrostore",
+  title: "Your reviews",
   description: "Reviews you've left on products, including ones awaiting approval.",
 };
 
@@ -25,12 +25,12 @@ export default async function MyReviewsPage() {
               <span aria-hidden>/</span>
               <Link href="/account" className="hover:text-brand">Account</Link>
               <span aria-hidden>/</span>
-              <span className="font-semibold text-navy">My Reviews</span>
+              <span className="font-semibold text-navy">Your reviews</span>
             </nav>
           </div>
 
           <h1 className="pb-6 pt-4 text-[clamp(1.6rem,1.2rem+1.4vw,2.1rem)] font-extrabold tracking-[-0.03em] text-navy">
-            My Reviews
+            Your reviews
           </h1>
 
           <div className="flex flex-col lg:flex-row gap-8 items-start">

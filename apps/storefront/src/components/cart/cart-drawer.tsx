@@ -4,7 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Minus, Plus, Trash2, X } from "lucide-react";
-import { formatPrice } from "@/lib/utils";
+import { cleanName, formatPrice } from "@/lib/utils";
+import type { PendingItem } from "@/lib/cart-client";
 import { track } from "@/lib/analytics";
 
 export type DrawerCart = {
@@ -35,14 +36,17 @@ export function CartDrawer({
   onClose,
   cart,
   setCart,
+  pending = null,
 }: {
   open: boolean;
   onClose: () => void;
   cart: DrawerCart | null;
   setCart: (cart: DrawerCart) => void;
+  /** An item whose add request is still in flight, shown at the top so the press feels instant. */
+  pending?: PendingItem | null;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
-  const [pending, setPending] = useState<string | null>(null);
+  const [busyLine, setBusyLine] = useState<string | null>(null);
   const [message, setMessage] = useState("");
 
   useEffect(() => {
@@ -53,8 +57,8 @@ export function CartDrawer({
   }, [open]);
 
   async function change(lineId: string, quantity: number) {
-    if (!cart || pending) return;
-    setPending(lineId);
+    if (!cart || busyLine) return;
+    setBusyLine(lineId);
     const item = cart.items.find((i) => i.id === lineId);
     const res = await fetch(quantity > 0 ? "/api/cart/update" : "/api/cart/remove", {
       method: "POST",
@@ -72,7 +76,7 @@ export function CartDrawer({
     } else {
       setMessage("The cart could not be updated. Try again.");
     }
-    setPending(null);
+    setBusyLine(null);
   }
 
   const items = cart?.items ?? [];
@@ -98,18 +102,32 @@ export function CartDrawer({
 
         <p aria-live="polite" className="sr-only">{message}</p>
 
-        {items.length === 0 ? (
+        {pending ? (
+          <div className="flex shrink-0 items-center gap-3 border-b border-border bg-surface-soft px-5 py-3" role="status">
+            <div className="relative h-12 w-12 shrink-0 rounded-md bg-white">
+              {pending.thumbnail ? <Image src={pending.thumbnail} alt="" fill sizes="48px" className="object-contain p-1" /> : null}
+            </div>
+            <p className="min-w-0 flex-1 text-[14px]">
+              <span className="line-clamp-1 font-semibold">{pending.title}</span>
+              <span className="text-text-secondary">Adding to your cart…</span>
+            </p>
+          </div>
+        ) : null}
+
+        {items.length === 0 && pending ? (
+          <div className="flex-1" />
+        ) : items.length === 0 ? (
           <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 text-center">
             <p className="text-[16px] text-text-secondary">Your cart is empty.</p>
             <Link href="/parts" onClick={onClose} className="btn btn-primary">
-              Shop Parts
+              Shop parts
             </Link>
           </div>
         ) : (
           <ul className="flex-1 divide-y divide-border overflow-y-auto px-5">
             {items.map((item) => {
-              const name = item.product_title ?? item.title;
-              const busy = pending === item.id;
+              const name = cleanName(item.product_title ?? item.title);
+              const busy = busyLine === item.id;
               return (
                 <li key={item.id} className={`flex gap-3 py-4 ${busy ? "opacity-60" : ""}`}>
                   <div className="relative h-16 w-16 shrink-0 rounded-md bg-surface-soft">
@@ -174,10 +192,10 @@ export function CartDrawer({
             </div>
             <p className="text-[13px] text-text-secondary">Prices include GST. Shipping is shown before you pay.</p>
             <Link href="/checkout" onClick={onClose} className="flex h-12 items-center justify-center rounded-md bg-brand text-[16px] font-semibold text-white hover:bg-navy">
-              Buy Now
+              Check out
             </Link>
             <Link href="/cart" onClick={onClose} className="flex h-11 items-center justify-center rounded-md border border-border-strong font-semibold hover:border-brand hover:text-brand">
-              View Cart
+              View cart
             </Link>
           </div>
         ) : null}

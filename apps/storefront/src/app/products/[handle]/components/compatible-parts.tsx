@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Check, Plus, ShoppingCart } from "lucide-react";
 import type { CompatibleItem } from "@/lib/data/compatible-products";
 import { formatPrice } from "@/lib/utils";
-import { CART_ADDED } from "@/components/layout/header-bar";
+import { addToCart } from "@/lib/cart-client";
 import { ProductTile } from "@/components/product/product-tile";
 import { ProductMediaFallback } from "@/components/product/product-media-fallback";
 
@@ -24,20 +24,7 @@ export function CompatibleParts({ items }: CompatiblePartsProps) {
     if (addingId) return;
     setAddingId(productId);
     try {
-      const res = await fetch("/api/cart/add", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          cart_id: localStorage.getItem("cart_id"),
-          variant_id: variantId,
-          quantity: 1,
-        }),
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        localStorage.setItem("cart_id", data.cart_id);
-        window.dispatchEvent(new Event(CART_ADDED));
+      if (await addToCart([{ variant_id: variantId, quantity: 1 }])) {
         setAddedIds((prev) => new Set(prev).add(productId));
         setTimeout(() => {
           setAddedIds((prev) => {
@@ -59,14 +46,11 @@ export function CompatibleParts({ items }: CompatiblePartsProps) {
       <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
         <div>
           <h2 id="compatible-parts-heading" className="text-[22px] font-extrabold tracking-[-0.02em] text-navy">
-            Works With: Verified Compatible Parts
+            Works with this part
           </h2>
-          <p className="mt-1 text-[14px] text-text-secondary">
-            Validated by Skyrostore compatibility rule engine for direct electrical and mechanical fit.
-          </p>
         </div>
         <Link href="/build" className="text-[13px] font-bold text-brand hover:underline">
-          Open in Build Configurator &rarr;
+          Check a full build &rarr;
         </Link>
       </div>
 

@@ -5,7 +5,7 @@ import { Footer } from "@/components/layout/footer";
 import { ResetPasswordForm } from "./reset-password-form";
 
 export const metadata = {
-  title: "Reset password — Skyrostore",
+  title: "Reset password",
   description: "Set a new password for your Skyrostore account.",
 };
 

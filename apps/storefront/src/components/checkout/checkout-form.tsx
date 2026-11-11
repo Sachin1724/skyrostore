@@ -5,12 +5,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Lock } from "lucide-react";
-import { formatPrice } from "@/lib/utils";
+import { cleanName, formatPrice } from "@/lib/utils";
 import { getSessionId, getVisitorId, track } from "@/lib/analytics";
 
 type CartItem = {
   id: string;
   title: string;
+  product_title?: string | null;
   quantity: number;
   unit_price: number;
   total: number;
@@ -215,7 +216,7 @@ export function CheckoutForm() {
                   ) : null}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-[14px] text-navy">{item.title}</p>
+                  <p className="truncate text-[14px] text-navy">{cleanName(item.product_title ?? item.title)}</p>
                   <p className="text-[13px] text-text-muted">Qty {item.quantity}</p>
                 </div>
                 <span className="shrink-0 text-[14px] tabular-nums text-navy">{formatPrice(item.total, "INR")}</span>
@@ -258,7 +259,7 @@ export function CheckoutForm() {
               onChange={(e) => setIsBusiness(e.target.checked)}
               className="mt-0.5 h-4 w-4 rounded border-border-strong"
             />
-            Purchasing for a business or registered institution? Claim 18% Input Tax Credit.
+            Buying for a business? Add your GSTIN to claim input tax credit.
           </label>
           {isBusiness ? (
             <div className="mt-3 space-y-2.5">

@@ -1,14 +1,14 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { cookies } from "next/headers";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
-import { AccountNav } from "@/components/account/account-nav";
+import { AccountNav, AccountTiles } from "@/components/account/account-nav";
 import { AccountView } from "@/components/account/account-view";
 import { ProfileView } from "@/components/account/profile-view";
+import { isSignedIn } from "@/lib/session";
 
 export const metadata = {
-  title: "Account — Skyrostore",
+  title: "Your account",
   description: "Sign in to access your orders, courier tracking, and tax invoices.",
 };
 
@@ -18,7 +18,7 @@ export const metadata = {
  * It never redirects, so the back button out of a sub-page lands here and stays.
  */
 export default async function AccountPage() {
-  const signedIn = Boolean((await cookies()).get("customer_token")?.value);
+  const signedIn = await isSignedIn();
 
   return (
     <>
@@ -36,6 +36,10 @@ export default async function AccountPage() {
               <AccountNav />
               <div className="w-full min-w-0 flex-1">
                 <h1 className="text-[clamp(1.6rem,1.2rem+1.4vw,2.1rem)] font-semibold text-navy">Your account</h1>
+                {/* Phones and tablets: the sections come first as tiles; desktop has the sidebar. */}
+                <div className="mt-5 lg:hidden">
+                  <AccountTiles />
+                </div>
                 <div className="mt-6">
                   <ProfileView />
                 </div>

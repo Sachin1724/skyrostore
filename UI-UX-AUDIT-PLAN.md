@@ -18,6 +18,30 @@ This plan is ordered around those questions.
 
 ## 0. Broken or trust-killing — fix first
 
+Done 10 Nov: 0.1 (cart routes pass `CART_QUERY` from `lib/medusa.ts`) and 0.6 (search fills the row, icons on
+the right edge).
+
+### Status, 11 Nov
+
+Done in code: 0.1, 0.2 (drawer opens on press, add route returns the cart), 0.4 "[DEV]" hidden in cart and
+checkout, 0.5 (unconfirmed claims removed from ticker, trust strip, brand header, product page, cart; the
+placeholder phone number removed from support and the company policy), 0.6, 0.7, 0.8; header 1.1–1.7 (PIN
+chip, account menu, orders, wishlist, search scope, typo correction with "showing results for", Frames in
+the bar, mega menu with pictures, static announcement bar); card 2.1, 2.2, 2.5, 2.6; listing 3.2–3.5; product
+page 4.1 (rating line once reviews exist), 4.2, 4.4–4.7, 4.9; home 5.1–5.7; copy table in 6; cart 8.1–8.3,
+8.5 (also fixed "Undo" and "Move to cart", which sent the wrong field and never worked).
+
+Not done, and why:
+- 2.3 / 2.4 ratings and delivery dates on cards: no review exists yet, and the courier API returns
+  serviceable yes/no only, no delivery date. Add when Shipmozo's rate API (with ETA) is wired.
+- 4.3 offers: done 11 Nov. Admin → Promotions → "Show on product pages" per code; active ones appear
+  under "Available offers" with one-tap copy.
+- 8.6 cart skeleton: the wait is the backend round trip to Supabase, not the page.
+- 0.3, 0.4 data, brand "k", category pictures: content (see below). The batteries category picture shows a
+  phone, and the propellers one an aircraft propeller.
+- Free delivery: done 11 Nov. `/store/settings` now reports the cheapest delivery price; while it is ₹0 the
+  cart shows "Delivery: Free" and no threshold bar. The bar returns by itself if delivery is ever priced.
+
 | # | What a buyer sees | Cause | Fix |
 |---|---|---|---|
 | 0.1 | Cart drawer line price, /cart subtotal, GST, order total and the free-shipping bar all show **₹NaN** | Medusa 2.21 store cart response has no per-line `total` (checked: `items[0].total` is `undefined`, `unit_price` and `cart.item_total` are present). `cart-drawer.tsx:151` and `cart-view.tsx:324,521` read `item.total` directly. Header total works only because `cartTotal()` falls back to `unit_price × quantity`. | Request the line totals in `/api/cart` (and add/update/remove routes) with `fields=*items,+items.total,+items.subtotal`, or compute the line total once in one helper and use it everywhere. Use `cart.total` / `cart.item_total` for summaries. |
@@ -178,6 +202,15 @@ template tells.
 6. Remove the 3-second skeleton flash: render from the header's already-loaded cart.
 
 ---
+
+## 9. Sideways rows (added 11 Nov, done)
+
+1. A small fixed set never scrolls: the 8 categories are a 4 × 2 grid on phones (picture over name) and one
+   row of 8 from 1280px.
+2. A row that must scroll (product shelves, gallery thumbnails, tab strips) never shows a native scrollbar.
+   It says "more this way" with a peeking next card (phones show 2 cards and a slice), a fade on whichever
+   edge has more, and on desktop arrow buttons that appear only when the row overflows and dim at the ends.
+3. Nothing on a page may be wider than the screen (the restock card was 19px too wide on phones; fixed).
 
 ## Order of work
 

@@ -17,6 +17,7 @@ export function ProductTile({
   action,
   overlay,
   badge,
+  footer,
   selected = false,
   priority = false,
 }: {
@@ -31,6 +32,8 @@ export function ProductTile({
   action?: React.ReactNode;
   overlay?: React.ReactNode;
   badge?: React.ReactNode;
+  /** Full-width row under the price, for a labelled "Add to cart" button. */
+  footer?: React.ReactNode;
   selected?: boolean;
   priority?: boolean;
 }) {
@@ -43,7 +46,7 @@ export function ProductTile({
           fill
           priority={priority}
           sizes="(min-width: 1280px) 20vw, (min-width: 640px) 33vw, 50vw"
-          className="object-contain p-4 transition-transform duration-300 ease-out group-hover:scale-[1.04]"
+          className="object-contain p-3 transition-transform duration-300 ease-out group-hover:scale-[1.04]"
         />
       ) : (
         fallback
@@ -51,7 +54,8 @@ export function ProductTile({
       {badge}
     </>
   );
-  const mediaClass = "relative block aspect-[4/3] w-full bg-surface-soft";
+  // One frame everywhere: square and white like the product photos themselves, so nothing is letterboxed.
+  const mediaClass = "relative block aspect-square w-full bg-white";
 
   return (
     <article
@@ -86,6 +90,7 @@ export function ProductTile({
           </div>
           {action}
         </div>
+        {footer ? <div className="pt-2">{footer}</div> : null}
       </div>
     </article>
   );

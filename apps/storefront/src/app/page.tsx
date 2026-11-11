@@ -4,7 +4,6 @@ import { HeroCarousel } from "@/components/home/hero-carousel";
 import { BrandShowcase } from "@/components/home/brand-showcase";
 import { CategoryGrid } from "@/components/home/category-grid";
 import { TrustGrid } from "@/components/home/trust-grid";
-import { FeaturedTabs } from "@/components/home/featured-tabs";
 import { B2BBanner } from "@/components/home/b2b-banner";
 import { RecommendedForYou } from "@/components/home/recommended-for-you";
 import { ProductRail } from "@/components/home/product-rail";
@@ -12,8 +11,9 @@ import { HomeFaq } from "@/components/home/home-faq";
 import { NewsletterCard } from "@/components/home/newsletter-card";
 import { RecentlyViewed } from "@/components/product/recently-viewed";
 import { getProducts } from "@/lib/data/products";
-import { getBrands, getCatalogIndex, getCategoryTree, countForNode, cleanName } from "@/lib/data/catalog";
+import { getBrands, getCatalogIndex, getCategoryTree, countForNode } from "@/lib/data/catalog";
 import { getSiteContent } from "@/lib/data/site-content";
+import { categoryHref } from "@/lib/category-art";
 
 export default async function HomePage() {
   const [tree, brands, index, { products }, content] = await Promise.all([
@@ -41,35 +41,26 @@ export default async function HomePage() {
     <>
       <Header />
       <main id="main" className="min-h-screen bg-surface-soft pb-20">
-        <div className="mx-auto max-w-[1760px] space-y-14 px-4 pt-5 md:space-y-20 md:px-8 md:pt-6">
-          {/* 1. Hero Overview */}
+        {/* Products reach the first screen: a short banner, then categories, then shelves. */}
+        <div className="mx-auto max-w-[1760px] space-y-10 px-4 pt-4 md:space-y-14 md:px-8 md:pt-5">
           <HeroCarousel slides={content.heroSlides} />
-
-          {/* 2. Certified brands */}
-          <BrandShowcase brands={brandRow} />
-
-          {/* 3. Shop by Category Grid */}
           <CategoryGrid categories={categories} />
-
-          {/* 4. Trust & guarantees */}
           <TrustGrid />
 
-          {/* 5. Featured hardware, tabbed */}
-          <FeaturedTabs products={products} />
-          {categoryShelves.map(({ node, items }) => (
-            <ProductRail key={node.id} title={`Top in ${node.name}`} href={`/parts?category=${node.handle}`} products={items.slice(0, 12)} />
-          ))}
+          {/* Admin order; a best-sellers shelf joins once order analytics can back it. */}
+          <ProductRail title="Popular parts" href="/parts" products={products.slice(0, 12)} />
 
-          {/* 7. Institutional Procurement & Fleet Quotations */}
-          <B2BBanner title={content.closingTitle} subtitle={content.closingSentence} />
-
-          {/* 8. Recently Viewed Hardware (LocalStorage powered, zero CLS) */}
+          {/* This browser's own history; both render nothing on a first visit. */}
           <RecentlyViewed />
           <RecommendedForYou />
 
-          {/* 10. Frequently Asked Questions */}
-          <HomeFaq faq={content.faq} />
+          {categoryShelves.map(({ node, items }) => (
+            <ProductRail key={node.id} title={node.name} href={categoryHref(node)} products={items.slice(0, 12)} />
+          ))}
 
+          <BrandShowcase brands={brandRow} />
+          <B2BBanner title={content.closingTitle} subtitle={content.closingSentence} />
+          <HomeFaq faq={content.faq} />
           <NewsletterCard />
         </div>
       </main>

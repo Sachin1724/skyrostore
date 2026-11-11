@@ -7,7 +7,7 @@ import { ShieldCheck, Wrench, Users, Headphones, Building2, CheckCircle2 } from 
 import { Suspense } from "react";
 
 export const metadata = {
-  title: "Request Bulk UAV Quotation & Custom Builds — Skyrostore",
+  title: "Request a bulk quote",
   description: "Request volume pricing, customized multi-rotor configurations, or institutional tender quotes with technical engineering review.",
 };
 

@@ -6,7 +6,7 @@ import { AccountNav } from "@/components/account/account-nav";
 import { AddressBookView } from "@/components/account/address-book-view";
 
 export const metadata = {
-  title: "Address Book — Skyrostore",
+  title: "Addresses",
   description: "Manage billing and shipping addresses for institutional orders.",
 };
 
@@ -23,12 +23,12 @@ export default function AddressesPage() {
               <span aria-hidden>/</span>
               <Link href="/account" className="hover:text-brand">Account</Link>
               <span aria-hidden>/</span>
-              <span className="font-semibold text-navy">Address Book</span>
+              <span className="font-semibold text-navy">Addresses</span>
             </nav>
           </div>
 
           <h1 className="pb-6 pt-4 text-[clamp(1.6rem,1.2rem+1.4vw,2.1rem)] font-extrabold tracking-[-0.03em] text-navy">
-            Address Book
+            Addresses
           </h1>
 
           <div className="flex flex-col lg:flex-row gap-8 items-start">

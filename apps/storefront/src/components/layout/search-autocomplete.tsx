@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import { Search, Loader2, Clock, X } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import { track } from "@/lib/analytics";
+import { categoryHref } from "@/lib/category-art";
+import type { SearchNote } from "@/lib/data/products";
 
 type Suggestion = {
   id: string;
@@ -48,22 +50,29 @@ function Highlight({ text, query }: { text: string; query: string }) {
   );
 }
 
-/** `category` scopes "see all results" to a category handle; `browse` are real categories offered when the box is empty. */
+/**
+ * `category` scopes "see all results" to a category handle; `browse` are real categories offered when the
+ * box is empty. `scoped` adds an "All ▾" category picker in front of the box, as large stores have.
+ */
 export function SearchAutocomplete({
   className = "",
   category = "",
   browse = [],
+  scoped = false,
 }: {
   className?: string;
   category?: string;
   browse?: { name: string; handle: string }[];
+  scoped?: boolean;
 }) {
   const router = useRouter();
   const listId = useId();
 
+  const [scope, setScope] = useState(category);
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [places, setPlaces] = useState<Place[]>([]);
+  const [note, setNote] = useState<SearchNote>(null);
   const [recent, setRecent] = useState<string[]>([]);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -97,6 +106,7 @@ export function SearchAutocomplete({
         .then((data) => {
           setSuggestions(data.suggestions || []);
           setPlaces(data.places || []);
+          setNote(data.note ?? null);
           setActiveIndex(-1);
         })
         .catch(() => undefined)
@@ -131,7 +141,7 @@ export function SearchAutocomplete({
     track("search_performed", { search_query: trimmed, metadata: { source: "header" } });
     remember(trimmed);
     setOpen(false);
-    router.push(`/search?q=${encodeURIComponent(trimmed)}${category ? `&category=${encodeURIComponent(category)}` : ""}`);
+    router.push(`/search?q=${encodeURIComponent(trimmed)}${scope ? `&category=${encodeURIComponent(scope)}` : ""}`);
   }
 
   function goToProduct(suggestion: Suggestion, position: number) {
@@ -189,6 +199,22 @@ export function SearchAutocomplete({
           goToResults(query);
         }}
       >
+        {scoped && browse.length > 0 ? (
+          <>
+            <label htmlFor={`${listId}-scope`} className="sr-only">Search in</label>
+            <select
+              id={`${listId}-scope`}
+              value={scope}
+              onChange={(e) => setScope(e.target.value)}
+              className="hidden h-full max-w-[150px] shrink-0 cursor-pointer rounded-l-full border-r border-border bg-surface-muted pl-4 pr-2 text-[13px] text-navy focus:outline-none xl:block"
+            >
+              <option value="">All</option>
+              {browse.map((c) => (
+                <option key={c.handle} value={c.handle}>{c.name}</option>
+              ))}
+            </select>
+          </>
+        ) : null}
         <label htmlFor={`${listId}-input`} className="sr-only">
           Search products and parts
         </label>
@@ -266,7 +292,7 @@ export function SearchAutocomplete({
                       <button
                         key={c.handle}
                         type="button"
-                        onClick={() => goToPlace({ kind: "Category", label: c.name, href: `/parts?category=${c.handle}` })}
+                        onClick={() => goToPlace({ kind: "Category", label: c.name, href: categoryHref(c) })}
                         className="rounded-full bg-surface-soft px-3 py-1.5 text-[13px] text-navy hover:bg-surface-muted"
                       >
                         {c.name}
@@ -279,6 +305,12 @@ export function SearchAutocomplete({
           ) : rows.length === 0 ? (
             <p className="px-4 py-3 text-[14px] text-text-muted">{loading ? "Searching…" : `No products match “${query.trim()}”.`}</p>
           ) : (
+            <>
+            {note ? (
+              <p className="border-b border-border bg-surface-soft px-4 py-2 text-[13px] text-text-secondary">
+                {note.kind === "corrected" ? <>Showing results for <strong className="font-semibold text-navy">{note.term}</strong></> : <>No exact match. Showing {note.label}</>}
+              </p>
+            ) : null}
             <ul id={listId} role="listbox" aria-label="Suggestions">
               {rows.map((row, index) => (
                 <li key={row.type === "place" ? `p-${row.place.href}` : row.suggestion.id} id={`${listId}-option-${index}`} role="option" aria-selected={index === activeIndex}>
@@ -326,6 +358,7 @@ export function SearchAutocomplete({
                 </li>
               ))}
             </ul>
+            </>
           )}
 
           {typed && (

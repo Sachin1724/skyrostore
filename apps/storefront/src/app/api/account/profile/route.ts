@@ -17,6 +17,12 @@ export async function GET() {
   if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
     const res = await fetch(`${BASE}/store/customers/me`, { headers: headers(token), cache: "no-store" });
+    // An expired token: drop the cookie so every page and the header agree the visitor is signed out.
+    if (res.status === 401) {
+      const out = NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      out.cookies.delete("customer_token");
+      return out;
+    }
     if (!res.ok) return NextResponse.json({ error: "Could not load your details" }, { status: res.status });
     const { customer } = await res.json();
     return NextResponse.json({

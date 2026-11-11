@@ -7,7 +7,7 @@ import { AccountNav } from "@/components/account/account-nav";
 import { SavedBuildsView } from "@/components/account/saved-builds-view";
 
 export const metadata = {
-  title: "Saved Builds — Skyrostore",
+  title: "Saved builds",
   description: "View the UAV configurations you've validated in the Build tool.",
 };
 
@@ -25,12 +25,12 @@ export default async function SavedBuildsPage() {
               <span aria-hidden>/</span>
               <Link href="/account" className="hover:text-brand">Account</Link>
               <span aria-hidden>/</span>
-              <span className="font-semibold text-navy">Saved Builds</span>
+              <span className="font-semibold text-navy">Saved builds</span>
             </nav>
           </div>
 
           <h1 className="pb-6 pt-4 text-[clamp(1.6rem,1.2rem+1.4vw,2.1rem)] font-extrabold tracking-[-0.03em] text-navy">
-            Saved Builds
+            Saved builds
           </h1>
 
           <div className="flex flex-col lg:flex-row gap-8 items-start">

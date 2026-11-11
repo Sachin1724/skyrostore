@@ -23,8 +23,9 @@ export type CatalogParams = Record<string, string | undefined>;
 const PAGE_SIZE = 24;
 const FETCH_LIMIT = 500;
 
+// "Featured" is the admin's own order. A best-selling sort returns once order analytics can back it.
 const SORTS = [
-  { value: "best_selling", label: "Best Selling" },
+  { value: "featured", label: "Featured" },
   { value: "newest", label: "Newest" },
   { value: "price_asc", label: "Price: low to high" },
   { value: "price_desc", label: "Price: high to low" },
@@ -68,19 +69,22 @@ export async function CatalogView({
   const active = trail ? trail[trail.length - 1] : null;
   const activeBrand = brands.find((b) => b.handle === brandHandle) ?? null;
 
-  const { products: fetched } = await getProducts({
+  const scope = {
     limit: FETCH_LIMIT,
-    q,
     category_id: active ? descendantIds(active) : undefined,
     collection_id: activeBrand ? [activeBrand.id] : undefined,
-  });
+  };
+  // One search pipeline for the page and the header dropdown; `note` says when it corrected a typo
+  // or fell back to the nearest parts, so the page can tell the visitor.
+  const { products: fetched, note } = await getProducts({ ...scope, q });
+  const correctedFrom = note?.kind === "corrected" ? note.term : null;
 
   const specs: Record<string, string> = {};
   for (const [key, value] of Object.entries(params)) if (key.startsWith("f_") && value) specs[key.slice(2)] = value;
   const min = rupeesParam(params.min);
   const max = rupeesParam(params.max);
   const stockOnly = params.stock === "1";
-  const sort = SORTS.some((s) => s.value === params.sort) ? params.sort! : "best_selling";
+  const sort = SORTS.some((s) => s.value === params.sort) ? params.sort! : "featured";
   const view = params.view === "list" ? "list" : "grid";
 
   const facets = buildFacets(fetched);
@@ -91,17 +95,9 @@ export async function CatalogView({
     return !stockOnly || inStock(p);
   });
 
-  if (sort === "best_selling") {
-    list = [...list].sort((a, b) => {
-      const invA = a.variants?.[0]?.inventory_quantity ?? 0;
-      const invB = b.variants?.[0]?.inventory_quantity ?? 0;
-      const countA = (a.variants?.length ?? 1) * 10 + invA;
-      const countB = (b.variants?.length ?? 1) * 10 + invB;
-      return countB - countA;
-    });
-  } else if (sort === "newest") {
+  if (sort === "newest") {
     list = [...list].sort((a, b) => String(b.created_at ?? "").localeCompare(String(a.created_at ?? "")));
-  } else {
+  } else if (sort !== "featured") {
     const dir = sort === "price_asc" ? 1 : -1;
     list = [...list].sort((a, b) => ((amountOf(a) ?? Infinity) - (amountOf(b) ?? Infinity)) * dir);
   }
@@ -138,8 +134,18 @@ export async function CatalogView({
   const clearAll = href(Object.fromEntries(Object.keys(params).filter((k) => k !== "q").map((k) => [k, undefined])));
 
   const levelNodes: CategoryNode[] = fixed.category ? active?.children ?? [] : active ? active.children : tree;
-  const visibleBrands = fixed.brand ? [] : brands.filter((b) => (index.byBrand.get(b.id) ?? 0) > 0);
-  const title = heading ?? (activeBrand && !fixed.brand ? `${activeBrand.title}${active ? ` ${active.name}` : ""}` : active?.name ?? "All Parts");
+  // Counts are taken from the products this page fetched, so they agree with what a click will show.
+  const inNode = (node: CategoryNode) => {
+    const ids = new Set(descendantIds(node));
+    return fetched.filter((p) => p.categories?.some((c) => ids.has(c.id))).length;
+  };
+  const brandCount = (id: string) => fetched.filter((p) => p.collection_id === id).length;
+  // One brand is no choice; the group appears once a second brand has products.
+  const brandsWithProducts = brands.filter((b) => (index.byBrand.get(b.id) ?? 0) > 0);
+  const visibleBrands = fixed.brand || brandsWithProducts.length < 2 ? [] : brandsWithProducts;
+  const title = heading ?? (activeBrand && !fixed.brand ? `${activeBrand.title}${active ? ` ${active.name}` : ""}` : active?.name ?? "All parts");
+  const from = list.length ? (page - 1) * PAGE_SIZE + 1 : 0;
+  const to = Math.min(page * PAGE_SIZE, list.length);
 
   const isBrandPage = Boolean(fixed.brand && activeBrand);
   const isSearchPage = basePath === "/search" || Boolean(q);
@@ -175,12 +181,23 @@ export async function CatalogView({
           </div>
         ) : (
           <div className="mt-2 flex flex-wrap items-baseline gap-x-3">
-            <h1 className="text-[clamp(1.6rem,1.2rem+1.4vw,2.1rem)] font-extrabold tracking-[-0.03em] text-navy">{title}</h1>
+            <h1 className="text-[clamp(1.6rem,1.2rem+1.4vw,2.1rem)] font-extrabold tracking-[-0.03em] text-navy">
+              {correctedFrom ? `Results for “${correctedFrom}”` : title}
+            </h1>
             <p className="text-[14px] tabular-nums text-text-secondary">
-              {list.length} {list.length === 1 ? "result" : "results"}
+              {list.length > PAGE_SIZE ? `${from}–${to} of ${list.length} results` : `${list.length} ${list.length === 1 ? "result" : "results"}`}
             </p>
           </div>
         )}
+        {correctedFrom ? (
+          <p className="mt-1 text-[14px] text-text-secondary">
+            No results for “{q}”. Showing results for <strong className="font-semibold text-navy">{correctedFrom}</strong> instead.
+          </p>
+        ) : note?.kind === "nearest" ? (
+          <p className="mt-1 text-[14px] text-text-secondary">
+            No exact match for “{q}”. Showing <strong className="font-semibold text-navy">{note.label}</strong>, in stock first.
+          </p>
+        ) : null}
 
         {/* Search Popular Suggestions on /search */}
         {isSearchPage ? (
@@ -204,7 +221,7 @@ export async function CatalogView({
                           className="flex min-h-9 items-center justify-between gap-3 text-text-secondary hover:text-navy"
                         >
                           <span>{node.name}</span>
-                          
+                          <span className="text-[13px] tabular-nums text-text-muted">{inNode(node)}</span>
                         </Link>
                       </li>
                     ))}
@@ -264,7 +281,7 @@ export async function CatalogView({
                 .map((facet, i) => (
                   <Group key={facet.key} title={facet.label + (facet.unit ? ` (${facet.unit})` : "")} open={i < 2 || Boolean(specs[facet.key])}>
                     <div className="flex flex-wrap gap-1.5">
-                      {facet.values.map(({ value }) => {
+                      {facet.values.map(({ value, count }) => {
                         const selected = specs[facet.key] === value;
                         return (
                           <Link
@@ -277,7 +294,7 @@ export async function CatalogView({
                           >
                             {value}
                             {facet.unit && facet.unit.length <= 3 ? facet.unit : ""}
-                            {selected ? <span aria-hidden>×</span> : null}
+                            {selected ? <span aria-hidden>×</span> : <span className="tabular-nums text-text-muted">({count})</span>}
                           </Link>
                         );
                       })}
@@ -298,7 +315,7 @@ export async function CatalogView({
                             className={`flex min-h-9 items-center justify-between gap-3 hover:text-navy ${selected ? "font-semibold text-navy" : "text-text-secondary"}`}
                           >
                             <span>{b.title}</span>
-                            
+                            <span className="text-[13px] tabular-nums text-text-muted">{brandCount(b.id)}</span>
                           </Link>
                         </li>
                       );
@@ -328,7 +345,7 @@ export async function CatalogView({
             ) : null}
 
             <div className="flex flex-wrap items-center justify-between gap-3 card px-3 py-2.5">
-              <SortSelect value={sort} options={SORTS.map((s) => ({ ...s, href: href({ sort: s.value === "best_selling" ? undefined : s.value }) }))} />
+              <SortSelect value={sort} options={SORTS.map((s) => ({ ...s, href: href({ sort: s.value === "featured" ? undefined : s.value }) }))} />
               <div className="flex items-center gap-2">
                 <div role="group" aria-label="View" className="flex gap-1.5">
                   {(["grid", "list"] as const).map((v) => (
@@ -355,7 +372,7 @@ export async function CatalogView({
                 </p>
                 <div className="mt-5 flex flex-wrap justify-center gap-2">
                   {chips.length ? (
-                    <Link href={clearAll} className="btn btn-primary">Clear Filters</Link>
+                    <Link href={clearAll} className="btn btn-primary">Clear filters</Link>
                   ) : null}
                   {tree.slice(0, 6).map((c) => (
                     <Link key={c.id} href={`/parts?category=${c.handle}`} className="btn btn-secondary">

@@ -7,7 +7,7 @@ import { AccountNav } from "@/components/account/account-nav";
 import { WishlistView } from "@/components/account/wishlist-view";
 
 export const metadata = {
-  title: "My Wishlist — Skyrostore",
+  title: "Wishlist",
   description: "View and manage your saved UAV components and configurations.",
 };
 
@@ -31,7 +31,7 @@ export default async function WishlistPage() {
         </div>
 
           <h1 className="pb-6 pt-4 text-[clamp(1.6rem,1.2rem+1.4vw,2.1rem)] font-extrabold tracking-[-0.03em] text-navy">
-            Saved Wishlist
+            Wishlist
           </h1>
 
           <div className="flex flex-col lg:flex-row gap-8 items-start">

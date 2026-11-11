@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { medusa } from "@/lib/medusa";
+import { medusa, CART_QUERY } from "@/lib/medusa";
 
 export async function POST(request: NextRequest) {
   try {
@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
 
     const { cart } = await medusa.store.cart.update(cart_id, {
       promo_codes: [promo_code],
-    });
+    }, CART_QUERY);
     return NextResponse.json({ cart });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Promotion code could not be applied";
@@ -27,7 +27,7 @@ export async function DELETE(request: NextRequest) {
 
     const { cart } = await medusa.store.cart.update(cart_id, {
       promo_codes: [],
-    });
+    }, CART_QUERY);
     return NextResponse.json({ cart });
   } catch {
     return NextResponse.json({ error: "Failed to remove promotion code" }, { status: 400 });

@@ -1,46 +1,24 @@
-import { Truck, ShieldCheck, Cpu, FileText } from "lucide-react";
+import Link from "next/link";
 
-const VALUE_PROPS = [
-  {
-    icon: Truck,
-    title: "Same-Day Dispatch",
-    subtitle: "Delhivery air express across 19,000+ PIN codes",
-  },
-  {
-    icon: ShieldCheck,
-    title: "100% Genuine Certified",
-    subtitle: "Authorized distributor parts with manufacturer warranties",
-  },
-  {
-    icon: Cpu,
-    title: "Fit & Compatibility Engine",
-    subtitle: "Parameter validation checks voltage, current & prop sizing",
-  },
-  {
-    icon: FileText,
-    title: "GST Tax Invoicing",
-    subtitle: "18% ITC breakdown provided with every commercial order",
-  },
+// Only what is true for every order. Dispatch times, coverage counts and distributor status go here once
+// the owner confirms them in writing.
+const FACTS = [
+  { title: "Tracked delivery", text: "Delhivery and partners, tracking number by email", href: "/policies/shipping" },
+  { title: "Secure payment", text: "UPI, cards and netbanking through Razorpay", href: "/support" },
+  { title: "Parts that fit", text: "We check your parts work together before you pay", href: "/build" },
+  { title: "GST invoice", text: "With every order, prices include GST", href: "/support" },
 ];
 
 export function TrustGrid() {
   return (
-    <section aria-label="Trust & Guarantees" className="rounded-xl border border-border bg-white p-4 md:p-6 shadow-sm">
-      <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 divide-y sm:divide-y-0 lg:divide-x divide-border">
-        {VALUE_PROPS.map(({ icon: Icon, title, subtitle }, index) => (
-          <li
-            key={title}
-            className={`flex items-start gap-3.5 pt-3 sm:pt-0 ${
-              index > 0 ? "lg:pl-6" : ""
-            }`}
-          >
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-brand-soft text-brand">
-              <Icon className="h-5 w-5" strokeWidth={2} aria-hidden />
-            </div>
-            <div>
-              <h3 className="text-[14px] font-bold text-navy leading-tight">{title}</h3>
-              <p className="mt-1 text-[12px] leading-snug text-text-secondary">{subtitle}</p>
-            </div>
+    <section aria-label="Why buy here" className="rounded-xl bg-white px-5 py-4 md:px-6">
+      <ul className="grid grid-cols-2 gap-x-6 gap-y-4 lg:grid-cols-4">
+        {FACTS.map((f) => (
+          <li key={f.title}>
+            <Link href={f.href} className="group block">
+              <p className="text-[15px] font-semibold text-navy group-hover:text-brand">{f.title}</p>
+              <p className="mt-0.5 text-[13px] leading-snug text-text-secondary">{f.text}</p>
+            </Link>
           </li>
         ))}
       </ul>

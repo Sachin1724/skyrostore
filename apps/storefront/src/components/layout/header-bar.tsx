@@ -3,28 +3,26 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, ShoppingCart, X } from "lucide-react";
-import { useIconHover } from "@animateicons/react";
-import { HeadsetIcon, UserIcon } from "@animateicons/react/lucide";
+import { Heart, Menu, ShoppingCart, X } from "lucide-react";
 import { SearchAutocomplete } from "@/components/layout/search-autocomplete";
+import { AccountMenu } from "@/components/layout/account-menu";
+import { DeliverTo } from "@/components/layout/deliver-to";
+import { categoryHref } from "@/lib/category-art";
+import { CART_ADDED, CART_ADDING, CART_FAILED, type PendingItem } from "@/lib/cart-client";
 import { SkyroLogo } from "@/components/brand/logo";
 import { CartDrawer, cartCount, cartTotal, type DrawerCart } from "@/components/cart/cart-drawer";
 import { formatPrice } from "@/lib/utils";
 
 type Cat = { name: string; handle: string };
 
-/** Event a product button fires after adding to the cart: the header refreshes and opens the drawer. */
-export const CART_ADDED = "cart:added";
-
 export function HeaderBar({ categories }: { categories: Cat[] }) {
   const pathname = usePathname();
   const [cart, setCart] = useState<DrawerCart | null>(null);
   const [cartOpen, setCartOpen] = useState(false);
+  const [pending, setPending] = useState<PendingItem | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [bump, setBump] = useState(0);
   const menuRef = useRef<HTMLDialogElement>(null);
-  const { ref: headsetRef, triggerProps: headsetTrigger } = useIconHover();
-  const { ref: userRef, triggerProps: userTrigger } = useIconHover();
 
   const refresh = useCallback(async () => {
     const id = localStorage.getItem("cart_id");
@@ -35,17 +33,39 @@ export function HeaderBar({ categories }: { categories: Cat[] }) {
 
   useEffect(() => {
     void refresh();
-    const onAdded = () =>
-      void refresh().then(() => {
+    // The drawer opens the moment a product button is pressed, then fills in when the add returns.
+    const onAdding = (e: Event) => {
+      setPending((e as CustomEvent<PendingItem | undefined>).detail ?? { title: "Your item" });
+      setCartOpen(true);
+    };
+    const onAdded = (e: Event) => {
+      const next = (e as CustomEvent<DrawerCart | null>).detail;
+      const done = () => {
+        setPending(null);
         setBump((n) => n + 1);
-        setCartOpen(true);
-      });
+      };
+      if (next) {
+        setCart(next);
+        done();
+      } else void refresh().then(done);
+    };
+    const onUpdated = (e: Event) => {
+      const next = (e as CustomEvent<DrawerCart | null>).detail;
+      if (next) setCart(next);
+      else void refresh();
+    };
+    const onFailed = () => setPending(null);
     const onStorage = () => void refresh();
-    window.addEventListener("storage", onStorage);
-    window.addEventListener(CART_ADDED, onAdded);
+    const events: [string, (e: Event) => void][] = [
+      ["storage", onStorage],
+      [CART_ADDING, onAdding],
+      [CART_ADDED, onAdded],
+      ["cart:updated", onUpdated],
+      [CART_FAILED, onFailed],
+    ];
+    for (const [name, fn] of events) window.addEventListener(name, fn);
     return () => {
-      window.removeEventListener("storage", onStorage);
-      window.removeEventListener(CART_ADDED, onAdded);
+      for (const [name, fn] of events) window.removeEventListener(name, fn);
     };
   }, [refresh]);
 
@@ -76,18 +96,20 @@ export function HeaderBar({ categories }: { categories: Cat[] }) {
           <SkyroLogo />
         </Link>
 
-        <div role="search" className="hidden h-11 min-w-0 flex-1 overflow-hidden rounded-full bg-surface-soft focus-within:bg-white focus-within:ring-2 focus-within:ring-brand/40 md:flex md:max-w-[720px]">
-          <SearchAutocomplete className="min-w-0 flex-1" browse={categories} />
+        <DeliverTo />
+
+        <div role="search" className="hidden h-11 min-w-0 flex-1 rounded-full bg-surface-soft focus-within:bg-white focus-within:ring-2 focus-within:ring-brand/40 md:flex">
+          <SearchAutocomplete className="min-w-0 flex-1" browse={categories} scoped />
         </div>
 
-        <nav aria-label="Account" className="ml-auto flex items-center gap-1 md:ml-0 md:gap-3">
-          <Link href="/support" {...headsetTrigger} className="hidden min-w-11 flex-col items-center gap-0.5 text-[13px] font-medium text-navy hover:text-brand lg:flex">
-            <HeadsetIcon ref={headsetRef} size={22} aria-hidden />
-            Support
+        <nav aria-label="Account" className="ml-auto flex items-center gap-1 md:gap-4">
+          <AccountMenu />
+          <Link href="/account/orders" className="hidden h-11 flex-col justify-center leading-tight text-navy hover:text-brand lg:flex">
+            <span className="text-[12px] text-text-secondary">Returns</span>
+            <span className="text-[14px] font-semibold">&amp; orders</span>
           </Link>
-          <Link href="/account" aria-label="Account" {...userTrigger} className="flex h-11 min-w-11 flex-col items-center justify-center gap-0.5 text-[13px] font-medium text-navy hover:text-brand">
-            <UserIcon ref={userRef} size={22} aria-hidden />
-            <span className="hidden lg:block">Account</span>
+          <Link href="/account/wishlist" aria-label="Wishlist" className="hidden h-11 min-w-11 items-center justify-center text-navy hover:text-brand md:flex">
+            <Heart className="h-[22px] w-[22px]" strokeWidth={1.8} aria-hidden />
           </Link>
           <button
             type="button"
@@ -113,14 +135,17 @@ export function HeaderBar({ categories }: { categories: Cat[] }) {
         </nav>
       </div>
 
-      {/* Phones: search always visible on its own row. */}
-      <div className="px-4 pb-3 md:hidden">
-        <div role="search" className="flex h-11 overflow-hidden rounded-full bg-surface-soft focus-within:ring-2 focus-within:ring-brand/40">
+      {/* Phones: search always visible on its own row, the delivery PIN under it. */}
+      <div className="px-4 pb-1 md:hidden">
+        <div role="search" className="flex h-11 rounded-full bg-surface-soft focus-within:ring-2 focus-within:ring-brand/40">
           <SearchAutocomplete className="min-w-0 flex-1" browse={categories} />
         </div>
       </div>
+      <div className="px-4 pb-1 lg:hidden">
+        <DeliverTo variant="row" />
+      </div>
 
-      <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} cart={cart} setCart={setCart} />
+      <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} cart={cart} setCart={setCart} pending={pending} />
 
       <dialog
         ref={menuRef}
@@ -140,7 +165,7 @@ export function HeaderBar({ categories }: { categories: Cat[] }) {
           <ul>
             {categories.map((c) => (
               <li key={c.handle}>
-                <Link href={`/parts?category=${c.handle}`} className="flex min-h-12 items-center border-b border-surface-muted text-[16px] font-semibold">
+                <Link href={categoryHref(c)} className="flex min-h-12 items-center border-b border-surface-muted text-[16px] font-semibold">
                   {c.name}
                 </Link>
               </li>
@@ -154,8 +179,10 @@ export function HeaderBar({ categories }: { categories: Cat[] }) {
               { href: "/build", label: "Build checker" },
               { href: "/brands", label: "Brands" },
               { href: "/bulk-orders", label: "Bulk orders" },
-              { href: "/account/orders", label: "My orders" },
-              { href: "/support", label: "Support" },
+              { href: "/account/orders", label: "Your orders" },
+              { href: "/account/wishlist", label: "Wishlist" },
+              { href: "/account", label: "Account" },
+              { href: "/support", label: "Help and support" },
             ].map((l) => (
               <li key={l.href}>
                 <Link href={l.href} className="flex min-h-12 items-center border-b border-surface-muted text-[16px] font-medium">{l.label}</Link>

@@ -450,7 +450,7 @@ export function BuilderView({
           ) : (
             <>
               {currentStep.id === "frame" && (
-                <div className="mt-5 flex gap-2 overflow-x-auto text-[13px]">
+                <div className="mt-5 flex gap-2 overflow-x-auto text-[13px] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                   {[
                     { id: "all", label: "All" },
                     { id: "quad", label: "Quadcopter" },

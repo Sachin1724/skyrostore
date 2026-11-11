@@ -7,7 +7,7 @@ import { AccountNav } from "@/components/account/account-nav";
 import { OrderDashboard } from "@/components/account/order-dashboard";
 
 export const metadata = {
-  title: "My Orders & Tracking — Skyrostore",
+  title: "Your orders",
   description: "Track your orders, view details, download invoices and manage returns.",
 };
 
@@ -31,7 +31,7 @@ export default async function OrdersPage() {
         </div>
 
           <h1 className="pb-6 pt-4 text-[clamp(1.6rem,1.2rem+1.4vw,2.1rem)] font-extrabold tracking-[-0.03em] text-navy">
-            Orders &amp; Tracking
+            Your orders
           </h1>
 
           <div className="flex flex-col lg:flex-row gap-8 items-start">

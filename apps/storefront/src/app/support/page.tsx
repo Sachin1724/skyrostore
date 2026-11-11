@@ -4,7 +4,7 @@ import { Footer } from "@/components/layout/footer";
 import { SupportView } from "./support-view";
 
 export const metadata = {
-  title: "UAV Support Center & Technical Desk — Skyrostore",
+  title: "Help and support",
   description:
     "Find technical answers, track your Delhivery order, check pin code delivery times, or reach our avionics applications desk.",
 };

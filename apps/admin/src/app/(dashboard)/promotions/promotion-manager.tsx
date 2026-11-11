@@ -9,6 +9,7 @@ type Promotion = {
   code: string;
   status: "draft" | "active" | "inactive";
   application_method: { type: "fixed" | "percentage"; value: number; currency_code: string | null; target_type: string } | null;
+  public: boolean;
 };
 
 async function call(url: string, method: string, body?: unknown) {
@@ -50,10 +51,18 @@ function PromotionRow({ promo, reload, setError }: { promo: Promotion; reload: (
     <li className="flex items-center gap-3 px-3 py-2.5">
       <span className="font-mono text-sm font-semibold text-gray-900">{promo.code}</span>
       <span className="text-sm text-gray-600">{describe(promo.application_method)}</span>
+      <label className="ml-auto flex items-center gap-1.5 text-xs text-gray-600" title="Listed under Available offers on every product page while the code is active">
+        <input
+          type="checkbox"
+          checked={promo.public}
+          onChange={(e) => run(() => call(`/api/promotions/${promo.id}`, "PATCH", { public: e.target.checked }))}
+        />
+        Show on product pages
+      </label>
       <select
         value={promo.status}
         onChange={(e) => run(() => call(`/api/promotions/${promo.id}`, "PATCH", { status: e.target.value }))}
-        className={`ml-auto rounded px-2 py-1 text-xs font-medium ${STATUS_STYLE[promo.status]}`}
+        className={`rounded px-2 py-1 text-xs font-medium ${STATUS_STYLE[promo.status]}`}
       >
         <option value="active">Active</option>
         <option value="inactive">Inactive</option>

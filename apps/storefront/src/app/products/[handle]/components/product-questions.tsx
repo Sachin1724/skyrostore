@@ -78,41 +78,33 @@ export function ProductQuestions({ productId, productTitle }: ProductQuestionsPr
 
   return (
     <section id="questions" aria-labelledby="questions-heading" className="scroll-mt-36 pt-4">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border pb-6">
-        <div>
-          <h2 id="questions-heading" className="text-[22px] font-extrabold tracking-[-0.02em] text-navy">
-            Questions &amp; Technical Answers
-          </h2>
-          <p className="mt-1 text-[14px] text-text-secondary">
-            Verified wiring pinouts, voltage compatibility, and firmware advice from our engineering team.
-          </p>
-        </div>
-
-        <button
-          type="button"
-          onClick={() => setIsAsking((prev) => !prev)}
-          className="self-start sm:self-auto rounded-md border border-navy px-5 py-2.5 text-[14px] font-bold text-navy transition-colors hover:bg-navy hover:text-white"
-        >
-          {isAsking ? "Cancel Question" : "Ask a Question"}
-        </button>
+      <div className="flex items-center justify-between gap-4">
+        <h2 id="questions-heading" className="text-[22px] font-extrabold tracking-[-0.02em] text-navy">
+          Questions and answers
+        </h2>
+        {total > 0 || isAsking ? (
+          <button type="button" onClick={() => setIsAsking((prev) => !prev)} className="btn btn-secondary btn-sm">
+            {isAsking ? "Cancel" : "Ask a question"}
+          </button>
+        ) : null}
       </div>
 
       {/* Ask Question Form */}
       {isAsking ? (
         <div className="mt-6 rounded-lg border border-border bg-surface-soft p-5 sm:p-6">
           <h3 className="text-[16px] font-bold text-navy flex items-center gap-2">
-            <HelpCircle className="h-4 w-4 text-brand" /> Ask About {productTitle}
+            <HelpCircle className="h-4 w-4 text-brand" /> Ask about {productTitle}
           </h3>
 
           {submitted ? (
             <div className="mt-4 rounded bg-success-soft p-4 text-[14px] font-semibold text-success flex items-center gap-2">
-              <Check className="h-5 w-5" /> Question submitted! Our engineering staff will review and respond shortly.
+              <Check className="h-5 w-5" /> Thanks. Your question appears here once our team answers it.
             </div>
           ) : (
             <form onSubmit={handleAskQuestion} className="mt-4 space-y-3">
               <div>
                 <label htmlFor="q-text" className="block text-[13px] font-bold text-navy">
-                  Your Technical Question
+                  Your question
                 </label>
                 <textarea
                   id="q-text"
@@ -128,14 +120,14 @@ export function ProductQuestions({ productId, productTitle }: ProductQuestionsPr
               <div className="grid gap-3 sm:grid-cols-2">
                 <div>
                   <label htmlFor="q-author" className="block text-[13px] font-bold text-navy">
-                    Your Name / Organization
+                    Your name
                   </label>
                   <input
                     id="q-author"
                     required
                     value={authorName}
                     onChange={(e) => setAuthorName(e.target.value)}
-                    placeholder="e.g. Rahul M. / Aerobotics Lab"
+                    placeholder="Name shown with your question"
                     className="mt-1 h-10 w-full rounded-md border border-border-strong bg-white px-3 text-[14px] text-navy"
                   />
                 </div>
@@ -146,7 +138,7 @@ export function ProductQuestions({ productId, productTitle }: ProductQuestionsPr
                     disabled={submitting}
                     className="btn btn-primary w-full"
                   >
-                    {submitting ? "Submitting..." : "Submit Question"}
+                    {submitting ? "Sending…" : "Send question"}
                   </button>
                 </div>
               </div>
@@ -184,7 +176,7 @@ export function ProductQuestions({ productId, productTitle }: ProductQuestionsPr
                 <div className="mt-4 ml-10 rounded-md border-l-2 border-brand bg-surface-soft p-4">
                   <div className="flex items-center gap-1.5 text-[13px] font-bold text-brand">
                     <ShieldCheck className="h-4 w-4" />
-                    <span>Answered by {q.answered_by || "Skyrostore Engineering Team"}</span>
+                    <span>Answered by {q.answered_by || "Skyrostore"}</span>
                   </div>
                   <p className="mt-1.5 text-[14px] leading-relaxed text-navy whitespace-pre-line">
                     {q.answer}
@@ -192,7 +184,7 @@ export function ProductQuestions({ productId, productTitle }: ProductQuestionsPr
                 </div>
               ) : (
                 <div className="mt-3 ml-10 text-[13px] text-text-muted italic">
-                  Awaiting staff answer from Skyrostore technical desk.
+                  Not answered yet.
                 </div>
               )}
             </article>
@@ -202,7 +194,7 @@ export function ProductQuestions({ productId, productTitle }: ProductQuestionsPr
         <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-3 rounded-xl bg-white px-5 py-4">
           <MessageSquare className="h-5 w-5 shrink-0 text-text-muted" aria-hidden />
           <p className="flex-1 text-[14px] text-text-secondary">
-            No questions yet. Ask about wiring, voltage tolerance or CAD files and our team answers here.
+            No questions yet. Ask about wiring, voltage or fit and we answer here.
           </p>
           <button type="button" onClick={() => setIsAsking(true)} className="btn btn-secondary btn-sm">
             Ask a question

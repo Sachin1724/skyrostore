@@ -32,7 +32,7 @@ interface RecentlyViewedProps {
 export function RecentlyViewed({
   currentProduct,
   className = "",
-  title = "Recently Viewed Hardware",
+  title = "Recently viewed",
 }: RecentlyViewedProps) {
   const [items, setItems] = useState<ViewedItem[]>([]);
   const [mounted, setMounted] = useState(false);
@@ -100,7 +100,7 @@ export function RecentlyViewed({
           onClick={clearHistory}
           className="flex items-center gap-1.5 text-[13px] font-semibold text-text-muted hover:text-error transition-colors"
         >
-          <Trash2 className="h-3.5 w-3.5" aria-hidden /> Clear History
+          <Trash2 className="h-3.5 w-3.5" aria-hidden /> Clear
         </button>
       </div>
 

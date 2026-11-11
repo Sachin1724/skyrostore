@@ -15,7 +15,6 @@ import {
   Truck,
   Headphones,
   Mail,
-  Phone,
   ChevronRight,
   ChevronDown,
   CheckCircle2,
@@ -360,7 +359,7 @@ export function SupportView() {
                 <Headphones className="h-4 w-4" aria-hidden />
               </div>
               <div>
-                <h2 className="text-[14px] font-extrabold text-navy">Technical Desk Contact</h2>
+                <h2 className="text-[14px] font-extrabold text-navy">Contact us</h2>
                 <p className="text-[13px] text-text-muted">Bhubaneswar Facility • 9 AM - 6 PM IST</p>
               </div>
             </div>
@@ -369,7 +368,7 @@ export function SupportView() {
               <div className="flex items-start gap-2.5">
                 <Mail className="h-4 w-4 text-brand shrink-0 mt-0.5" aria-hidden />
                 <div>
-                  <p className="font-bold text-navy">Technical &amp; Orders Support</p>
+                  <p className="font-bold text-navy">Orders and product questions</p>
                   <a href="mailto:support@skyrostore.com" className="text-text-secondary hover:text-brand hover:underline">
                     support@skyrostore.com
                   </a>
@@ -379,18 +378,10 @@ export function SupportView() {
               <div className="flex items-start gap-2.5">
                 <Building2 className="h-4 w-4 text-brand shrink-0 mt-0.5" aria-hidden />
                 <div>
-                  <p className="font-bold text-navy">Institutional &amp; Fleet RFQs</p>
+                  <p className="font-bold text-navy">Bulk orders and quotations</p>
                   <a href="mailto:bulk@skyrostore.com" className="text-text-secondary hover:text-brand hover:underline">
                     bulk@skyrostore.com
                   </a>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-2.5">
-                <Phone className="h-4 w-4 text-brand shrink-0 mt-0.5" aria-hidden />
-                <div>
-                  <p className="font-bold text-navy">Direct Engineering Helpline</p>
-                  <span className="font-mono text-text-secondary">+91 98765 43210</span>
                 </div>
               </div>
             </div>

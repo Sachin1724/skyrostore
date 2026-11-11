@@ -6,7 +6,7 @@ import { BuilderView } from "@/components/builder/builder-view";
 import { getUAVComponents } from "@/lib/data/uav-components";
 
 export const metadata = {
-  title: "Multi-Rotor UAV Build Configurator — Skyrostore",
+  title: "Build your drone",
   description: "Select components, validate propulsion compatibility, and configure a custom aerial platform with automated spec validation.",
 };
 

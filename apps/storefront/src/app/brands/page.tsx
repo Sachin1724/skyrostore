@@ -7,7 +7,7 @@ import { BrandsDirectory } from "./components/brands-directory";
 import { ShieldCheck, Truck, FileText, Building2, ArrowRight } from "lucide-react";
 
 export const metadata = {
-  title: "Authorized UAV Hardware Brands & Manufacturers — Skyrostore",
+  title: "Brands",
   description: "Browse certified multi-rotor component manufacturers: T-Motor, Holybro, CUAV, Hobbywing and more with official warranty and GST invoicing.",
 };
 

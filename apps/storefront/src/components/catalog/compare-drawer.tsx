@@ -229,7 +229,7 @@ export function CompareDrawer() {
             <div className="flex items-center justify-between border-b border-border px-6 py-4 bg-surface-soft">
               <div>
                 <h2 id="compare-modal-title" className="text-[18px] font-extrabold text-navy">
-                  Technical Hardware Comparison
+                  Compare parts
                 </h2>
                 <p className="text-[13px] text-text-muted">
                   Comparing {items.length} drone components side by side

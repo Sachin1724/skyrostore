@@ -17,8 +17,8 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
     el.scrollTo({ left: ((i + slides.length) % slides.length) * el.clientWidth, behavior: "smooth" });
   };
 
-  // Advance on its own. The banner fills the first screen, so the pointer rests on it
-  // most of the time; pausing on hover stopped it for good. Keyboard focus and a hidden
+  // Advance on its own. The pointer often rests on the banner, and pausing on hover
+  // stopped it for good. Keyboard focus and a hidden
   // tab still hold it, and a reduced-motion preference turns it off.
   useEffect(() => {
     if (paused || slides.length < 2 || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -46,7 +46,7 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
         {slides.map((s, i) => (
           <li
             key={i}
-            className="relative min-h-[460px] w-full shrink-0 snap-start md:min-h-[600px]"
+            className="relative min-h-[260px] w-full shrink-0 snap-start md:min-h-[380px]"
             aria-roledescription="slide"
             aria-label={`${i + 1} of ${slides.length}`}
           >
@@ -58,9 +58,9 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
                   aria-hidden
                   className="absolute inset-0 bg-[linear-gradient(to_top,rgba(10,26,47,0.92)_18%,rgba(10,26,47,0.55))] md:bg-[linear-gradient(to_right,rgba(10,26,47,0.88),rgba(10,26,47,0.6)_42%,rgba(10,26,47,0)_74%)]"
                 />
-                <div className="relative flex min-h-[460px] max-w-[760px] flex-col items-start justify-center gap-5 p-7 md:min-h-[600px] md:p-16">
+                <div className="relative flex min-h-[260px] max-w-[680px] flex-col items-start justify-center gap-4 p-6 md:min-h-[380px] md:p-14">
                   {s.title ? (
-                    <h1 className="text-[clamp(2.5rem,1rem+6.2vw,6rem)] font-semibold leading-[0.95] tracking-[-0.035em] text-white">{s.title}</h1>
+                    <h1 className="text-[clamp(2rem,1rem+3.4vw,3.75rem)] font-semibold leading-[1] tracking-[-0.035em] text-white">{s.title}</h1>
                   ) : null}
                   {s.text ? <p className="max-w-[46ch] text-[16px] leading-relaxed text-on-dark md:text-[20px]">{s.text}</p> : null}
                   {s.cta && s.href ? (

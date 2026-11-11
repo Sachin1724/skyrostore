@@ -94,7 +94,7 @@ const POLICIES: Record<string, Policy> = {
       ],
       [
         "Statutory Corporate Entity",
-        "Skyro Aerial Technologies Pvt. Ltd., Technology Corridor, Chandaka Industrial Estate, Patia, Bhubaneswar, Odisha 751024, India. GSTIN: 21AAECS9821R1ZM. Contact: support@skyrostore.com | Phone: +91 98765 43210.",
+        "Skyro Aerial Technologies Pvt. Ltd., Technology Corridor, Chandaka Industrial Estate, Patia, Bhubaneswar, Odisha 751024, India. GSTIN: 21AAECS9821R1ZM. Contact: support@skyrostore.com.",
       ],
     ],
   },
@@ -142,7 +142,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const policy = POLICIES[(await params).slug];
   return {
-    title: `${policy?.title ?? "Legal Policy"} — Skyrostore`,
+    title: `${policy?.title ?? "Policy"}`,
     description: policy?.intro ?? "Official legal and compliance policies for Skyrostore.",
   };
 }

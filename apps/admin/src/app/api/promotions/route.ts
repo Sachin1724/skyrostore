@@ -1,10 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
-import { adminCall, respond } from "@/lib/medusa-admin";
+import { adminCall, getStoreMetadata, respond } from "@/lib/medusa-admin";
 
 const FIELDS = "id,code,status,type,application_method.type,application_method.value,application_method.currency_code,application_method.target_type,created_at";
 
+/** Every code, each marked with whether shoppers see it under "Available offers" on product pages. */
 export async function GET() {
-  return respond(await adminCall("GET", `/admin/promotions?limit=100&fields=${FIELDS}`));
+  const [list, store] = await Promise.all([
+    adminCall("GET", `/admin/promotions?limit=100&fields=${FIELDS}`),
+    getStoreMetadata().catch(() => ({ metadata: {} as Record<string, unknown> })),
+  ]);
+  if (!list.ok) return respond(list);
+  const shown = new Set((store.metadata.public_offers as string[] | undefined) ?? []);
+  const promotions = (list.data.promotions ?? []).map((p: { id: string }) => ({ ...p, public: shown.has(p.id) }));
+  return NextResponse.json({ ok: true, promotions });
 }
 
 export async function POST(request: NextRequest) {
