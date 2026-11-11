@@ -56,7 +56,7 @@ export function orderPlacedEmail(order: {
 }): { subject: string; html: string } {
   return {
     subject: `Order #${order.display_id} confirmed`,
-    html: `<p>Thanks for your order.</p><p><strong>Order #${esc(order.display_id)}</strong> — ${esc(
+    html: `<p>Thanks for your order.</p><p><strong>Order #${esc(order.display_id)}</strong>: ${esc(
       money(order.total, order.currency_code)
     )}</p><p>We'll email you again once it ships.</p>`,
   };
@@ -94,7 +94,7 @@ export function passwordResetEmail(resetLink: string): { subject: string; html: 
 export function orderCanceledEmail(order: { display_id: number | string }): { subject: string; html: string } {
   return {
     subject: `Order #${order.display_id} cancelled`,
-    html: `<p>Order <strong>#${esc(order.display_id)}</strong> has been cancelled.</p><p>If a payment was captured, it will be refunded to your original payment method — reach out to support if you don't see it within a few business days.</p>`,
+    html: `<p>Order <strong>#${esc(order.display_id)}</strong> has been cancelled.</p><p>If a payment was captured, it will be refunded to your original payment method. Contact support if you don't see it within a few business days.</p>`,
   };
 }
 

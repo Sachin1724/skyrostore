@@ -190,7 +190,7 @@ export function ProductDetailClient({
           {highlights.length ? (
             <ul className="mt-3 flex flex-wrap gap-1.5">
               {highlights.map((h) => (
-                <li key={h} className="rounded-full bg-surface-muted px-3 py-1 text-[13px] font-medium tabular-nums text-navy">
+                <li key={h} className="rounded-md bg-surface-muted px-3 py-1 text-[13px] font-medium tabular-nums text-navy">
                   {h}
                 </li>
               ))}

@@ -176,7 +176,7 @@ export function BrandsDirectory({ brands }: BrandsDirectoryProps) {
                     </div>
                   )}
 
-                  <span className="rounded-full bg-surface-soft px-2.5 py-1 text-[13px] font-bold tabular-nums text-text-muted">
+                  <span className="rounded-md bg-surface-soft px-2.5 py-1 text-[13px] font-bold tabular-nums text-text-muted">
                     {b.count} {b.count === 1 ? "component" : "components"}
                   </span>
                 </div>

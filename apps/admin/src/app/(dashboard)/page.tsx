@@ -69,7 +69,7 @@ export default async function DashboardPage() {
       <h2 className="mt-6 text-sm font-semibold uppercase tracking-wider text-gray-500">Fulfilment</h2>
       <div className="mt-2 grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard label="Awaiting fulfilment" value={fulfilment.awaiting_fulfilment} href="/orders?state=paid_processing" />
-        <StatCard label="Packed — to ship" value={fulfilment.packed} href="/orders?state=packed" />
+        <StatCard label="Packed, to ship" value={fulfilment.packed} href="/orders?state=packed" />
         <StatCard label="Shipped" value={fulfilment.shipped} href="/orders?state=shipped" />
         <StatCard label="Delivered" value={fulfilment.delivered} href="/orders?state=delivered" />
       </div>

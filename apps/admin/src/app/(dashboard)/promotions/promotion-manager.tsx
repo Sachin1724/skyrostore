@@ -24,7 +24,7 @@ async function call(url: string, method: string, body?: unknown) {
 }
 
 function describe(am: Promotion["application_method"]) {
-  if (!am) return "—";
+  if (!am) return "-";
   const discount = am.type === "percentage" ? `${am.value}% off` : `₹${am.value} off`;
   return `${discount} ${am.target_type === "order" ? "entire order" : "line items"}`;
 }

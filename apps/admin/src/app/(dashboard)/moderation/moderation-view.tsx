@@ -136,7 +136,7 @@ export function ModerationView() {
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="text-sm font-semibold text-gray-900">
-                    {r.title} — {r.rating}★ {r.verified_purchase && <span className="text-xs text-green-700">verified purchase</span>}
+                    {r.title}, {r.rating}★ {r.verified_purchase && <span className="text-xs text-green-700">verified purchase</span>}
                   </p>
                   <p className="mt-1 text-sm text-gray-700">{r.content}</p>
                   <p className="mt-1 flex items-center gap-1.5 text-xs text-gray-400">

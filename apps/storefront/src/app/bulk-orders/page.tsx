@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { ArrowRight } from "lucide-react";
@@ -30,7 +29,7 @@ export default function BulkOrdersLandingPage() {
             <span className="font-semibold text-navy">Bulk orders</span>
           </nav>
 
-          <section className="mt-4 grid items-center overflow-hidden rounded-2xl bg-white md:grid-cols-[1.1fr_1fr]">
+          <section className="mt-4 overflow-hidden rounded-2xl bg-white">
             <div className="p-5 sm:p-8 md:p-12">
               <h1 className="text-[clamp(1.9rem,1.4rem+2.4vw,3.4rem)] font-extrabold leading-[1.08] tracking-[-0.03em] text-navy">
                 Bulk orders
@@ -48,9 +47,6 @@ export default function BulkOrdersLandingPage() {
                   Build your drone first
                 </Link>
               </div>
-            </div>
-            <div className="relative hidden h-full min-h-[360px] bg-surface-soft md:block">
-              <Image src="/images/hero/bulk-hero-drone.png" alt="" fill sizes="45vw" className="object-cover object-right" />
             </div>
           </section>
 

@@ -129,7 +129,7 @@ export default async function OrdersPage({
                     {new Date(order.created_at).toLocaleDateString()}
                   </td>
                   <td className="py-2.5 pr-4 text-gray-700">
-                    <p>{order.email || "—"}</p>
+                    <p>{order.email || "-"}</p>
                     {order.shipping_address?.phone ? (
                       <p className="font-mono text-xs text-gray-500">{order.shipping_address.phone}</p>
                     ) : null}

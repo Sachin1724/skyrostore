@@ -185,7 +185,7 @@ export function SupportView() {
                 key={tag}
                 type="button"
                 onClick={() => setSearchQuery(tag)}
-                className="inline-flex min-h-10 items-center rounded-full border border-border bg-surface-soft px-3.5 text-[14px] font-medium text-navy transition-colors hover:border-brand-cyan hover:bg-surface-muted"
+                className="inline-flex min-h-10 items-center rounded-md border border-border bg-surface-soft px-3.5 text-[14px] font-medium text-navy transition-colors hover:border-brand-cyan hover:bg-surface-muted"
               >
                 {tag}
               </button>

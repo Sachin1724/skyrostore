@@ -17,7 +17,7 @@ export function HomeFaq({ faq }: HomeFaqProps) {
   const shown = faq.slice(0, SHOWN);
 
   return (
-    <section aria-labelledby="home-faq-heading" className="reveal">
+    <section aria-labelledby="home-faq-heading">
       <div className="flex flex-wrap items-baseline justify-between gap-3">
         <h2 id="home-faq-heading" className="text-[clamp(1.4rem,1.1rem+1vw,1.75rem)] font-semibold text-navy">
           Common questions

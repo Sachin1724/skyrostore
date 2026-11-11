@@ -118,7 +118,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
                       <div className="font-mono text-[11px] font-normal text-gray-400">{product.handle as string}</div>
                     </td>
                     <td className="py-2.5 pr-4 text-xs text-gray-600">
-                      {cats.length ? cats.map((c) => categoryName.get(c.id) || "—").join(", ") : <span className="text-gray-400">None</span>}
+                      {cats.length ? cats.map((c) => categoryName.get(c.id) || "-").join(", ") : <span className="text-gray-400">None</span>}
                     </td>
                     <td className="py-2.5 pr-4 text-xs text-gray-600">
                       {brand ? brand.title : <span className="text-gray-400">None</span>}

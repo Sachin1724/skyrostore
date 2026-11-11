@@ -36,11 +36,11 @@ export default async function CustomersPage() {
                       href={`/customers/${c.id as string}`}
                       className="text-gray-900 hover:underline"
                     >
-                      {[c.first_name, c.last_name].filter(Boolean).join(" ") || "—"}
+                      {[c.first_name, c.last_name].filter(Boolean).join(" ") || "-"}
                     </a>
                   </td>
                   <td className="py-2.5 pr-4 text-gray-500">
-                    {(c.email as string) || "—"}
+                    {(c.email as string) || "-"}
                   </td>
                   <td className="py-2.5 pr-4 text-gray-500">
                     {new Date(c.created_at as string).toLocaleDateString()}

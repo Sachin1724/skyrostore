@@ -623,7 +623,7 @@ export function ProductEditorClient({ initialProduct, categories, brands, storef
                 {variants.map((v) => (
                   <tr key={v.id as string}>
                     <td className="py-2.5 font-medium text-gray-900">{v.title as string}</td>
-                    <td className="py-2.5 font-mono text-gray-600">{v.sku as string || "—"}</td>
+                    <td className="py-2.5 font-mono text-gray-600">{v.sku as string || "-"}</td>
                     <td className="py-2.5 text-gray-600">
                       {v.manage_inventory ? "Tracked" : "Unmanaged"}
                     </td>

@@ -21,6 +21,7 @@ import {
   ShieldCheck,
   Undo2,
   Percent,
+  Mail,
 } from "lucide-react";
 
 type NavItem = { href: string; label: string; icon: typeof LayoutDashboard; countKey?: keyof NavCounts };
@@ -33,7 +34,7 @@ const GROUPS: { label: string; items: NavItem[] }[] = [
       { href: "/", label: "Dashboard", icon: LayoutDashboard },
       { href: "/orders", label: "Orders", icon: ShoppingCart, countKey: "ordersAwaiting" },
       { href: "/shipments", label: "Shipments", icon: Truck },
-      { href: "/bulk-orders", label: "Bulk & Quotes", icon: FileText, countKey: "bulkSubmitted" },
+      { href: "/bulk-orders", label: "Quotations", icon: FileText, countKey: "bulkSubmitted" },
       { href: "/returns", label: "Returns", icon: Undo2, countKey: "returnsPending" },
       { href: "/support", label: "Support", icon: MessageSquare },
     ],
@@ -53,9 +54,10 @@ const GROUPS: { label: string; items: NavItem[] }[] = [
     items: [
       { href: "/content", label: "Homepage", icon: PenLine },
       { href: "/promotions", label: "Promotions", icon: Percent },
-      { href: "/moderation", label: "Moderation", icon: ShieldCheck, countKey: "moderationPending" },
+      { href: "/moderation", label: "Reviews & questions", icon: ShieldCheck, countKey: "moderationPending" },
       { href: "/analytics", label: "Analytics", icon: BarChart3 },
       { href: "/customers", label: "Customers", icon: Users },
+      { href: "/subscribers", label: "Subscribers", icon: Mail },
     ],
   },
   {

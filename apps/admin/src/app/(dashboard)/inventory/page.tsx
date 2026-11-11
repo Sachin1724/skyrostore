@@ -62,10 +62,10 @@ export default async function InventoryPage({
                 return (
                   <tr key={item.id as string}>
                     <td className="py-2.5 pr-4 font-mono text-xs">
-                      {(item.sku as string) || "—"}
+                      {(item.sku as string) || "-"}
                     </td>
                     <td className="py-2.5 pr-4 font-medium">
-                      {(item.title as string) || "—"}
+                      {(item.title as string) || "-"}
                     </td>
                     <td className="py-2.5 pr-4">
                       <StockCell

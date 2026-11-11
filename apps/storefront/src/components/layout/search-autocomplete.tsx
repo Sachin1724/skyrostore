@@ -206,7 +206,7 @@ export function SearchAutocomplete({
               id={`${listId}-scope`}
               value={scope}
               onChange={(e) => setScope(e.target.value)}
-              className="hidden h-full max-w-[150px] shrink-0 cursor-pointer rounded-l-full border-r border-border bg-surface-muted pl-4 pr-2 text-[13px] text-navy focus:outline-none xl:block"
+              className="hidden h-full max-w-[150px] shrink-0 cursor-pointer rounded-l-md border-r border-border bg-surface-muted pl-4 pr-2 text-[13px] text-navy focus:outline-none xl:block"
             >
               <option value="">All</option>
               {browse.map((c) => (
@@ -293,7 +293,7 @@ export function SearchAutocomplete({
                         key={c.handle}
                         type="button"
                         onClick={() => goToPlace({ kind: "Category", label: c.name, href: categoryHref(c) })}
-                        className="rounded-full bg-surface-soft px-3 py-1.5 text-[13px] text-navy hover:bg-surface-muted"
+                        className="rounded-md bg-surface-soft px-3 py-1.5 text-[13px] text-navy hover:bg-surface-muted"
                       >
                         {c.name}
                       </button>

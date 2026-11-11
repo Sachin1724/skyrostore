@@ -1,6 +1,7 @@
 "use client";
 
-import { SkyroLogo } from "@/components/brand/logo";
+import { SellerBlock } from "@/components/checkout/seller-block";
+import type { Seller } from "@/lib/data/site-settings";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { createTimeline, stagger, svg } from "animejs";
@@ -63,7 +64,7 @@ function ActionLink({ href, children, primary }: { href: string; children: React
  * Payment confirmed: the quad draws itself, its props spin up, the check lands
  * in the body, then the order details rise in.
  */
-export function OrderSuccess({ orderId, summary, gstin }: { orderId?: string; summary: Summary | null; gstin?: string }) {
+export function OrderSuccess({ orderId, summary, seller }: { orderId?: string; summary: Summary | null; seller: Seller }) {
   const root = useRef<HTMLDivElement>(null);
   const timeline = useRef<ReturnType<typeof createTimeline> | null>(null);
   const [done, setDone] = useState(false);
@@ -235,18 +236,7 @@ export function OrderSuccess({ orderId, summary, gstin }: { orderId?: string; su
             <div id="printable-invoice" className="flex-1 overflow-y-auto p-6 md:p-8 space-y-6 text-navy print:overflow-visible">
               {/* Company & Invoice Meta */}
               <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 border-b border-border pb-6">
-                <div>
-                  <SkyroLogo variant="full" className="mb-3 !h-16" />
-                  <span className="text-[20px] font-extrabold tracking-tight text-navy">
-                    SKYROSTORE SYSTEMS
-                  </span>
-                  <p className="mt-1 text-[13px] text-text-secondary leading-relaxed">
-                    Technology Hub, Infocity Road<br />
-                    Bhubaneswar, Odisha 751024, India<br />
-                    <strong>GSTIN:</strong> {gstin || "21AAECS9821R1ZM"}<br />
-                    <strong>State:</strong> Odisha (Code: 21)
-                  </p>
-                </div>
+                <SellerBlock seller={seller} />
 
                 <div className="text-left sm:text-right">
                   <span className="inline-block rounded bg-brand-soft px-2.5 py-0.5 text-[13px] font-extrabold text-brand">

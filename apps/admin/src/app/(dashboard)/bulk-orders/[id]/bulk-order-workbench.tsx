@@ -339,19 +339,19 @@ export function BulkOrderWorkbench({ initialRequest, storefrontUrl }: BulkOrderW
             </div>
             <div>
               <span className="text-gray-400 block font-mono">Phone</span>
-              <span className="font-semibold text-gray-900">{request.phone || "—"}</span>
+              <span className="font-semibold text-gray-900">{request.phone || "-"}</span>
             </div>
             <div>
               <span className="text-gray-400 block font-mono">Organization</span>
-              <span className="font-semibold text-gray-900">{request.company_name || "—"}</span>
+              <span className="font-semibold text-gray-900">{request.company_name || "-"}</span>
             </div>
             <div>
               <span className="text-gray-400 block font-mono">GSTIN</span>
-              <span className="font-mono text-gray-900">{request.gstin || "—"}</span>
+              <span className="font-mono text-gray-900">{request.gstin || "-"}</span>
             </div>
             <div>
               <span className="text-gray-400 block font-mono">Destination</span>
-              <span className="text-gray-900">{request.delivery_city ? `${request.delivery_city}, ${request.delivery_state || ""}` : "—"}</span>
+              <span className="text-gray-900">{request.delivery_city ? `${request.delivery_city}, ${request.delivery_state || ""}` : "-"}</span>
             </div>
             <div>
               <span className="text-gray-400 block font-mono">Requested Timeframe</span>
@@ -359,7 +359,7 @@ export function BulkOrderWorkbench({ initialRequest, storefrontUrl }: BulkOrderW
             </div>
             <div>
               <span className="text-gray-400 block font-mono">Budget Range</span>
-              <span className="text-gray-900">{request.budget_range || "—"}</span>
+              <span className="text-gray-900">{request.budget_range || "-"}</span>
             </div>
           </div>
         </div>
@@ -376,11 +376,11 @@ export function BulkOrderWorkbench({ initialRequest, storefrontUrl }: BulkOrderW
             </div>
             <div>
               <span className="text-gray-400 block font-mono">Target Payload</span>
-              <span className="font-medium text-gray-900">{request.target_payload_g ? `${request.target_payload_g}g` : "—"}</span>
+              <span className="font-medium text-gray-900">{request.target_payload_g ? `${request.target_payload_g}g` : "-"}</span>
             </div>
             <div>
               <span className="text-gray-400 block font-mono">Target Flight Time</span>
-              <span className="font-medium text-gray-900">{request.target_flight_time_min ? `${request.target_flight_time_min} mins` : "—"}</span>
+              <span className="font-medium text-gray-900">{request.target_flight_time_min ? `${request.target_flight_time_min} mins` : "-"}</span>
             </div>
             <div>
               <span className="text-gray-400 block font-mono">Environment</span>

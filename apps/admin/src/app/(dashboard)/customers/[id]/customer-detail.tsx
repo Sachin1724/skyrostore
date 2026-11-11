@@ -277,8 +277,8 @@ export function CustomerDetail({
                   <td className="py-2 pr-4 text-gray-500">
                     {new Date(order.created_at).toLocaleDateString()}
                   </td>
-                  <td className="py-2 pr-4 font-mono text-xs">{order.payment_status || "—"}</td>
-                  <td className="py-2 pr-4 font-mono text-xs">{order.fulfillment_status || "—"}</td>
+                  <td className="py-2 pr-4 font-mono text-xs">{order.payment_status || "-"}</td>
+                  <td className="py-2 pr-4 font-mono text-xs">{order.fulfillment_status || "-"}</td>
                   <td className="py-2 text-right font-medium">
                     {order.total} {order.currency_code?.toUpperCase()}
                   </td>

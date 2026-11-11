@@ -15,7 +15,7 @@ import { AnalyticsTracker } from "@/components/analytics/tracker";
 
 export const metadata: Metadata = {
   title: {
-    default: "Skyrostore — Professional UAVs & Components",
+    default: "Skyrostore: drone parts and complete UAVs",
     template: "%s | Skyrostore",
   },
   description:

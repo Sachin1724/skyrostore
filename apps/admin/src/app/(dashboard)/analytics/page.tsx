@@ -134,7 +134,7 @@ export default async function AnalyticsPage({
                     <td className="py-2 pr-3">{cart.item_count}</td>
                     <td className="py-2 pr-3 text-gray-600">{cart.idle_minutes} min</td>
                     <td className="py-2 pr-3 font-mono text-xs text-gray-600">
-                      {cart.last_checkout_step || cart.last_action || "—"}
+                      {cart.last_checkout_step || cart.last_action || "-"}
                     </td>
                     <td className="py-2 font-mono text-xs">{cart.state}</td>
                   </tr>
@@ -169,10 +169,10 @@ export default async function AnalyticsPage({
                   <td className="py-2 pr-3 font-medium text-gray-900">{event.event_type}</td>
                   <td className="py-2 pr-3 font-mono text-xs text-gray-500">{event.session_id}</td>
                   <td className="py-2 pr-3 font-mono text-xs text-gray-600">
-                    {event.checkout_step || event.page_path || "—"}
+                    {event.checkout_step || event.page_path || "-"}
                   </td>
                   <td className="py-2 font-mono text-xs text-gray-600">
-                    {event.order_id || event.product_id || event.cart_id || "—"}
+                    {event.order_id || event.product_id || event.cart_id || "-"}
                   </td>
                 </tr>
               ))}

@@ -24,7 +24,7 @@ export default async function SupportPage() {
     <div>
       <h1 className="text-xl font-semibold text-gray-900">Support</h1>
       <p className="mt-1 text-sm text-gray-500">
-        Customer queries route through two queues below — there is no separate ticket inbox.
+        Customer queries route through two queues below, there is no separate ticket inbox.
       </p>
 
       <div className="mt-6 grid max-w-2xl gap-4 sm:grid-cols-2">

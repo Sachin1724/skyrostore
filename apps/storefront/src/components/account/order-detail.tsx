@@ -1,6 +1,7 @@
 "use client";
 
-import { SkyroLogo } from "@/components/brand/logo";
+import { SellerBlock } from "@/components/checkout/seller-block";
+import type { Seller } from "@/lib/data/site-settings";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
@@ -60,7 +61,7 @@ type Order = {
   }>;
 };
 
-export function OrderDetail({ orderId, gstin }: { orderId: string; gstin?: string }) {
+export function OrderDetail({ orderId, seller }: { orderId: string; seller: Seller }) {
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -411,17 +412,7 @@ export function OrderDetail({ orderId, gstin }: { orderId: string; gstin?: strin
 
             <div id="printable-invoice" className="flex-1 overflow-y-auto p-6 md:p-8 space-y-6 text-navy print:overflow-visible">
               <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 border-b border-border pb-6">
-                <div>
-                  <SkyroLogo variant="full" className="mb-3 !h-16" />
-                  <span className="text-[18px] font-extrabold tracking-tight text-navy">
-                    SKYROSTORE SYSTEMS PRIVATE LIMITED
-                  </span>
-                  <p className="mt-1 text-[13px] text-text-secondary leading-relaxed">
-                    Infocity Complex, Bhubaneswar, Odisha 751024<br />
-                    <strong>GSTIN:</strong> {gstin || "21AAECS9821R1ZM"}<br />
-                    <strong>State Code:</strong> 21 (Odisha)
-                  </p>
-                </div>
+                <SellerBlock seller={seller} />
 
                 <div className="text-left sm:text-right text-[13px]">
                   <p className="font-bold text-navy text-[14px]">Invoice #{order.display_id}</p>

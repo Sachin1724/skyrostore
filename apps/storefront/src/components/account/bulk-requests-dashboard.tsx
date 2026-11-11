@@ -80,21 +80,21 @@ function getStatusBadge(status: string, validUntil?: string | null) {
   switch (status) {
     case "SUBMITTED":
       return (
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-300 bg-slate-100 px-2.5 py-0.5 text-[13px] font-bold text-slate-800">
+        <span className="inline-flex items-center gap-1.5 rounded-md border border-slate-300 bg-slate-100 px-2.5 py-0.5 text-[13px] font-bold text-slate-800">
           <span className="h-1.5 w-1.5 rounded-full bg-slate-500" />
           Submitted
         </span>
       );
     case "UNDER_REVIEW":
       return (
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-sky-300 bg-sky-50 px-2.5 py-0.5 text-[13px] font-bold text-sky-800">
+        <span className="inline-flex items-center gap-1.5 rounded-md border border-sky-300 bg-sky-50 px-2.5 py-0.5 text-[13px] font-bold text-sky-800">
           <span className="h-1.5 w-1.5 rounded-full bg-sky-500 animate-pulse" />
           Under Review
         </span>
       );
     case "NEEDS_INFORMATION":
       return (
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-300 bg-amber-50 px-2.5 py-0.5 text-[13px] font-bold text-amber-800">
+        <span className="inline-flex items-center gap-1.5 rounded-md border border-amber-300 bg-amber-50 px-2.5 py-0.5 text-[13px] font-bold text-amber-800">
           <AlertCircle className="h-3 w-3 text-amber-600" />
           Action Needed
         </span>
@@ -102,20 +102,20 @@ function getStatusBadge(status: string, validUntil?: string | null) {
     case "QUOTED":
       if (isExpired) {
         return (
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-300 bg-slate-100 px-2.5 py-0.5 text-[13px] font-bold text-slate-600">
+          <span className="inline-flex items-center gap-1.5 rounded-md border border-slate-300 bg-slate-100 px-2.5 py-0.5 text-[13px] font-bold text-slate-600">
             Quote Expired
           </span>
         );
       }
       return (
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300 bg-emerald-50 px-2.5 py-0.5 text-[13px] font-extrabold text-emerald-800">
+        <span className="inline-flex items-center gap-1.5 rounded-md border border-emerald-300 bg-emerald-50 px-2.5 py-0.5 text-[13px] font-extrabold text-emerald-800">
           <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
           Quote Ready
         </span>
       );
     case "ACCEPTED":
       return (
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500 bg-emerald-600 px-2.5 py-0.5 text-[13px] font-bold text-white">
+        <span className="inline-flex items-center gap-1.5 rounded-md border border-emerald-500 bg-emerald-600 px-2.5 py-0.5 text-[13px] font-bold text-white">
           <CheckCircle2 className="h-3 w-3" />
           Accepted
         </span>
@@ -123,26 +123,26 @@ function getStatusBadge(status: string, validUntil?: string | null) {
     case "CONVERTED_TO_ORDER":
     case "IN_PRODUCTION":
       return (
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-navy bg-navy px-2.5 py-0.5 text-[13px] font-bold text-white">
+        <span className="inline-flex items-center gap-1.5 rounded-md border border-navy bg-navy px-2.5 py-0.5 text-[13px] font-bold text-white">
           In Production
         </span>
       );
     case "EXPIRED":
       return (
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-300 bg-slate-100 px-2.5 py-0.5 text-[13px] font-bold text-slate-600">
+        <span className="inline-flex items-center gap-1.5 rounded-md border border-slate-300 bg-slate-100 px-2.5 py-0.5 text-[13px] font-bold text-slate-600">
           Expired
         </span>
       );
     case "CANCELLED":
     case "REJECTED":
       return (
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-rose-200 bg-rose-50 px-2.5 py-0.5 text-[13px] font-bold text-rose-700">
+        <span className="inline-flex items-center gap-1.5 rounded-md border border-rose-200 bg-rose-50 px-2.5 py-0.5 text-[13px] font-bold text-rose-700">
           Declined
         </span>
       );
     default:
       return (
-        <span className="inline-flex items-center rounded-full border border-border bg-surface-soft px-2.5 py-0.5 text-[13px] font-bold text-navy">
+        <span className="inline-flex items-center rounded-md border border-border bg-surface-soft px-2.5 py-0.5 text-[13px] font-bold text-navy">
           {status}
         </span>
       );

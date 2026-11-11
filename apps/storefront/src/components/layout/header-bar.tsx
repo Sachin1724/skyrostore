@@ -98,7 +98,7 @@ export function HeaderBar({ categories }: { categories: Cat[] }) {
 
         <DeliverTo />
 
-        <div role="search" className="hidden h-11 min-w-0 flex-1 rounded-full bg-surface-soft focus-within:bg-white focus-within:ring-2 focus-within:ring-brand/40 md:flex">
+        <div role="search" className="hidden h-11 min-w-0 flex-1 rounded-md bg-surface-soft focus-within:bg-white focus-within:ring-2 focus-within:ring-brand/40 md:flex">
           <SearchAutocomplete className="min-w-0 flex-1" browse={categories} scoped />
         </div>
 
@@ -118,7 +118,7 @@ export function HeaderBar({ categories }: { categories: Cat[] }) {
               setCartOpen(true);
             }}
             aria-label={`Open cart, ${count} ${count === 1 ? "item" : "items"}`}
-            className="flex h-11 items-center gap-2.5 rounded-full px-2.5 text-[14px] font-medium text-navy hover:text-brand md:h-10 md:bg-surface-soft md:px-3.5"
+            className="flex h-11 items-center gap-2.5 rounded-md px-2.5 text-[14px] font-medium text-navy hover:text-brand md:h-10 md:bg-surface-soft md:px-3.5"
           >
             <span className="relative">
               <ShoppingCart className="h-[22px] w-[22px]" strokeWidth={1.8} aria-hidden />
@@ -137,7 +137,7 @@ export function HeaderBar({ categories }: { categories: Cat[] }) {
 
       {/* Phones: search always visible on its own row, the delivery PIN under it. */}
       <div className="px-4 pb-1 md:hidden">
-        <div role="search" className="flex h-11 rounded-full bg-surface-soft focus-within:ring-2 focus-within:ring-brand/40">
+        <div role="search" className="flex h-11 rounded-md bg-surface-soft focus-within:ring-2 focus-within:ring-brand/40">
           <SearchAutocomplete className="min-w-0 flex-1" browse={categories} />
         </div>
       </div>

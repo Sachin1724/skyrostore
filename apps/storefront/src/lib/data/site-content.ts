@@ -16,11 +16,11 @@ export type SiteContent = {
 export const DEFAULT_CONTENT: SiteContent = {
   // Shown until the team publishes its own banners; every one points at a real page.
   heroSlides: [
-    { image: "/images/hero/storefront-hero-drone.png", title: "Parts that fly together.", text: "Motors, props, ESCs, packs and frames, checked against each other before they ship.", cta: "Shop all parts", href: "/parts" },
-    { image: "/images/hero/builder-drone-frame.png", title: "Build it before you buy it.", text: "Pick every part and we check the voltages, currents and clearances as you go.", cta: "Build your drone", href: "/build" },
-    { image: "/images/hero/bulk-hero-drone.png", title: "Equipping a team?", text: "Send quantities for a fleet, a lab or a course and we reply with a quotation.", cta: "Request a quote", href: "/bulk-orders" },
+    { image: "", title: "Drone parts and complete UAVs", text: "Motors, ESCs, flight controllers, batteries, propellers and frames, with a fit check before you pay.", cta: "Shop all parts", href: "/parts" },
+    { image: "/images/hero/builder-drone-frame.png", title: "Build your drone part by part", text: "Choose a frame, motors, ESC, battery and propellers. We check voltage, current and prop size as you go.", cta: "Build your drone", href: "/build" },
+    { image: "", title: "Bulk orders for labs and fleets", text: "Send the parts and quantities. We reply with a quotation and a GST invoice.", cta: "Request a quote", href: "/bulk-orders" },
   ],
-  heroTitle: "Parts that fly together.",
+  heroTitle: "Drone parts and complete UAVs",
   heroSentence: "Motors, props, ESCs, packs and frames, each checked against the others before it ships from Odisha.",
   faq: [
     { q: "How does the compatibility check work?", a: "It compares the published specifications of the parts you pick: motor voltage range against the pack, recommended prop size against the prop, current against the ESC. It flags a mismatch before you pay." },
@@ -40,7 +40,7 @@ async function fetchContent(): Promise<SiteContent> {
   const { content } = await medusa.client.fetch<{ content: Partial<SiteContent> | null }>("/store/site-content");
   const c = content ?? {};
   return {
-    heroSlides: c.heroSlides?.filter((s) => s.image).length ? c.heroSlides.filter((s) => s.image) : DEFAULT_CONTENT.heroSlides,
+    heroSlides: c.heroSlides?.filter((s) => s.image || s.title).length ? c.heroSlides.filter((s) => s.image || s.title) : DEFAULT_CONTENT.heroSlides,
     heroTitle: c.heroTitle || DEFAULT_CONTENT.heroTitle,
     heroSentence: c.heroSentence || DEFAULT_CONTENT.heroSentence,
     faq: c.faq?.length ? c.faq : DEFAULT_CONTENT.faq,

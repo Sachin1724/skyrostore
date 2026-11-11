@@ -8,7 +8,7 @@ const LABELS: Record<string, string> = {
   orders: "Orders",
   analytics: "Analytics",
   events: "Events",
-  "bulk-orders": "Bulk & Quotes",
+  "bulk-orders": "Quotations",
   products: "Products",
   new: "New",
   categories: "Categories",
@@ -20,7 +20,10 @@ const LABELS: Record<string, string> = {
   shipments: "Shipments",
   payments: "Payments",
   support: "Support",
-  moderation: "Moderation",
+  moderation: "Reviews & questions",
+  promotions: "Promotions",
+  returns: "Returns",
+  subscribers: "Subscribers",
   settings: "Settings",
 };
 

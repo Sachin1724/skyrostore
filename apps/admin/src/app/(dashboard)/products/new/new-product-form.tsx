@@ -218,8 +218,8 @@ export function NewProductForm({ categories, brands }: { categories: Category[];
               onChange={(e) => setStatus(e.target.value as "draft" | "published")}
               className={FIELD}
             >
-              <option value="draft">Draft — hidden from the storefront</option>
-              <option value="published">Published — visible</option>
+              <option value="draft">Draft, hidden from the storefront</option>
+              <option value="published">Published, visible</option>
             </select>
           </label>
         </div>
