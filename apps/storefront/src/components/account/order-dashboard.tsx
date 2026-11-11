@@ -180,7 +180,7 @@ export function OrderDashboard() {
                 key={tab}
                 type="button"
                 onClick={() => setActiveTab(tab)}
-                className={`whitespace-nowrap pb-2 text-[13px] font-bold transition-all ${
+                className={`min-h-11 whitespace-nowrap pb-2 text-[14px] font-bold transition-all ${
                   activeTab === tab
                     ? "border-b-2 border-brand text-graphite"
                     : "text-text-muted hover:text-graphite"

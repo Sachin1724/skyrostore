@@ -83,8 +83,9 @@ export function ProductTile({
           )}
         </h3>
         {spec ? <p className="truncate text-[13px] tabular-nums text-text-secondary">{spec}</p> : null}
-        <div className="mt-auto flex items-end justify-between gap-2 pt-2">
-          <div className="min-w-0">
+        {/* Price keeps its width; on a narrow card the action wraps under it instead of overlapping. */}
+        <div className="mt-auto flex flex-wrap items-end justify-between gap-2 pt-2">
+          <div className="whitespace-nowrap">
             {price}
             {status}
           </div>

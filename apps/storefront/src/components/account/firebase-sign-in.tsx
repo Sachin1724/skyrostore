@@ -187,7 +187,7 @@ export function FirebaseSignIn({ onSignedIn, onError }: { onSignedIn: () => void
             role="tab"
             aria-selected={method === m}
             onClick={() => setMethod(m)}
-            className={`-mb-px border-b-2 pb-2 font-semibold ${
+            className={`-mb-px min-h-11 border-b-2 pb-2 font-semibold ${
               method === m ? "border-graphite text-graphite" : "border-transparent text-text-muted hover:text-graphite"
             }`}
           >

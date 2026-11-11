@@ -507,7 +507,7 @@ export function BuilderView({
               type="button"
               disabled={activeStepIdx === 0}
               onClick={() => goToStep(activeStepIdx - 1)}
-              className="flex items-center gap-1 text-[14px] font-medium text-text-secondary hover:text-navy disabled:opacity-0"
+              className="flex min-h-11 items-center gap-1 text-[14px] font-medium text-text-secondary hover:text-navy disabled:opacity-0"
             >
               <ChevronLeft className="h-4 w-4" aria-hidden /> Back
             </button>

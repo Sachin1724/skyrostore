@@ -5,7 +5,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { FirebaseSignIn } from "./firebase-sign-in";
 import { firebaseConfigured } from "@/lib/firebase";
-import { ShieldCheck, ArrowRight } from "lucide-react";
 
 type AuthMode = "login" | "register";
 
@@ -113,13 +112,13 @@ export function AccountView() {
   }
 
   return (
-    <div className="card p-6 md:p-8">
+    <div className="card p-4 sm:p-6 md:p-8">
       <div className="border-b border-border pb-4">
         <h1 className="text-[24px] font-semibold text-navy">
-          {mode === "login" ? "Sign in to Skyrostore" : "Create Builder Account"}
+          {mode === "login" ? "Sign in to Skyrostore" : "Create your account"}
         </h1>
         <p className="mt-1 text-[13px] text-text-secondary">
-          Access your order history, live Delhivery courier tracking, saved builds, and GST tax invoices.
+          See your orders and tracking, saved builds and GST invoices.
         </p>
       </div>
 
@@ -254,7 +253,7 @@ export function AccountView() {
             ? "Processing..."
             : mode === "login"
             ? "Sign In to Account"
-            : "Create Builder Account"}
+            : "Create your account"}
         </button>
       </form>
 
@@ -284,13 +283,10 @@ export function AccountView() {
         )}
       </div>
 
-      <div className="mt-6 pt-4 border-t border-border flex items-center justify-between text-[13px] text-text-muted">
-        <span className="flex items-center gap-1.5">
-          <ShieldCheck className="h-4 w-4 text-brand" aria-hidden />
-          <span>GST Compliance Verified</span>
-        </span>
-        <Link href="/support" className="hover:text-brand font-semibold">
-          Need Assistance?
+      <div className="mt-6 border-t border-border pt-4 text-center text-[14px] text-text-secondary">
+        Trouble signing in?{" "}
+        <Link href="/support" className="inline-block py-2 font-semibold text-brand hover:text-navy">
+          Get help
         </Link>
       </div>
     </div>

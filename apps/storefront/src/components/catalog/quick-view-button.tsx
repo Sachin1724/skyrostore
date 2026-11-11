@@ -1,6 +1,7 @@
 "use client";
 
 import { Eye } from "lucide-react";
+import { cleanName } from "@/lib/utils";
 import type { HttpTypes } from "@medusajs/types";
 
 interface QuickViewButtonProps {
@@ -25,7 +26,7 @@ export function QuickViewButton({ product, className = "", variant = "icon" }: Q
       <button
         type="button"
         onClick={handleClick}
-        aria-label={`Quick view ${product.title}`}
+        aria-label={`Quick view ${cleanName(product.title ?? "")}`}
         className={`inline-flex items-center gap-1.5 rounded bg-white px-3 py-1.5 text-[13px] font-bold text-navy transition-all hover:bg-navy hover:text-white ${className}`}
       >
         <Eye className="h-3.5 w-3.5" aria-hidden />
@@ -38,8 +39,8 @@ export function QuickViewButton({ product, className = "", variant = "icon" }: Q
     <button
       type="button"
       onClick={handleClick}
-      aria-label={`Quick view ${product.title}`}
-      className={`flex h-8 w-8 items-center justify-center rounded-full bg-white text-navy transition-transform hover:scale-110 hover:text-brand ${className}`}
+      aria-label={`Quick view ${cleanName(product.title ?? "")}`}
+      className={`relative after:absolute after:-inset-2 after:content-[''] flex h-8 w-8 items-center justify-center rounded-full bg-white text-navy transition-transform hover:scale-110 hover:text-brand ${className}`}
     >
       <Eye className="h-4 w-4" aria-hidden />
     </button>

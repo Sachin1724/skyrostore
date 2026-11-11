@@ -193,7 +193,7 @@ export function ProductQuestions({ productId, productTitle }: ProductQuestionsPr
       ) : (
         <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-3 rounded-xl bg-white px-5 py-4">
           <MessageSquare className="h-5 w-5 shrink-0 text-text-muted" aria-hidden />
-          <p className="flex-1 text-[14px] text-text-secondary">
+          <p className="flex-[1_1_16rem] text-[14px] text-text-secondary">
             No questions yet. Ask about wiring, voltage or fit and we answer here.
           </p>
           <button type="button" onClick={() => setIsAsking(true)} className="btn btn-secondary btn-sm">

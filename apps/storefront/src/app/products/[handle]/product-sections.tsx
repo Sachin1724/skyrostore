@@ -31,9 +31,9 @@ export function ProductSections({
 }: ProductSectionsProps) {
   const sections = [
     { id: "overview", label: "Overview", show: Boolean(description || listing.key_features.length) },
-    { id: "specifications", label: "Specifications", show: true },
-    { id: "in-the-box", label: "In the Box", show: listing.in_the_box.length > 0 },
-    { id: "documents", label: "Documents", show: listing.documents.length > 0 },
+    { id: "specifications", label: "Specifications", short: "Specs", show: true },
+    { id: "in-the-box", label: "In the box", short: "In box", show: listing.in_the_box.length > 0 },
+    { id: "documents", label: "Documents", short: "Docs", show: listing.documents.length > 0 },
     { id: "reviews", label: "Reviews", show: true },
     { id: "questions", label: "Q&A", show: true },
   ].filter((s) => s.show);
@@ -62,17 +62,25 @@ export function ProductSections({
   return (
     <div className="mt-12">
       <nav aria-label="Product sections" className="sticky top-[121px] z-20 border-b border-border bg-page/95 md:top-[77px] lg:top-[125px]">
-        <ul className="flex gap-1 overflow-x-auto [scrollbar-width:none]">
+        {/* Phones: the tabs share the width equally with short names, so none is cut off at the edge. */}
+        <ul className="flex overflow-x-auto [scrollbar-width:none] sm:gap-1">
           {sections.map((s) => (
-            <li key={s.id}>
+            <li key={s.id} className="flex-1 sm:flex-none">
               <a
                 href={`#${s.id}`}
                 aria-current={active === s.id ? "true" : undefined}
-                className={`relative inline-flex h-12 items-center whitespace-nowrap px-3 text-[16px] first:pl-0 font-semibold transition-colors ${
+                className={`relative flex h-12 items-center justify-center whitespace-nowrap px-2 text-[15px] font-semibold transition-colors sm:inline-flex sm:px-3 sm:text-[16px] ${
                   active === s.id ? "text-brand" : "text-text-secondary hover:text-navy"
                 }`}
               >
-                {s.label}
+                {"short" in s && s.short ? (
+                  <>
+                    <span className="sm:hidden">{s.short}</span>
+                    <span className="hidden sm:inline">{s.label}</span>
+                  </>
+                ) : (
+                  s.label
+                )}
                 <span
                   aria-hidden
                   className={`absolute inset-x-3 bottom-0 h-[3px] rounded-t bg-brand transition-[opacity,scale] duration-200 ease-out ${active === s.id ? "opacity-100" : "scale-x-50 opacity-0"}`}

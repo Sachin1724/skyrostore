@@ -99,7 +99,7 @@ export function ProductCard({ product, priority = false }: { product: HttpTypes.
           <div className="absolute right-2.5 top-2.5 z-10 flex flex-col items-end gap-1.5">
             <WishlistButton
               productId={product.id}
-              className="flex h-8 w-8 items-center justify-center rounded-full bg-white transition-transform hover:scale-110"
+              className="relative after:absolute after:-inset-2 after:content-[''] flex h-8 w-8 items-center justify-center rounded-full bg-white transition-transform hover:scale-110"
             />
             <div className="card-extra">
               <QuickViewButton product={product} />
@@ -123,7 +123,7 @@ export function ProductListRow({ product }: { product: HttpTypes.StoreProduct })
         <CompareCheckbox product={product} />
         <WishlistButton
           productId={product.id}
-          className="flex h-7 w-7 items-center justify-center rounded-full bg-surface-soft text-navy hover:text-brand"
+          className="relative after:absolute after:-inset-2 after:content-[''] flex h-7 w-7 items-center justify-center rounded-full bg-surface-soft text-navy hover:text-brand"
         />
       </div>
       <Link href={s.href} tabIndex={-1} aria-hidden className="relative h-20 w-20 shrink-0 rounded-md bg-surface-soft">

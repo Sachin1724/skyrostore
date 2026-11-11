@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 
@@ -20,6 +20,15 @@ export const metadata: Metadata = {
   },
   description:
     "Engineering-grade drones, flight hardware, and components for mapping, inspection, agriculture, and custom aerial systems.",
+};
+
+// viewport-fit=cover lets fixed bottom bars pad for the home indicator with env(safe-area-inset-bottom);
+// the status bar takes the blue of the announcement strip at the top of every page. Zoom stays enabled.
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#1D6AC2",
 };
 
 export default function RootLayout({

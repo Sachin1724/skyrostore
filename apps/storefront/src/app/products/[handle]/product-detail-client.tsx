@@ -159,18 +159,15 @@ export function ProductDetailClient({
       {/* Main PDP Grid: Gallery (Left) and Buy Box (Right) */}
       <section className="mt-4 grid gap-8 lg:grid-cols-[minmax(0,6fr)_minmax(0,5fr)] lg:gap-12">
         {/* Product Gallery Island */}
-        {/* The picture stays in view while the taller buy box scrolls past it. */}
-        <div className="lg:sticky lg:top-[150px] lg:self-start">
-          <ProductGallery
-            title={title}
-            images={images}
-            thumbnail={product.thumbnail ?? null}
-            videoUrl={listing.video_url ?? (metadata.video_url as string | null | undefined)}
-            componentType={metadata.component_type as string | undefined}
-            category={category}
-            discountPercent={discountPercent}
-          />
-        </div>
+        <ProductGallery
+          title={title}
+          images={images}
+          thumbnail={product.thumbnail ?? null}
+          videoUrl={listing.video_url ?? (metadata.video_url as string | null | undefined)}
+          componentType={metadata.component_type as string | undefined}
+          category={category}
+          discountPercent={discountPercent}
+        />
 
         {/* Buy Box Information */}
         <div>

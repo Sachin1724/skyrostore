@@ -94,8 +94,8 @@ export function FrequentlyBoughtTogether({
 
       <div className="mt-6 card p-5 lg:p-7">
         <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
-          {/* Visual Bundle Flow */}
-          <div className="flex flex-wrap items-center gap-4 sm:gap-6">
+          {/* Visual bundle flow, wider screens only: on a phone the tiles and plus signs wrap raggedly, and the checklist beside it already names every item and price. */}
+          <div className="hidden flex-wrap items-center gap-4 sm:flex sm:gap-6">
             {allBundleProducts.map((item, index) => {
               const isChecked = selectedVariants.has(item.variantId);
               const meta = (item.product.metadata ?? {}) as Record<string, unknown>;
@@ -147,7 +147,7 @@ export function FrequentlyBoughtTogether({
           </div>
 
           {/* Bundle Summary & Add Action */}
-          <div className="flex flex-col justify-between border-t border-border pt-5 lg:border-l lg:border-t-0 lg:pl-8 lg:pt-0">
+          <div className="flex flex-col justify-between sm:border-t sm:border-border sm:pt-5 lg:border-l lg:border-t-0 lg:pl-8 lg:pt-0">
             <div>
               <span className="text-[13px] font-semibold text-text-secondary">
                 Total for {selectedProducts.length} items
@@ -202,10 +202,10 @@ export function FrequentlyBoughtTogether({
               >
                 {success ? (
                   <>
-                    <Check className="h-5 w-5" /> Added {selectedProducts.length} Items to Cart
+                    <Check className="h-5 w-5" /> Added {selectedProducts.length} items to cart
                   </>
                 ) : adding ? (
-                  "Adding Bundle..."
+                  "Adding…"
                 ) : (
                   <>
                     <ShoppingCart className="h-4 w-4" /> Add all {selectedProducts.length} to cart

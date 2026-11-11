@@ -218,7 +218,7 @@ export function ProductReviews({ productId, productTitle }: ProductReviewsProps)
         </div>
       ) : (
         <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-3 rounded-xl bg-white px-5 py-4">
-          <p className="flex-1 text-[14px] text-text-secondary">
+          <p className="flex-[1_1_16rem] text-[14px] text-text-secondary">
             No reviews yet. Be the first to review the {productTitle}.
           </p>
           <button type="button" onClick={() => setIsModalOpen(true)} className="btn btn-primary btn-sm">

@@ -212,6 +212,75 @@ template tells.
    edge has more, and on desktop arrow buttons that appear only when the row overflows and dim at the ends.
 3. Nothing on a page may be wider than the screen (the restock card was 19px too wide on phones; fixed).
 
+## 10. Small phones (audit 11 Nov, done 11 Nov except the real-phone check in 10.3)
+
+Method: every page loaded at 320, 360 and 390px wide (touch, mobile viewport) with Playwright. Measured:
+pages wider than the screen, inputs under 16px (iOS zooms the page on focus), tap targets under 40px,
+and full-page screenshots at 360px read by eye. Emulation, not a real phone: items marked (device) must be
+confirmed on hardware.
+
+### 10.1 What is broken
+
+| Where | Problem | Cause |
+|---|---|---|
+| Every page at 320px | Page drags sideways by 4px | Announcement bar line is `whitespace-nowrap` and 328px long |
+| Product pages at 320 and 360px | Page is 388px wide; buy box and title run off the right edge | Main grid has no column rule, so the single phone column grows to its widest content; also a second `sticky` wrapper added around a gallery that already has one |
+| Product page tabs | "Q&A" cut off at the edge | Tab row does not fit and has no scroll affordance |
+| Product page reviews / questions (empty) | Sentence squeezed into a narrow column beside its button | Text and button side by side at every width |
+| Product page "Buy it with" | Three tiles and "+" signs wrap into a ragged 2 + 1 grid | Desktop row layout reused on phones |
+| Product page "Works with" cards | "In stock" breaks over two lines beside the Add button | Price, stock and button forced into one row in a 150px card |
+| Build your drone | Price and "Select" button overlap ("₹6,499Select") | Same one-row price + action in a two-column grid |
+| Bulk quote request | Item table cut off ("Unit Price", "Total" hidden) | Desktop table inside a clipped card |
+| Sign in, forgot password, orders search, bulk request, support, brands | Page zooms in when the field is tapped (device) | Inputs at 13–14px |
+| Bulk orders (5,600px) and Support (5,000px) | Very long scroll; cards inside cards lose a third of the width to padding | Desktop card nesting kept on phones |
+| Footer on every page | About 700px of stacked link lists | Four columns stack one under another |
+| Small targets | Hero dots 16×6px, wishlist / quick view 32px, A–Z brand letters 32px, bulk step circles 28px, inline links 16–20px tall | Desktop sizes |
+| Quick view buttons | Screen readers hear "[DEV]" in the label | Title not passed through `cleanName` |
+| Copy still making claims on phone pages | Support "Orders over ₹5,000 qualify for free standard shipping", "Instant serviceability & transit SLA"; sign-in "GST Compliance Verified"; bulk orders tier rebates (8 / 15 / 22 %), "Certificate of Conformance", "within one business day" | Old copy, unconfirmed |
+
+### 10.2 Fixes, in order
+
+1. **Global baseline** (one file each, fixes every page at once):
+   - `globals.css`: inputs, selects and textareas at 16px minimum; `-webkit-tap-highlight-color: transparent`;
+     `touch-action: manipulation` on links and buttons; hover styles only under `(hover: hover)` (Tailwind 4
+     already does this for `hover:`; check the hand-written `:hover` rules in globals.css); `overflow-wrap:
+     anywhere` on long tokens (SKUs, emails) inside cards.
+   - `layout.tsx`: `viewport` export with `viewport-fit=cover` and `theme-color` matching the header, so the
+     sticky bottom bars can pad for the home indicator with `env(safe-area-inset-bottom)` (device).
+   - Announcement bar: allow wrapping or shorten the phone line ("Secure payment by Razorpay").
+2. **Page shells**: every two-column page grid gets `grid-cols-[minmax(0,1fr)]` below its desktop breakpoint
+   (product, cart, checkout, bulk request, support, account). Remove the extra sticky wrapper on the product
+   page.
+3. **Cards on phones**: one level of card only. Inner panels lose their border and padding below `sm`, so
+   content gets the full 328px instead of about 260px. Applies to bulk orders, support, bulk request, account
+   sign-in, product sections.
+4. **Price + action rows** (product tile action slot, builder tiles, "Works with" cards): stack price above a
+   full-width button below `sm`, as the main product card already does.
+5. **Product page**: tabs become a full-width segmented row (four equal tabs, short labels: Overview, Specs,
+   Reviews, Q&A); empty reviews / questions stack text over button; "Buy it with" becomes a vertical list
+   with checkboxes on phones (thumbnail, name, price per row) instead of tiles and "+" signs.
+6. **Bulk quote table**: below `md`, each line becomes a stacked row (name, then price × quantity = total).
+7. **Long pages**: bulk orders and support get shorter phone versions — tier cards become a compact list,
+   process steps a numbered `<ol>`, FAQs stay collapsed, the knowledge grid two columns of short tiles.
+8. **Footer on phones**: the three link columns become collapsible groups (`<details>`), contact emails stay
+   open; cuts it to about 300px.
+9. **Tap targets**: 44px minimum hit area on icon buttons (wishlist, quick view, rail arrows, A–Z letters,
+   step circles) using padding, not bigger icons; hero dots get a 44px invisible hit area; inline text links
+   in lists get `py-2`.
+10. **Copy**: remove or rewrite the claims in the last table row, same rule as section 6; owner confirms any
+    to restore.
+11. **Labels**: pass titles through `cleanName` in quick view and compare buttons.
+
+### 10.3 Done when
+
+- No page is wider than the screen at 320, 360, 390 and 768px (scripted check, all routes above).
+- No input under 16px; no visible control with a hit area under 44 × 44px except inline links in running
+  text.
+- Screenshots at 360px read cleanly by eye for every route, menu, cart drawer, search dropdown and filter
+  sheet open.
+- Checked once on a real Android and iPhone over the LAN (device items: zoom on focus, home-indicator
+  padding, sticky bars, keyboard covering inputs).
+
 ## Order of work
 
 | # | Work | Needs from the team |

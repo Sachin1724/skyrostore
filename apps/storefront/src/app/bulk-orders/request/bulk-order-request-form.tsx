@@ -478,7 +478,7 @@ export function BulkOrderRequestForm() {
       <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
         {/* LEFT COLUMN: Stepper + Active Step Content (8 cols) */}
         <div className="space-y-6 lg:col-span-8">
-          <div className="bg-white p-6">
+          <div className="bg-white p-4 sm:p-6">
             {/* Horizontal or Sub-step progress indicators */}
             <div className="flex flex-wrap items-center justify-between border-b border-border pb-5">
               {[
@@ -498,7 +498,7 @@ export function BulkOrderRequestForm() {
                     className="flex items-center gap-2.5 py-1 text-left transition-opacity hover:opacity-80"
                   >
                     <div
-                      className={`flex h-7 w-7 items-center justify-center rounded-full text-[14px] font-bold ${
+                      className={`relative after:absolute after:-inset-2 after:content-[''] flex h-7 w-7 items-center justify-center rounded-full text-[14px] font-bold ${
                         isActive
                           ? "bg-brand text-white"
                           : isPassed
@@ -606,10 +606,10 @@ export function BulkOrderRequestForm() {
                   </div>
                 </div>
 
-                {/* Products Table matching mockup */}
+                {/* A table from md up; below that each line stacks (name and remove, unit price, quantity and total). */}
                 <div className="overflow-x-auto rounded-lg border border-border">
-                  <table className="w-full text-left text-[13px]">
-                    <thead className="border-b border-border bg-surface-soft text-[13px] font-bold text-text-muted">
+                  <table className="w-full text-left text-[13px] max-md:block">
+                    <thead className="border-b border-border bg-surface-soft text-[13px] font-bold text-text-muted max-md:hidden">
                       <tr>
                         <th className="px-4 py-3">Product</th>
                         <th className="px-4 py-3">Unit Price</th>
@@ -618,10 +618,10 @@ export function BulkOrderRequestForm() {
                         <th className="px-3 py-3 text-center"></th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-border bg-white">
+                    <tbody className="divide-y divide-border bg-white max-md:block">
                       {filteredItems.map((item) => (
-                        <tr key={item.id} className="transition-colors hover:bg-surface-soft/50">
-                          <td className="px-4 py-3.5">
+                        <tr key={item.id} className="transition-colors hover:bg-surface-soft/50 max-md:grid max-md:grid-cols-[minmax(0,1fr)_auto] max-md:items-center max-md:gap-x-3 max-md:gap-y-2 max-md:p-4">
+                          <td className="px-4 py-3.5 max-md:order-1 max-md:p-0">
                             <div className="flex items-center gap-3">
                               <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded border border-border bg-surface-soft">
                                 <Image
@@ -637,15 +637,17 @@ export function BulkOrderRequestForm() {
                               </div>
                             </div>
                           </td>
-                          <td className="whitespace-nowrap px-4 py-3.5 font-bold text-graphite">
+                          <td className="whitespace-nowrap px-4 py-3.5 font-bold text-graphite max-md:order-3 max-md:col-span-2 max-md:p-0 max-md:font-medium max-md:text-text-secondary">
                             {formatINR(item.unit_price)}
+                            <span className="md:hidden"> each</span>
                           </td>
-                          <td className="px-4 py-3.5">
+                          <td className="px-4 py-3.5 max-md:order-4 max-md:p-0">
                             <div className="inline-flex items-center rounded border border-border bg-white">
                               <button
                                 type="button"
                                 onClick={() => handleUpdateQuantity(item.id, -1)}
-                                className="px-2.5 py-1 text-text-secondary transition-colors hover:bg-surface-soft hover:text-graphite"
+                                aria-label={`Fewer ${item.title}`}
+                                className="h-10 px-3 text-text-secondary transition-colors hover:bg-surface-soft hover:text-graphite"
                               >
                                 &minus;
                               </button>
@@ -655,20 +657,22 @@ export function BulkOrderRequestForm() {
                               <button
                                 type="button"
                                 onClick={() => handleUpdateQuantity(item.id, 1)}
-                                className="px-2.5 py-1 text-text-secondary transition-colors hover:bg-surface-soft hover:text-graphite"
+                                aria-label={`More ${item.title}`}
+                                className="h-10 px-3 text-text-secondary transition-colors hover:bg-surface-soft hover:text-graphite"
                               >
                                 +
                               </button>
                             </div>
                           </td>
-                          <td className="whitespace-nowrap px-4 py-3.5 text-right font-bold text-graphite">
+                          <td className="whitespace-nowrap px-4 py-3.5 text-right font-bold text-graphite max-md:order-5 max-md:p-0">
                             {formatINR(item.unit_price * item.requested_quantity)}
                           </td>
-                          <td className="px-3 py-3.5 text-center">
+                          <td className="px-3 py-3.5 text-center max-md:order-2 max-md:p-0">
                             <button
                               type="button"
                               onClick={() => handleRemoveItem(item.id)}
-                              className="text-text-muted transition-colors hover:text-rose-600"
+                              className="inline-flex h-10 w-10 items-center justify-center text-text-muted transition-colors hover:text-rose-600"
+                              aria-label={`Remove ${item.title}`}
                               title="Remove item"
                             >
                               <X className="h-4 w-4" />
@@ -677,15 +681,15 @@ export function BulkOrderRequestForm() {
                         </tr>
                       ))}
                       {items.length === 0 ? (
-                        <tr>
-                          <td colSpan={5} className="py-8 text-center text-text-muted">
+                        <tr className="max-md:block">
+                          <td colSpan={5} className="py-8 text-center text-text-muted max-md:block max-md:px-4">
                             <p className="font-semibold text-graphite text-[14px]">No components added to request yet</p>
                             <p className="mt-1 text-[14px] text-text-secondary">Click &quot;Add Another Product&quot; below or define custom requirements in Step 2.</p>
                           </td>
                         </tr>
                       ) : filteredItems.length === 0 ? (
-                        <tr>
-                          <td colSpan={5} className="py-8 text-center text-text-muted">
+                        <tr className="max-md:block">
+                          <td colSpan={5} className="py-8 text-center text-text-muted max-md:block max-md:px-4">
                             No products found in this category filter.
                           </td>
                         </tr>
@@ -708,7 +712,7 @@ export function BulkOrderRequestForm() {
                   <button
                     type="button"
                     onClick={handleClearAll}
-                    className="inline-flex items-center gap-1.5 text-[14px] font-medium text-rose-600 transition-colors hover:text-rose-700"
+                    className="inline-flex min-h-11 items-center gap-1.5 text-[14px] font-medium text-rose-600 transition-colors hover:text-rose-700"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                     Clear All
@@ -1103,7 +1107,7 @@ export function BulkOrderRequestForm() {
         {/* RIGHT COLUMN: REQUEST SUMMARY & WHY CHOOSE BULK (4 cols) */}
         <div className="space-y-6 lg:col-span-4">
           {/* Card 1: Request Summary */}
-          <div className="bg-white p-6">
+          <div className="bg-white p-4 sm:p-6">
             <div className="flex items-center justify-between border-b border-border pb-4">
               <h3 className="text-[16px] font-bold text-graphite">Request Summary</h3>
               <span className="text-[14px] text-text-muted">{items.length} items</span>
@@ -1139,19 +1143,19 @@ export function BulkOrderRequestForm() {
             </div>
           </div>
 
-          {/* Card 2: Why Choose Bulk Orders? */}
-          <div className="bg-white p-6">
+          {/* Card 2: what the quotation includes */}
+          <div className="bg-white p-4 sm:p-6">
             <h3 className="text-[16px] font-bold text-graphite">
-              Why Choose Bulk Orders?
+              What you get
             </h3>
             <ul className="mt-4 space-y-3 text-[14px] text-text-secondary">
               {[
-                "Special volume pricing",
+                "Prices for your quantities",
                 "Custom configuration support",
-                "Dedicated technical consultation",
-                "Priority production and delivery",
+                "A check that the parts work together",
+                "Delivery and lead time for each line",
                 "GST invoicing for businesses",
-                "After-sales support for fleet orders",
+                "Tracking once the order ships",
               ].map((benefit, i) => (
                 <li key={i} className="flex items-center gap-2.5">
                   <div className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-brand text-white">

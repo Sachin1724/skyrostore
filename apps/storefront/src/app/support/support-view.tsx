@@ -223,7 +223,7 @@ export function SupportView() {
                 key={tag}
                 type="button"
                 onClick={() => setSearchQuery(tag)}
-                className="rounded-full border border-border bg-surface-soft px-3 py-1 text-[13px] font-medium text-navy transition-colors hover:bg-surface-muted hover:border-brand-cyan"
+                className="inline-flex min-h-10 items-center rounded-full border border-border bg-surface-soft px-3.5 text-[14px] font-medium text-navy transition-colors hover:border-brand-cyan hover:bg-surface-muted"
               >
                 {tag}
               </button>
@@ -235,7 +235,7 @@ export function SupportView() {
       {/* 2. Interactive Diagnostics Row (3 Columns: Track, PIN Check, Direct Desk) */}
       <section className="grid grid-cols-1 md:grid-cols-3 gap-5">
         {/* Card 1: Track Shipment */}
-        <div className="card p-5 flex flex-col justify-between">
+        <div className="card flex flex-col justify-between p-4 sm:p-5">
           <div>
             <div className="flex items-center gap-2.5 border-b border-border pb-3">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-surface-soft text-navy">
@@ -243,13 +243,13 @@ export function SupportView() {
               </div>
               <div>
                 <h2 className="text-[14px] font-extrabold text-navy">Track Consignment</h2>
-                <p className="text-[13px] text-text-muted">Delhivery &amp; BlueDart Air Waybills</p>
+                <p className="text-[13px] text-text-muted">Tracking number or order number</p>
               </div>
             </div>
 
             <form onSubmit={handleTrackOrder} className="mt-4 space-y-2.5">
               <label htmlFor="track-input" className="block text-[13px] font-semibold text-text-secondary">
-                Air Waybill / Order Number
+                Tracking or order number
               </label>
               <input
                 id="track-input"
@@ -285,7 +285,7 @@ export function SupportView() {
         </div>
 
         {/* Card 2: PIN Code Delivery Check */}
-        <div className="card p-5 flex flex-col justify-between">
+        <div className="card flex flex-col justify-between p-4 sm:p-5">
           <div>
             <div className="flex items-center gap-2.5 border-b border-border pb-3">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-surface-soft text-navy">
@@ -293,7 +293,7 @@ export function SupportView() {
               </div>
               <div>
                 <h2 className="text-[14px] font-extrabold text-navy">PIN Delivery Lookup</h2>
-                <p className="text-[13px] text-text-muted">Instant serviceability &amp; transit SLA</p>
+                <p className="text-[13px] text-text-muted">Check that we deliver to your PIN code</p>
               </div>
             </div>
 
@@ -346,13 +346,10 @@ export function SupportView() {
             )}
           </div>
 
-          <div className="mt-4 border-t border-border pt-3 text-[13px] text-text-muted">
-            <span className="font-medium text-text-secondary">Orders over ₹5,000</span> qualify for free standard shipping.
-          </div>
         </div>
 
         {/* Card 3: Direct Engineering Desk */}
-        <div id="contact-desk" className="card p-5 flex flex-col justify-between">
+        <div id="contact-desk" className="card flex flex-col justify-between p-4 sm:p-5">
           <div>
             <div className="flex items-center gap-2.5 border-b border-border pb-3">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-surface-soft text-navy">
@@ -399,7 +396,7 @@ export function SupportView() {
       </section>
 
       {/* 3. Browse Help Categories Grid (9 Cards) */}
-      <section className="card p-6 md:p-8">
+      <section className="card p-4 sm:p-6 md:p-8">
         <div className="border-b border-border pb-4">
           <h2 className="text-[20px] font-extrabold text-navy">
             Technical Knowledge &amp; Category Topics
@@ -439,7 +436,7 @@ export function SupportView() {
       </section>
 
       {/* 4. Frequently Asked Questions Accordion */}
-      <section className="card p-6 md:p-8">
+      <section className="card p-4 sm:p-6 md:p-8">
         <div className="flex items-center justify-between border-b border-border pb-4">
           <div>
             <h2 className="text-[20px] font-extrabold text-navy">

@@ -95,7 +95,7 @@ export function BrandsDirectory({ brands }: BrandsDirectoryProps) {
               onClick={() => activeLetters.has("#") && setSelectedLetter("#")}
               disabled={!activeLetters.has("#")}
               aria-pressed={selectedLetter === "#"}
-              className={`h-8 w-8 rounded text-[13px] font-bold transition-all ${
+              className={`h-10 w-10 rounded text-[14px] font-bold transition-all sm:h-8 sm:w-8 sm:text-[13px] ${
                 selectedLetter === "#"
                   ? "bg-navy text-white"
                   : activeLetters.has("#")
@@ -115,7 +115,7 @@ export function BrandsDirectory({ brands }: BrandsDirectoryProps) {
                   onClick={() => hasItems && setSelectedLetter(letter)}
                   disabled={!hasItems}
                   aria-pressed={isSelected}
-                  className={`h-8 w-8 rounded text-[13px] font-bold transition-all ${
+                  className={`h-10 w-10 rounded text-[14px] font-bold transition-all sm:h-8 sm:w-8 sm:text-[13px] ${
                     isSelected
                       ? "bg-navy text-white"
                       : hasItems

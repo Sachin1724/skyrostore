@@ -34,11 +34,11 @@ export default function BulkOrderRequestPage() {
             <div className="max-w-[760px]">
 
               <h1 className="mt-3 text-[clamp(1.8rem,1.4rem+2.2vw,3rem)] font-extrabold leading-[1.1] tracking-[-0.03em] text-navy">
-                Request Bulk Quotation &amp; Custom UAV Builds
+                Request a bulk quote
               </h1>
 
               <p className="mt-3 text-[14px] md:text-[16px] leading-relaxed text-text-secondary">
-                Configure multiple units, bespoke payloads, or enterprise fleet lots. All submissions receive an itemized proposal with volume pricing, GST tax invoicing, and technical validation within 24 hours.
+                Add the parts and quantities, or describe a custom build. We reply with an itemised quotation including GST.
               </p>
             </div>
 

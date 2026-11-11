@@ -83,7 +83,7 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
           <button type="button" aria-label="Next slide" onClick={() => go(index + 1)} className="absolute right-4 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white text-navy md:flex">
             <ChevronRight className="h-5 w-5" aria-hidden />
           </button>
-          <div className="absolute bottom-6 left-7 flex gap-2 md:left-16">
+          <div className="absolute bottom-2 left-6 flex md:left-15">
             {slides.map((_, i) => (
               <button
                 key={i}
@@ -91,8 +91,10 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
                 aria-label={`Go to slide ${i + 1}`}
                 aria-current={i === index}
                 onClick={() => go(i)}
-                className={`h-1.5 rounded-full transition-all ${i === index ? "w-10 bg-white" : "w-4 bg-white/50"}`}
-              />
+                className="flex h-11 items-center px-1"
+              >
+                <span aria-hidden className={`block h-1.5 rounded-full transition-all ${i === index ? "w-10 bg-white" : "w-4 bg-white/50"}`} />
+              </button>
             ))}
           </div>
         </>
