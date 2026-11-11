@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { medusa } from "@/lib/medusa";
+import { medusa, CART_QUERY } from "@/lib/medusa";
 
 export async function POST(request: NextRequest) {
   const { cart_id, line_item_id } = await request.json();
@@ -9,7 +9,8 @@ export async function POST(request: NextRequest) {
 
   const { parent: cart } = await medusa.store.cart.deleteLineItem(
     cart_id,
-    line_item_id
+    line_item_id,
+    CART_QUERY
   );
 
   return NextResponse.json({ cart });

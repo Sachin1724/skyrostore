@@ -40,7 +40,7 @@ export default async function AdminBulkOrderDetailPage({
 
   return (
     <div className="mx-auto max-w-5xl pb-16">
-      <BulkOrderWorkbench initialRequest={requestData} />
+      <BulkOrderWorkbench initialRequest={requestData} storefrontUrl={process.env.STOREFRONT_URL || "http://localhost:3000"} />
     </div>
   );
 }

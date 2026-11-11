@@ -1,79 +1,65 @@
+import Link from "next/link";
+import { cookies } from "next/headers";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { BuilderView } from "@/components/builder/builder-view";
 import { getUAVComponents } from "@/lib/data/uav-components";
-import Image from "next/image";
-import { ShieldCheck, Activity, ShoppingCart } from "lucide-react";
 
-export const metadata = { title: "Build Your UAV — Skyrostore" };
+export const metadata = {
+  title: "Build your drone",
+  description: "Select components, validate propulsion compatibility, and configure a custom aerial platform with automated spec validation.",
+};
 
-export default async function BuildPage() {
-  const components = await getUAVComponents();
+async function getResumeItems(configId: string | undefined) {
+  if (!configId) return null;
+  const cookieStore = await cookies();
+  const token = cookieStore.get("customer_token")?.value;
+  if (!token) return null;
+  try {
+    const base = process.env.NEXT_PUBLIC_MEDUSA_URL || "http://localhost:9000";
+    const pk = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "";
+    const res = await fetch(`${base}/store/uav/configurations/${encodeURIComponent(configId)}`, {
+      headers: { "x-publishable-api-key": pk, Authorization: `Bearer ${token}` },
+      cache: "no-store",
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return (data.configuration?.items as { product_variant_id: string; component_type: string }[]) ?? null;
+  } catch {
+    return null;
+  }
+}
+
+export default async function BuildPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ configId?: string }>;
+}) {
+  const [components, { configId }] = await Promise.all([getUAVComponents(), searchParams]);
+  const resumeItems = await getResumeItems(configId);
 
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-surface-soft">
-        {/* Hero Banner */}
-        <section className="relative overflow-hidden border-b border-border bg-white">
-          <div className="mx-auto flex max-w-[1280px] flex-col justify-between px-8 py-8 md:flex-row md:items-center md:px-10">
-            <div className="relative z-10 max-w-xl">
-              <h1 className="text-[34px] font-extrabold tracking-[-0.03em] text-graphite md:text-[40px]">
-                Build Your UAV
-              </h1>
-              <p className="mt-2 text-[14px] leading-relaxed text-text-secondary">
-                Select components, validate compatibility, and configure a custom aerial platform for your application.
-              </p>
-            </div>
-            {/* Banner Disassembled Frame Asset */}
-            <div className="pointer-events-none relative mt-4 h-28 w-full max-w-[500px] md:mt-0 md:h-32">
-              <Image
-                src="/images/hero/builder-drone-frame.png"
-                alt="Disassembled Carbon Frame"
-                fill
-                className="object-contain object-right"
-              />
-            </div>
-          </div>
-        </section>
+      <main id="main" className="min-h-screen bg-surface-soft pb-20">
+        <div className="mx-auto max-w-[1760px] px-4 md:px-8">
+          {/* Breadcrumbs */}
+          <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 pt-5 text-[13px] text-text-secondary">
+            <Link href="/" className="hover:text-brand">Home</Link>
+            <span aria-hidden>/</span>
+            <span className="font-semibold text-navy">Build Configurator</span>
+          </nav>
 
-        {/* 3-Item Trust Strip */}
-        <section className="border-b border-border bg-white">
-          <div className="mx-auto grid max-w-[1280px] grid-cols-1 gap-4 px-8 py-4 sm:grid-cols-3 md:px-10">
-            <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent/20 text-graphite">
-                <ShieldCheck className="h-4 w-4 text-graphite" />
-              </div>
-              <div>
-                <p className="text-[12px] font-bold text-graphite">Real-time Compatibility</p>
-                <p className="text-[11px] text-text-muted">Avoid incompatible components</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent/20 text-graphite">
-                <Activity className="h-4 w-4 text-graphite" />
-              </div>
-              <div>
-                <p className="text-[12px] font-bold text-graphite">Live Performance Estimate</p>
-                <p className="text-[11px] text-text-muted">Weight, power and flight time</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent/20 text-graphite">
-                <ShoppingCart className="h-4 w-4 text-graphite" />
-              </div>
-              <div>
-                <p className="text-[12px] font-bold text-graphite">Add to Cart or Request Quote</p>
-                <p className="text-[11px] text-text-muted">Buy single or bulk quantities</p>
-              </div>
-            </div>
-          </div>
-        </section>
+          <h1 className="mt-4 text-2xl font-bold text-navy md:text-3xl">Build your drone</h1>
+          <p className="mt-1 max-w-[640px] text-[14px] text-text-secondary">
+            Pick parts step by step. We check that the motors, ESC, battery and propellers work together.
+          </p>
 
-        {/* 3-Column Main Builder View */}
-        <section className="mx-auto max-w-[1280px] px-8 py-8 md:px-10">
-          <BuilderView components={components} />
-        </section>
+          {/* Main Builder View */}
+          <section className="mt-6">
+            <BuilderView components={components} resumeItems={resumeItems} />
+          </section>
+        </div>
       </main>
       <Footer />
     </>

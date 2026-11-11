@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
 
   if (configuration_id && token) {
     try {
-      await fetch(`${BASE}/store/uav/configurations/${configuration_id}/snapshot`, {
+      await fetch(`${BASE}/store/uav/configurations/${encodeURIComponent(configuration_id)}/snapshot`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

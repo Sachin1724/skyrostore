@@ -19,24 +19,27 @@ import {
   Cpu,
   ShieldAlert,
   Info,
+  ExternalLink,
 } from "lucide-react";
 
-import { VisibilityToggle } from "../visibility-toggle";
 import { ProductImages } from "./product-images";
 import { ProductClassification } from "./product-classification";
+import { ProductListingDetails } from "./product-listing-details";
 
 interface ProductEditorClientProps {
   initialProduct: Record<string, unknown>;
   categories: { id: string; name: string }[];
   brands: { id: string; name: string }[];
+  storefrontUrl: string;
 }
 
-export function ProductEditorClient({ initialProduct, categories, brands }: ProductEditorClientProps) {
+export function ProductEditorClient({ initialProduct, categories, brands, storefrontUrl }: ProductEditorClientProps) {
   const metadata = (initialProduct.metadata as Record<string, unknown>) || {};
   const existingSpecs = extractTechnicalSpecs(metadata);
 
   // Basic Information
   const [title, setTitle] = useState((initialProduct.title as string) || "");
+  const [status, setStatus] = useState((initialProduct.status as string) || "draft");
   const [handle, setHandle] = useState((initialProduct.handle as string) || "");
   const [description, setDescription] = useState((initialProduct.description as string) || "");
 
@@ -60,7 +63,7 @@ export function ProductEditorClient({ initialProduct, categories, brands }: Prod
     }
     // Also merge flat metadata if not already present
     for (const [k, v] of Object.entries(metadata)) {
-      if (k === "technical_specs" || k === "sku" || k === "id") continue;
+      if (k === "technical_specs" || k === "listing" || k === "sku" || k === "id") continue;
       if (vals[k] === undefined && v !== undefined && v !== null) {
         vals[k] = v as string | number | boolean;
       }
@@ -77,7 +80,7 @@ export function ProductEditorClient({ initialProduct, categories, brands }: Prod
   const [isSaving, setIsSaving] = useState(false);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<"specs" | "images" | "basic" | "commercial">("images");
+  const [activeTab, setActiveTab] = useState<"specs" | "images" | "page" | "basic" | "commercial">("images");
 
   const currentTemplate = COMPONENT_SPEC_TEMPLATES[componentType] || null;
 
@@ -141,9 +144,12 @@ export function ProductEditorClient({ initialProduct, categories, brands }: Prod
     setCustomSpecs((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleSave = async (e: React.FormEvent) => {
+  const [savingAs, setSavingAs] = useState<"draft" | "published" | null>(null);
+
+  const handleSave = async (e: React.FormEvent, publishAs: "draft" | "published") => {
     e.preventDefault();
     setIsSaving(true);
+    setSavingAs(publishAs);
     setErrorMessage(null);
     setSuccessMsg(null);
 
@@ -173,13 +179,13 @@ export function ProductEditorClient({ initialProduct, categories, brands }: Prod
         title,
         handle,
         description,
+        status: publishAs,
         technicalSpecs: {
           schemaVersion: 1,
           componentType,
           fields: templateValues,
         },
         customFields: cleanedCustom,
-        existingMetadata: metadata,
       };
 
       const res = await fetch(`/api/products/${initialProduct.id}`, {
@@ -193,20 +199,22 @@ export function ProductEditorClient({ initialProduct, categories, brands }: Prod
         throw new Error(data.error || "Failed to save product specifications");
       }
 
-      setSuccessMsg("Product specifications saved successfully to Medusa catalog.");
+      setStatus(publishAs);
+      setSuccessMsg(publishAs === "published" ? "Saved and published." : "Saved as draft.");
       setTimeout(() => setSuccessMsg(null), 4000);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       setErrorMessage(msg);
     } finally {
       setIsSaving(false);
+      setSavingAs(null);
     }
   };
 
   const variants = (initialProduct.variants as Record<string, unknown>[]) || [];
 
   return (
-    <form onSubmit={handleSave} className="space-y-6">
+    <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
       {/* Header & Actions */}
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-gray-200 pb-5">
         <div className="flex items-center gap-4">
@@ -232,15 +240,22 @@ export function ProductEditorClient({ initialProduct, categories, brands }: Prod
         </div>
 
         <div className="flex items-center gap-4">
-          <VisibilityToggle id={initialProduct.id as string} status={initialProduct.status as string} />
-          <button
-            type="submit"
-            disabled={isSaving}
-            className="inline-flex items-center gap-2 rounded-md bg-gray-900 px-4 py-2 text-sm font-semibold text-white shadow-xs hover:bg-gray-800 disabled:opacity-50"
+          <a
+            href={`${storefrontUrl}/products/${handle}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-gray-900"
           >
-            <Save className="h-4 w-4" />
-            {isSaving ? "Saving..." : "Save Product"}
-          </button>
+            View on live store
+            <ExternalLink className="h-3.5 w-3.5" aria-hidden />
+          </a>
+          <span
+            className={`rounded px-2 py-0.5 text-xs font-semibold ${
+              status === "published" ? "bg-emerald-100 text-emerald-700" : "bg-gray-100 text-gray-500"
+            }`}
+          >
+            {status === "published" ? "Published" : "Draft"}
+          </span>
         </div>
       </div>
 
@@ -285,6 +300,17 @@ export function ProductEditorClient({ initialProduct, categories, brands }: Prod
         </button>
         <button
           type="button"
+          onClick={() => setActiveTab("page")}
+          className={`pb-3 ${
+            activeTab === "page"
+              ? "border-b-2 border-gray-900 font-semibold text-gray-900"
+              : "text-gray-500 hover:text-gray-700"
+          }`}
+        >
+          Product page
+        </button>
+        <button
+          type="button"
           onClick={() => setActiveTab("basic")}
           className={`pb-3 ${
             activeTab === "basic"
@@ -312,7 +338,12 @@ export function ProductEditorClient({ initialProduct, categories, brands }: Prod
           productId={initialProduct.id as string}
           initialImages={((initialProduct.images as { url: string }[]) || []).map((i) => i.url)}
           initialThumbnail={(initialProduct.thumbnail as string) || null}
+          productTitle={title}
         />
+      )}
+
+      {activeTab === "page" && (
+        <ProductListingDetails productId={initialProduct.id as string} metadata={metadata} />
       )}
 
       {/* TAB 1: TECHNICAL SPECIFICATIONS */}
@@ -605,7 +636,7 @@ export function ProductEditorClient({ initialProduct, categories, brands }: Prod
         </div>
       )}
 
-      {/* Bottom Save Bar */}
+      {/* Bottom Save Bar — exactly two actions: save without publishing, or save and publish */}
       <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200">
         <Link
           href="/products"
@@ -614,12 +645,22 @@ export function ProductEditorClient({ initialProduct, categories, brands }: Prod
           Cancel
         </Link>
         <button
-          type="submit"
+          type="button"
+          onClick={(e) => handleSave(e, "draft")}
+          disabled={isSaving}
+          className="inline-flex items-center gap-2 rounded-md border border-gray-300 bg-white px-5 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+        >
+          <Save className="h-4 w-4" />
+          {savingAs === "draft" ? "Saving…" : "Save Draft"}
+        </button>
+        <button
+          type="button"
+          onClick={(e) => handleSave(e, "published")}
           disabled={isSaving}
           className="inline-flex items-center gap-2 rounded-md bg-gray-900 px-5 py-2 text-sm font-semibold text-white shadow-xs hover:bg-gray-800 disabled:opacity-50"
         >
           <Save className="h-4 w-4" />
-          {isSaving ? "Saving Product..." : "Save Product"}
+          {savingAs === "published" ? "Saving…" : "Save & Publish"}
         </button>
       </div>
     </form>

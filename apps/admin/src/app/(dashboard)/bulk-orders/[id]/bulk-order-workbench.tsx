@@ -15,10 +15,14 @@ import {
   Building2,
   Cpu,
   Layers,
+  Link2,
+  MessageCircle,
+  Wand2,
 } from "lucide-react";
 
 interface BulkOrderWorkbenchProps {
   initialRequest: any;
+  storefrontUrl: string;
 }
 
 const ALLOWED_STATUS_TRANSITIONS: Record<string, string[]> = {
@@ -33,10 +37,37 @@ const ALLOWED_STATUS_TRANSITIONS: Record<string, string[]> = {
   CANCELLED: [],
 };
 
-export function BulkOrderWorkbench({ initialRequest }: BulkOrderWorkbenchProps) {
+export function BulkOrderWorkbench({ initialRequest, storefrontUrl }: BulkOrderWorkbenchProps) {
   const [request, setRequest] = useState(initialRequest);
   const [isProcessing, setIsProcessing] = useState(false);
   const [notification, setNotification] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [fetchingPriceFor, setFetchingPriceFor] = useState<string | null>(null);
+
+  const quoteLink = `${storefrontUrl}/account/bulk-requests/${request.id}`;
+
+  function copyQuoteLink() {
+    navigator.clipboard.writeText(quoteLink).catch(() => null);
+    setNotification({ type: "success", text: "Quote link copied." });
+  }
+
+  async function fetchRetailPrice(item: any) {
+    if (!item.product_id) return;
+    setFetchingPriceFor(item.id);
+    try {
+      const qs = new URLSearchParams({ product_id: item.product_id, ...(item.variant_id ? { variant_id: item.variant_id } : {}) });
+      const res = await fetch(`/api/bulk-orders/variant-price?${qs}`);
+      const data = await res.json();
+      if (res.ok && data.unit_price != null) {
+        setQuotedPrices((prev) => ({ ...prev, [item.id]: Number(data.unit_price) }));
+      } else {
+        setNotification({ type: "error", text: "No retail price found for this item." });
+      }
+    } catch {
+      setNotification({ type: "error", text: "Could not fetch retail price." });
+    } finally {
+      setFetchingPriceFor(null);
+    }
+  }
 
   // Status transition state
   const allowedNextStatuses = ALLOWED_STATUS_TRANSITIONS[request.status] || [];
@@ -202,6 +233,23 @@ export function BulkOrderWorkbench({ initialRequest }: BulkOrderWorkbenchProps) 
         </div>
 
         <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={copyQuoteLink}
+            className="flex items-center gap-1.5 rounded border border-gray-200 px-2.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
+          >
+            <Link2 className="h-3.5 w-3.5" />
+            Copy quote link
+          </button>
+          <a
+            href={`https://wa.me/?text=${encodeURIComponent(`Your quotation ${request.reference_no} is ready: ${quoteLink}`)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 rounded border border-gray-200 px-2.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
+          >
+            <MessageCircle className="h-3.5 w-3.5" />
+            WhatsApp
+          </a>
           <span className="font-mono text-xs text-gray-500">CURRENT STATUS:</span>
           <span className="rounded bg-gray-900 px-2.5 py-1 font-mono text-xs font-bold text-white uppercase">
             {request.status}
@@ -433,20 +481,33 @@ export function BulkOrderWorkbench({ initialRequest }: BulkOrderWorkbenchProps) 
                       <td className="py-2.5 px-4 text-center font-mono font-bold text-gray-900">
                         {item.requested_quantity}
                       </td>
-                      <td className="py-2.5 px-4 w-44">
-                        <input
-                          type="number"
-                          min={0}
-                          step="any"
-                          value={quotedPrices[item.id] ?? ""}
-                          onChange={(e) =>
-                            setQuotedPrices({
-                              ...quotedPrices,
-                              [item.id]: Math.max(0, parseFloat(e.target.value) || 0),
-                            })
-                          }
-                          className="w-full rounded border border-gray-300 px-2 py-1 text-xs font-mono font-bold text-gray-900"
-                        />
+                      <td className="py-2.5 px-4 w-56">
+                        <div className="flex items-center gap-1.5">
+                          <input
+                            type="number"
+                            min={0}
+                            step="any"
+                            value={quotedPrices[item.id] ?? ""}
+                            onChange={(e) =>
+                              setQuotedPrices({
+                                ...quotedPrices,
+                                [item.id]: Math.max(0, parseFloat(e.target.value) || 0),
+                              })
+                            }
+                            className="w-full rounded border border-gray-300 px-2 py-1 text-xs font-mono font-bold text-gray-900"
+                          />
+                          {item.product_id ? (
+                            <button
+                              type="button"
+                              onClick={() => fetchRetailPrice(item)}
+                              disabled={fetchingPriceFor === item.id}
+                              title="Fetch current retail price"
+                              className="shrink-0 rounded border border-gray-200 p-1.5 text-gray-600 hover:bg-gray-50 disabled:opacity-50"
+                            >
+                              <Wand2 className="h-3.5 w-3.5" />
+                            </button>
+                          ) : null}
+                        </div>
                       </td>
                       <td className="py-2.5 px-4 text-right font-mono font-bold text-gray-900">
                         ₹{lineTotal.toLocaleString("en-IN")}

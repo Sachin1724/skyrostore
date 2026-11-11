@@ -1,3 +1,4 @@
+import { visitorHeaders } from "@/lib/visitor-headers";
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
@@ -12,7 +13,7 @@ export async function POST(request: NextRequest) {
 
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
-      "x-publishable-api-key": PK,
+      "x-publishable-api-key": PK, ...visitorHeaders(request),
     };
     if (token) {
       headers["Authorization"] = `Bearer ${token}`;

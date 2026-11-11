@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { Trash2, Pencil, Check, X } from "lucide-react";
 import type { Brand } from "@/lib/catalog";
-import { UploadButton } from "../products/image-uploader";
+import { UploadButton, LibraryButton } from "../products/image-uploader";
+import { useConfirm } from "@/components/ui/confirm-dialog";
 
 async function call(url: string, method: string, body?: unknown) {
   const res = await fetch(url, {
@@ -19,6 +20,7 @@ async function call(url: string, method: string, body?: unknown) {
 function BrandRow({ brand, reload, setError }: { brand: Brand; reload: () => Promise<void>; setError: (m: string) => void }) {
   const [editing, setEditing] = useState(false);
   const [title, setTitle] = useState(brand.title);
+  const confirm = useConfirm();
 
   const run = async (fn: () => Promise<unknown>) => {
     setError("");
@@ -48,7 +50,8 @@ function BrandRow({ brand, reload, setError }: { brand: Brand; reload: () => Pro
       )}
       <div className="ml-auto flex items-center gap-3">
         <UploadButton multiple={false} label={brand.metadata?.logo ? "Replace logo" : "Add logo"} onUploaded={(urls) => run(() => call(`/api/brands/${brand.id}`, "PATCH", { logo: urls[0] }))} />
-        <button type="button" aria-label="Delete" onClick={() => { if (window.confirm(`Delete "${brand.title}"?`)) void run(() => call(`/api/brands/${brand.id}`, "DELETE")); }} className="text-gray-400 hover:text-rose-600"><Trash2 className="h-4 w-4" /></button>
+        <LibraryButton onPicked={(urls) => run(() => call(`/api/brands/${brand.id}`, "PATCH", { logo: urls[0] }))} />
+        <button type="button" aria-label="Delete" onClick={async () => { if (await confirm({ title: `Delete "${brand.title}"?`, confirmLabel: "Delete" })) void run(() => call(`/api/brands/${brand.id}`, "DELETE")); }} className="text-gray-400 hover:text-rose-600"><Trash2 className="h-4 w-4" /></button>
       </div>
     </li>
   );

@@ -12,8 +12,9 @@
     "db:migrate": "medusa db:migrate"
   },
   "dependencies": {
-    "@medusajs/framework": "latest",
-    "@medusajs/medusa": "latest",
+    "@medusajs/framework": "2.21.2",
+    "@medusajs/medusa": "2.21.2",
+    "@sentry/node": "^8.55.2",
     "razorpay": "^2.9.8",
     "zod": "^3.24.0"
   },

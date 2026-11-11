@@ -1,6 +1,7 @@
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { OrderDetail } from "@/components/account/order-detail";
+import { getSiteSettings } from "@/lib/data/site-settings";
 
 export const metadata = { title: "Order Details" };
 
@@ -10,12 +11,13 @@ export default async function OrderDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  const { gstin } = await getSiteSettings();
 
   return (
     <>
       <Header />
-      <main className="mx-auto max-w-[960px] px-8 py-8 md:px-10">
-        <OrderDetail orderId={id} />
+      <main id="main" className="mx-auto max-w-[960px] px-8 py-8 md:px-10">
+        <OrderDetail orderId={id} gstin={gstin} />
       </main>
       <Footer />
     </>

@@ -1,4 +1,6 @@
+import { visitorHeaders } from "@/lib/visitor-headers";
 import { NextRequest, NextResponse } from "next/server";
+import { passwordProblem } from "@/lib/password";
 
 const BASE = process.env.NEXT_PUBLIC_MEDUSA_URL || "http://localhost:9000";
 const PK = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "";
@@ -6,12 +8,11 @@ const PK = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "";
 export async function POST(request: NextRequest) {
   const { email, password, first_name, last_name } = await request.json();
 
-  if (!email || !password) {
-    return NextResponse.json(
-      { error: "Email and password required" },
-      { status: 400 }
-    );
+  if (typeof email !== "string" || !email) {
+    return NextResponse.json({ error: "Email and password required" }, { status: 400 });
   }
+  const problem = passwordProblem(password);
+  if (problem) return NextResponse.json({ error: problem }, { status: 400 });
 
   try {
     // Register auth identity
@@ -19,7 +20,7 @@ export async function POST(request: NextRequest) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-publishable-api-key": PK,
+        "x-publishable-api-key": PK, ...visitorHeaders(request),
       },
       body: JSON.stringify({ email, password }),
     });
@@ -36,7 +37,7 @@ export async function POST(request: NextRequest) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-publishable-api-key": PK,
+        "x-publishable-api-key": PK, ...visitorHeaders(request),
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({ first_name, last_name }),

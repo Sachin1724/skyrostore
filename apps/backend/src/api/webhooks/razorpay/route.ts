@@ -1,7 +1,9 @@
 import crypto from "crypto";
+import * as Sentry from "@sentry/node";
 import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http";
 import { ContainerRegistrationKeys } from "@medusajs/framework/utils";
 import { recordEvent, safeErrorCategory } from "../../../lib/analytics";
+import { confirmRazorpayCart, razorpay } from "../../../lib/razorpay-checkout";
 
 const WEBHOOK_SECRET = process.env.RAZORPAY_WEBHOOK_SECRET || "";
 
@@ -116,7 +118,8 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
     .first()
     .catch(() => null);
 
-  if (existing) {
+  // A failed attempt stays unprocessed so Razorpay's retry runs it again.
+  if (existing?.processed) {
     return res.json({ ok: true, message: "Already processed" });
   }
 
@@ -136,6 +139,18 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
         const payment = event.payload?.payment?.entity;
         if (payment) {
           await reconcilePaymentAttempt(db, payment, "succeeded", "payment_succeeded");
+          // Customer closed the tab after paying: the order is still created.
+          // Throws (→ 500, Razorpay retries) only if confirmation genuinely fails.
+          const cartId =
+            payment.notes?.cart_id ||
+            (payment.order_id ? ((await razorpay().orders.fetch(payment.order_id)) as any).notes?.cart_id : null);
+          if (cartId && payment.order_id) {
+            await confirmRazorpayCart(req.scope, {
+              cart_id: cartId,
+              razorpay_order_id: payment.order_id,
+              razorpay_payment_id: payment.id,
+            });
+          }
           // Mark webhook as processed
           await db("razorpay_webhook_log")
             .where({ event_id: eventId })
@@ -174,6 +189,7 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error("Razorpay webhook error:", msg);
+    Sentry.captureException(err);
     return res.status(500).json({ error: msg });
   }
 }

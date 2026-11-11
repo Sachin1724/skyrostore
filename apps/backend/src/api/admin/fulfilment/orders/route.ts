@@ -19,6 +19,7 @@ const LIST_FIELDS = [
   "customer.last_name",
   "shipping_address.city",
   "shipping_address.province",
+  "shipping_address.phone",
   "items.id",
   "items.title",
   "items.quantity",

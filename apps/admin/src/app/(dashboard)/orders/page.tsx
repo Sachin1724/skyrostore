@@ -105,10 +105,11 @@ export default async function OrdersPage({
                 <th className="pb-2 pr-4">Order</th>
                 <th className="pb-2 pr-4">Date</th>
                 <th className="pb-2 pr-4">Customer</th>
+                <th className="pb-2 pr-4">Items</th>
                 <th className="pb-2 pr-4">Status</th>
                 <th className="pb-2 pr-4">Payment</th>
-                <th className="pb-2 pr-4">Units</th>
                 <th className="pb-2 text-right">Total</th>
+                <th className="pb-2 pl-4" />
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -127,14 +128,31 @@ export default async function OrdersPage({
                   <td className="py-2.5 pr-4 text-gray-500">
                     {new Date(order.created_at).toLocaleDateString()}
                   </td>
-                  <td className="py-2.5 pr-4 text-gray-700">{order.email || "—"}</td>
+                  <td className="py-2.5 pr-4 text-gray-700">
+                    <p>{order.email || "—"}</p>
+                    {order.shipping_address?.phone ? (
+                      <p className="font-mono text-xs text-gray-500">{order.shipping_address.phone}</p>
+                    ) : null}
+                  </td>
+                  <td className="py-2.5 pr-4 text-gray-600">
+                    {order.items?.length
+                      ? `${order.items[0].title}${order.items.length > 1 ? ` +${order.items.length - 1} more` : ""} (${order.item_count})`
+                      : order.item_count}
+                  </td>
                   <td className="py-2.5 pr-4">
                     <StateBadge state={order.fulfilment_state} />
                   </td>
                   <td className="py-2.5 pr-4 font-mono text-xs text-gray-600">{order.payment_status}</td>
-                  <td className="py-2.5 pr-4 text-gray-600">{order.item_count}</td>
                   <td className="py-2.5 text-right font-medium">
                     {order.total} {order.currency_code?.toUpperCase()}
+                  </td>
+                  <td className="py-2.5 pl-4 text-right">
+                    <Link
+                      href={`/orders/${order.id}`}
+                      className="rounded border border-gray-200 px-2 py-1 text-xs font-semibold text-gray-700 hover:bg-gray-50"
+                    >
+                      {order.fulfilment_state === "paid_processing" ? "Pack" : "Open"}
+                    </Link>
                   </td>
                 </tr>
               ))}

@@ -2,12 +2,14 @@ packages:
   - "apps/*"
   - "packages/*"
 allowBuilds:
+  '@firebase/util': false
   "@medusajs/telemetry": true
+  '@sentry/cli': true
   esbuild: true
   msgpackr-extract: true
   protobufjs: true
   unrs-resolver: true
-nodeLinker: hoisted
-overrides:
-  "@types/react": 19.3.0
-  "@types/react-dom": 19.3.0
+# Medusa's admin bundler require.resolve()s @medusajs/dashboard and @medusajs/ui from inside
+# the pnpm store; without these at the root its Tailwind content list gets an empty string.
+publicHoistPattern:
+  - "@medusajs/*"

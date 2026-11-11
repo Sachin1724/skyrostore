@@ -41,7 +41,8 @@ export type FulfilmentOrder = {
   fulfilment_state: string;
   item_count: number;
   is_bulk_order: boolean;
-  shipping_address?: { city?: string; province?: string } | null;
+  shipping_address?: { city?: string; province?: string; phone?: string } | null;
+  items?: { id: string; title: string; quantity: number }[];
 };
 
 export function getFulfilmentOrders(
@@ -67,6 +68,8 @@ export function getFulfilmentOrder(token: string, id: string) {
     payment_attempts: Array<Record<string, any>>;
     bulk_order_request: Record<string, any> | null;
     history: Array<{ at: string; event: string; detail?: string | null }>;
+    shipmozo_configured: boolean;
+    suggested_weight_g: number;
   }>(token, `/admin/fulfilment/orders/${id}`);
 }
 

@@ -171,7 +171,7 @@ describe("Phase 4.2: Integration Gaps", () => {
       }
     });
 
-    it("verify-payment step rejects missing fields", async () => {
+    it("confirm step rejects missing fields", async () => {
       const storefront = "http://localhost:3000";
       try {
         const res = await fetch(`${storefront}/api/cart/checkout`, {
@@ -179,7 +179,7 @@ describe("Phase 4.2: Integration Gaps", () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             cart_id: "cart_test",
-            step: "verify-payment",
+            step: "confirm",
           }),
         });
         if (!res.ok) {

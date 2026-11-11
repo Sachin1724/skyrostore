@@ -18,7 +18,7 @@ export async function POST(
 
     const body = await request.json().catch(() => ({}));
 
-    const res = await fetch(`${BASE}/store/bulk-orders/${id}/decline`, {
+    const res = await fetch(`${BASE}/store/bulk-orders/${encodeURIComponent(id)}/decline`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -1,0 +1,16 @@
+**/node_modules
+**/.next
+**/.medusa
+**/dist
+**/.turbo
+**/.env
+**/.env.*
+!**/.env.example
+backups
+test-results
+playwright-report
+.taste-skill
+.screenshots*
+UI
+*.log
+.git

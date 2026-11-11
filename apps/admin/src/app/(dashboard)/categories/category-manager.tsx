@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Plus, Trash2, Pencil, Check, X } from "lucide-react";
 import { buildTree, type Category, type CategoryNode } from "@/lib/catalog";
+import { useConfirm } from "@/components/ui/confirm-dialog";
 
 async function call(url: string, method: string, body?: unknown) {
   const res = await fetch(url, {
@@ -51,6 +52,7 @@ function Row({
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState(node.name);
   const [adding, setAdding] = useState(false);
+  const confirm = useConfirm();
 
   const run = async (fn: () => Promise<unknown>) => {
     setError("");
@@ -94,7 +96,7 @@ function Row({
           <button
             type="button"
             aria-label="Delete"
-            onClick={() => { if (window.confirm(`Delete "${node.name}"?`)) void run(() => call(`/api/categories/${node.id}`, "DELETE")); }}
+            onClick={async () => { if (await confirm({ title: `Delete "${node.name}"?`, confirmLabel: "Delete" })) void run(() => call(`/api/categories/${node.id}`, "DELETE")); }}
             className="text-gray-400 hover:text-rose-600"
           >
             <Trash2 className="h-4 w-4" />

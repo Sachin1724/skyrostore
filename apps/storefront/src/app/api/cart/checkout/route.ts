@@ -1,3 +1,4 @@
+import { visitorHeaders } from "@/lib/visitor-headers";
 import { NextRequest, NextResponse } from "next/server";
 
 const BASE = process.env.NEXT_PUBLIC_MEDUSA_URL || "http://localhost:9000";
@@ -57,6 +58,48 @@ function recordPaymentAttempt(body: Record<string, unknown>) {
   }).catch(() => undefined);
 }
 
+/** Razorpay Magic Checkout line items, in paise, from the server-side cart. */
+function buildLineItems(cart: any) {
+  return (cart.items || []).map((item: any) => {
+    const quantity = Number(item.quantity || 1);
+    const price = Math.round(Number(item.total ?? item.unit_price * quantity) / quantity);
+    return {
+      type: "e-commerce",
+      sku: item.variant_sku || item.variant_id,
+      variant_id: item.variant_id,
+      price,
+      offer_price: price,
+      tax_amount: 0,
+      quantity,
+      name: item.title,
+      description: item.variant_title || item.title,
+      ...(item.thumbnail ? { image_url: item.thumbnail } : {}),
+    };
+  });
+}
+
+/** Order-linked UAV snapshot, retried; never blocks the order. */
+async function saveSnapshot(orderId: string, cart: any) {
+  if (!cart?.items?.length) return;
+  const snapshotBody = JSON.stringify({
+    order_id: orderId,
+    items: cart.items.map((i: any) => ({ variant_id: i.variant_id, quantity: i.quantity })),
+  });
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      if (attempt > 0) await new Promise((r) => setTimeout(r, 500 * attempt));
+      const snapRes = await fetch(`${BASE}/store/uav/order-snapshot`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-publishable-api-key": PK },
+        body: snapshotBody,
+      });
+      if (snapRes.ok) return;
+    } catch {
+      // retry
+    }
+  }
+}
+
 export async function POST(request: NextRequest) {
   const body = await request.json();
   const { cart_id, step } = body;
@@ -72,17 +115,23 @@ export async function POST(request: NextRequest) {
   try {
     switch (step) {
       case "customer": {
-        const { email, shipping_address } = body;
-        if (!email || !shipping_address) {
-          return NextResponse.json(
-            { error: "Missing email or address" },
-            { status: 400 }
-          );
+        // Razorpay Magic Checkout collects the name, phone and address; the
+        // country alone is enough for shipping options and tax here.
+        const { email, company_name, gstin } = body;
+        const GSTIN_RE = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
+        if (gstin && !GSTIN_RE.test(gstin)) {
+          return NextResponse.json({ error: "That GSTIN doesn't look valid. Check for typos." }, { status: 400 });
         }
-        const data = await storeApi(`/store/carts/${cart_id}`, "POST", {
-          email,
-          shipping_address,
-          billing_address: shipping_address,
+        const data = await storeApi(`/store/carts/${encodeURIComponent(cart_id)}`, "POST", {
+          ...(typeof email === "string" && email ? { email } : {}),
+          shipping_address: { country_code: "in" },
+          // Carried onto the order on completion, for the itemized GST tax invoice. Always sent: Medusa
+          // merges metadata and drops a key set to "", so an unticked "business purchase" clears a GSTIN
+          // left by an earlier attempt instead of carrying it onto this order.
+          metadata: {
+            company_name: company_name ? String(company_name).trim().slice(0, 200) : "",
+            gstin: gstin || "",
+          },
         });
         recordStep(journey, "checkout_step_completed", { cart_id, checkout_step: "customer" });
         return NextResponse.json({ cart: data.cart });
@@ -90,7 +139,7 @@ export async function POST(request: NextRequest) {
 
       case "shipping": {
         const { shipping_options } = await storeApi(
-          `/store/shipping-options?cart_id=${cart_id}`
+          `/store/shipping-options?cart_id=${encodeURIComponent(cart_id)}`
         );
 
         if (!shipping_options?.length) {
@@ -107,7 +156,7 @@ export async function POST(request: NextRequest) {
 
         const option = shipping_options[0];
         const data = await storeApi(
-          `/store/carts/${cart_id}/shipping-methods`,
+          `/store/carts/${encodeURIComponent(cart_id)}/shipping-methods`,
           "POST",
           { option_id: option.id }
         );
@@ -123,6 +172,24 @@ export async function POST(request: NextRequest) {
       case "payment": {
         const { provider_id: requestedProvider } = body;
 
+        // Hold stock before opening Razorpay — otherwise two shoppers can both
+        // pay for the last unit and the second one's money is taken with
+        // nothing to show for it. See backend lib/inventory-hold.ts.
+        // Visitor headers so the backend's per-visitor limit applies to this shopper, not to this server.
+        const reserveRes = await fetch(`${BASE}/store/carts/${encodeURIComponent(cart_id)}/reserve`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "x-publishable-api-key": PK, ...visitorHeaders(request) },
+        });
+        if (!reserveRes.ok) {
+          const reserveData = await reserveRes.json().catch(() => ({}));
+          recordStep(journey, "checkout_step_failed", {
+            cart_id,
+            checkout_step: "payment",
+            metadata: { reason: "inventory_hold_failed" },
+          });
+          return NextResponse.json({ error: reserveData.error || "Could not reserve stock for checkout." }, { status: 409 });
+        }
+
         // Create payment collection for this cart
         const pcData = await storeApi(
           `/store/payment-collections`,
@@ -135,7 +202,7 @@ export async function POST(request: NextRequest) {
         let providerId = requestedProvider || "pp_system_default";
         try {
           const { payment_providers } = await storeApi(
-            `/store/payment-providers?region_id=${(await storeApi(`/store/carts/${cart_id}`)).cart.region_id}`
+            `/store/payment-providers?region_id=${(await storeApi(`/store/carts/${encodeURIComponent(cart_id)}`)).cart.region_id}`
           );
           const available = (payment_providers || []).map((p: any) => p.id);
           if (available.includes("pp_razorpay") && !requestedProvider) {
@@ -147,10 +214,18 @@ export async function POST(request: NextRequest) {
           // Fall back to requested or default
         }
 
+        // Magic Checkout needs the items; built here from the server-side cart,
+        // and the provider re-checks the paid amount against the cart total.
+        let data: Record<string, unknown> = { cart_id };
+        if (providerId === "pp_razorpay") {
+          const { cart } = await storeApi(`/store/carts/${encodeURIComponent(cart_id)}`);
+          data = { cart_id, line_items: buildLineItems(cart) };
+        }
+
         const session = await storeApi(
           `/store/payment-collections/${pcId}/payment-sessions`,
           "POST",
-          { provider_id: providerId }
+          { provider_id: providerId, data }
         );
 
         recordStep(journey, "checkout_step_completed", { cart_id, checkout_step: "payment" });
@@ -169,7 +244,7 @@ export async function POST(request: NextRequest) {
           visitor_id: journey.visitor_id,
         });
 
-        const { cart } = await storeApi(`/store/carts/${cart_id}`);
+        const { cart } = await storeApi(`/store/carts/${encodeURIComponent(cart_id)}`);
         return NextResponse.json({
           cart,
           payment_collection_id: pcId,
@@ -178,54 +253,51 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      case "verify-payment": {
-        const { razorpay_order_id, razorpay_payment_id, razorpay_signature, payment_session_id } = body;
-        if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature || !payment_session_id) {
+      case "confirm": {
+        const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = body;
+        if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+          return NextResponse.json({ error: "Missing Razorpay verification fields" }, { status: 400 });
+        }
+        const { cart: preCart } = await storeApi(`/store/carts/${encodeURIComponent(cart_id)}`);
+
+        const res = await fetch(`${BASE}/store/razorpay/confirm`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "x-publishable-api-key": PK, ...visitorHeaders(request) },
+          body: JSON.stringify({ cart_id, razorpay_order_id, razorpay_payment_id, razorpay_signature }),
+        });
+        const result = await res.json().catch(() => ({}));
+        if (!res.ok || !result.order_id) {
+          recordPaymentAttempt({
+            cart_id,
+            provider_reference: razorpay_payment_id,
+            outcome: "failed",
+            error_message: "verification_failed",
+            session_id: journey.session_id,
+            visitor_id: journey.visitor_id,
+          });
+          recordStep(journey, "checkout_step_failed", {
+            cart_id,
+            checkout_step: "verify-payment",
+            metadata: { reason: "verification_failed" },
+          });
           return NextResponse.json(
-            { error: "Missing Razorpay verification fields" },
-            { status: 400 }
+            { error: result.error || "Payment could not be confirmed. If money was debited, it will be confirmed automatically." },
+            { status: 402 }
           );
         }
 
-        const authData = await storeApi(
-          `/store/payment-collections/${body.payment_collection_id}/payment-sessions/${payment_session_id}`,
-          "POST",
-          {
-            data: { razorpay_order_id, razorpay_payment_id, razorpay_signature },
-          }
-        );
-
-        const sessionStatus = authData?.payment_session?.status;
-        // The payment module decides; we only record what it reported.
-        recordPaymentAttempt({
+        await saveSnapshot(result.order_id, preCart);
+        recordStep(journey, "checkout_step_completed", {
           cart_id,
-          payment_session_id,
-          provider_reference: razorpay_payment_id,
-          outcome: sessionStatus === "authorized" ? undefined : "failed",
-          error_message: sessionStatus === "authorized" ? undefined : "verification_failed",
-          session_id: journey.session_id,
-          visitor_id: journey.visitor_id,
+          checkout_step: "complete",
+          order_id: result.order_id,
         });
-
-        if (sessionStatus === "authorized") {
-          recordStep(journey, "checkout_step_completed", { cart_id, checkout_step: "verify-payment" });
-          return NextResponse.json({ verified: true, payment_session: authData.payment_session });
-        }
-
-        recordStep(journey, "checkout_step_failed", {
-          cart_id,
-          checkout_step: "verify-payment",
-          metadata: { reason: "verification_failed" },
-        });
-        return NextResponse.json(
-          { error: "Payment verification failed. Please retry or use a different method.", verified: false },
-          { status: 402 }
-        );
+        return NextResponse.json({ order: { id: result.order_id } });
       }
 
       case "complete": {
         // Re-validate UAV components in cart before completing
-        const { cart: preCart } = await storeApi(`/store/carts/${cart_id}`);
+        const { cart: preCart } = await storeApi(`/store/carts/${encodeURIComponent(cart_id)}`);
         if (preCart?.items?.length) {
           try {
             const variantIds = preCart.items.map((i: any) => i.variant_id).filter(Boolean);
@@ -275,33 +347,12 @@ export async function POST(request: NextRequest) {
         }
 
         const result = await storeApi(
-          `/store/carts/${cart_id}/complete`,
+          `/store/carts/${encodeURIComponent(cart_id)}/complete`,
           "POST"
         );
 
-        // Create order-linked UAV snapshot with retry (non-blocking)
         const orderId = result?.order?.id;
-        if (orderId && preCart?.items?.length) {
-          const snapshotItems = preCart.items.map((i: any) => ({
-            variant_id: i.variant_id,
-            quantity: i.quantity,
-          }));
-          const snapshotBody = JSON.stringify({ order_id: orderId, items: snapshotItems });
-          let snapshotOk = false;
-          for (let attempt = 0; attempt < 3 && !snapshotOk; attempt++) {
-            try {
-              if (attempt > 0) await new Promise((r) => setTimeout(r, 500 * attempt));
-              const snapRes = await fetch(`${BASE}/store/uav/order-snapshot`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json", "x-publishable-api-key": PK },
-                body: snapshotBody,
-              });
-              snapshotOk = snapRes.ok;
-            } catch {
-              // retry
-            }
-          }
-        }
+        if (orderId) await saveSnapshot(orderId, preCart);
 
         recordStep(journey, "checkout_step_completed", {
           cart_id,

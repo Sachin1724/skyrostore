@@ -5,6 +5,7 @@ import {
   MAX_EVENTS_PER_BATCH,
   normaliseEvent,
 } from "../../../../lib/analytics";
+import { bufferEvents } from "../../../../lib/analytics-buffer";
 
 /**
  * Collector for browser events. Accepts a single event or a small batch
@@ -48,12 +49,13 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
 
   try {
     const db = req.scope.resolve(ContainerRegistrationKeys.PG_CONNECTION) as any;
-    await db("analytics_event").insert(rows).onConflict("event_key").ignore();
+    // Queued, not written: the response does not wait on the database, and a
+    // burst of beacons becomes a few batched inserts instead of hundreds.
+    const { queued, dropped } = bufferEvents(db, rows);
+    return res.status(202).json({ accepted: queued, rejected: rejected.length, dropped });
   } catch (err: unknown) {
     // Collection must never break the customer journey.
     console.error("analytics event write failed:", err instanceof Error ? err.message : err);
     return res.status(202).json({ accepted: 0, rejected: rejected.length });
   }
-
-  return res.status(202).json({ accepted: rows.length, rejected: rejected.length });
 }

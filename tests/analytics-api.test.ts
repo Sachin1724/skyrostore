@@ -10,6 +10,21 @@ const BASE = process.env.MEDUSA_URL || "http://localhost:9000";
 const PK = "pk_11e52cb93d15418c56289d434fee7c53a391460b6a393b72ad48192afe3c4816";
 
 /** Any HTTP answer means the server is listening; the status itself is irrelevant. */
+/**
+ * The collector buffers writes and flushes every 2s (src/lib/analytics-buffer.ts),
+ * so an event is readable shortly after it is accepted, not instantly.
+ */
+async function listEvents(url: string, init: RequestInit): Promise<Response> {
+  let res = await fetch(url, init);
+  for (let i = 0; i < 15; i++) {
+    const body = await res.clone().json().catch(() => ({}));
+    if ((body.events || []).length) return res;
+    await new Promise((r) => setTimeout(r, 300));
+    res = await fetch(url, init);
+  }
+  return res;
+}
+
 async function backendUp(): Promise<boolean> {
   try {
     await fetch(`${BASE}/store/health`, { signal: AbortSignal.timeout(2500) });
@@ -50,7 +65,7 @@ describe.skipIf(!up)("event collection", () => {
     expect(res.status).toBe(202);
     expect((await res.json()).accepted).toBe(1);
 
-    const listRes = await fetch(`${BASE}/admin/analytics/events?session_id=${sessionId}`, {
+    const listRes = await listEvents(`${BASE}/admin/analytics/events?session_id=${sessionId}`, {
       headers: { Authorization: `Bearer ${adminToken}` },
     });
     const { events } = await listRes.json();
@@ -71,7 +86,7 @@ describe.skipIf(!up)("event collection", () => {
     await fetch(`${BASE}/store/analytics/events`, { method: "POST", headers: storeHeaders, body });
     await fetch(`${BASE}/store/analytics/events`, { method: "POST", headers: storeHeaders, body });
 
-    const listRes = await fetch(`${BASE}/admin/analytics/events?session_id=${sessionId}`, {
+    const listRes = await listEvents(`${BASE}/admin/analytics/events?session_id=${sessionId}`, {
       headers: { Authorization: `Bearer ${adminToken}` },
     });
     const { count } = await listRes.json();
@@ -111,7 +126,7 @@ describe.skipIf(!up)("event collection", () => {
       }),
     });
 
-    const listRes = await fetch(`${BASE}/admin/analytics/events?session_id=${sessionId}`, {
+    const listRes = await listEvents(`${BASE}/admin/analytics/events?session_id=${sessionId}`, {
       headers: { Authorization: `Bearer ${adminToken}` },
     });
     const raw = JSON.stringify(await listRes.json());

@@ -1,72 +1,34 @@
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
+import Link from "next/link";
+import { Lock } from "lucide-react";
+import { SkyroLogo } from "@/components/brand/logo";
 import { CheckoutForm } from "@/components/checkout/checkout-form";
 
-export const metadata = { title: "Checkout — Skyrostore" };
+export const metadata = { title: "Checkout" };
 
+/** Focused checkout: logo, secure note and a way back to the cart; no store navigation. */
 export default function CheckoutPage() {
   return (
     <>
-      <Header />
-      <main className="min-h-screen bg-surface-soft">
-        {/* 4-Step Progress Stepper */}
-        <section className="border-b border-border bg-white">
-          <div className="mx-auto flex max-w-[840px] items-center justify-between px-8 py-5">
-            {/* Step 1: Shipping */}
-            <div className="flex items-center gap-3">
-              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-accent font-bold text-[12px] text-graphite shadow-xs">
-                1
-              </div>
-              <div>
-                <p className="text-[12px] font-bold text-graphite">Shipping</p>
-                <p className="text-[10px] text-text-muted">Address &amp; delivery</p>
-              </div>
-            </div>
-            <div className="h-px flex-1 bg-border mx-3" />
-
-            {/* Step 2: Payment */}
-            <div className="flex items-center gap-3 opacity-60">
-              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-surface-muted font-bold text-[12px] text-text-secondary">
-                2
-              </div>
-              <div>
-                <p className="text-[12px] font-bold text-graphite">Payment</p>
-                <p className="text-[10px] text-text-muted">Secure payment</p>
-              </div>
-            </div>
-            <div className="h-px flex-1 bg-border mx-3" />
-
-            {/* Step 3: Review */}
-            <div className="flex items-center gap-3 opacity-60">
-              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-surface-muted font-bold text-[12px] text-text-secondary">
-                3
-              </div>
-              <div>
-                <p className="text-[12px] font-bold text-graphite">Review</p>
-                <p className="text-[10px] text-text-muted">Confirm your order</p>
-              </div>
-            </div>
-            <div className="h-px flex-1 bg-border mx-3" />
-
-            {/* Step 4: Complete */}
-            <div className="flex items-center gap-3 opacity-60">
-              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-surface-muted font-bold text-[12px] text-text-secondary">
-                4
-              </div>
-              <div>
-                <p className="text-[12px] font-bold text-graphite">Complete</p>
-                <p className="text-[10px] text-text-muted">Order placed</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Checkout Main 2-Column Section */}
-        <section className="mx-auto max-w-[1280px] px-8 py-8 md:px-10">
+      <header className="bg-white">
+        <div className="mx-auto flex h-16 max-w-[1760px] items-center justify-between gap-4 px-4 md:px-8">
+          <Link href="/" aria-label="Skyrostore home"><SkyroLogo /></Link>
+          <p className="flex items-center gap-2 text-[14px] font-semibold text-navy">
+            <Lock className="h-4 w-4 text-success" aria-hidden /> Secure checkout
+          </p>
+        </div>
+      </header>
+      <main id="main" className="min-h-screen bg-page pb-20">
+        <div className="mx-auto max-w-[920px] px-4 md:px-8">
+          <h1 className="pb-6 pt-8 text-[clamp(1.6rem,1.2rem+1.4vw,2.1rem)] font-semibold text-navy">Checkout</h1>
           <CheckoutForm />
-        </section>
+        </div>
       </main>
-      <Footer />
+      <footer className="bg-white">
+        <p className="mx-auto max-w-[1760px] px-4 py-5 text-[13px] text-text-secondary md:px-8">
+          <Link href="/policies/refunds" className="hover:text-brand">Returns</Link> ·{" "}
+          <Link href="/support" className="hover:text-brand">Help</Link>
+        </p>
+      </footer>
     </>
   );
 }

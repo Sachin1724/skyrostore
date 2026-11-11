@@ -2,8 +2,20 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { storefrontChannelId } from "@/lib/medusa-admin";
 import { serializeMetadataWithSpecs, ProductTechnicalSpecifications } from "@/lib/technical-specs";
+import { parseListing } from "@/lib/listing";
 
 const BASE_URL = process.env.NEXT_PUBLIC_MEDUSA_URL || "http://localhost:9000";
+
+/** The product's metadata as stored now, so a save never writes back a stale copy. */
+async function currentMetadata(id: string, token: string): Promise<Record<string, unknown> | null> {
+  const res = await fetch(`${BASE_URL}/admin/products/${id}?fields=metadata`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+  if (!res.ok) return null;
+  const data = await res.json().catch(() => null);
+  return (data?.product?.metadata as Record<string, unknown> | null) ?? {};
+}
 
 export async function GET(
   request: NextRequest,
@@ -53,6 +65,7 @@ export async function PATCH(
     images?: string[];
     category_ids?: string[];
     collection_id?: string | null;
+    listing?: unknown;
   };
 
   const update: Record<string, unknown> = {};
@@ -81,6 +94,13 @@ export async function PATCH(
     update.images = body.images.map((url) => ({ url }));
   }
   if (body.thumbnail !== undefined) update.thumbnail = body.thumbnail;
+  if (body.listing !== undefined) {
+    const parsed = parseListing(body.listing);
+    if ("error" in parsed) return NextResponse.json({ error: parsed.error }, { status: 400 });
+    const metadata = await currentMetadata(id, token);
+    if (!metadata) return NextResponse.json({ error: "Could not read the product" }, { status: 502 });
+    update.metadata = { ...metadata, listing: parsed.listing };
+  }
 
   if (Object.keys(update).length === 0) {
     return NextResponse.json({ error: "Nothing to update" }, { status: 400 });
@@ -115,7 +135,16 @@ export async function POST(
 
   try {
     const body = await request.json();
-    const { title, handle, description, technicalSpecs, customFields, existingMetadata } = body;
+    const { title, handle, description, technicalSpecs, customFields, status } = body;
+    if (status !== undefined && status !== "published" && status !== "draft") {
+      return NextResponse.json({ error: "Invalid status" }, { status: 400 });
+    }
+    // Read the stored metadata rather than trusting the copy the editor loaded:
+    // other sections (listing details) save independently in between.
+    const existingMetadata = await currentMetadata(id, token);
+    if (!existingMetadata) {
+      return NextResponse.json({ error: "Could not read the product before saving" }, { status: 502 });
+    }
 
     // Build authoritative technical specifications object
     const finalSpecs: ProductTechnicalSpecifications = {
@@ -135,6 +164,14 @@ export async function POST(
     if (title) updatePayload.title = title;
     if (handle) updatePayload.handle = handle;
     if (description !== undefined) updatePayload.description = description;
+    if (status !== undefined) {
+      updatePayload.status = status;
+      // Publishing also repairs channel membership, so products created before this fix appear.
+      if (status === "published") {
+        const channelId = await storefrontChannelId();
+        if (channelId) updatePayload.sales_channels = [{ id: channelId }];
+      }
+    }
 
     const res = await fetch(`${BASE_URL}/admin/products/${id}`, {
       method: "POST",

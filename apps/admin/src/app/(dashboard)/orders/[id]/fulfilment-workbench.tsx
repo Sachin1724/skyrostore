@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Package, Truck, CheckCircle2, AlertTriangle } from "lucide-react";
+import { Package, Truck, CheckCircle2, AlertTriangle, Printer, Ban, Undo2 } from "lucide-react";
+import { useConfirm } from "@/components/ui/confirm-dialog";
 import { STATE_LABELS } from "@/lib/data/fulfilment";
 
 type Props = {
@@ -13,6 +14,8 @@ type Props = {
   paymentAttempts: Array<Record<string, any>>;
   bulkRequest: Record<string, any> | null;
   history: Array<{ at: string; event: string; detail?: string | null }>;
+  shipmozoConfigured: boolean;
+  suggestedWeightG: number;
 };
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -24,6 +27,44 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
+const MILESTONES = ["Paid", "Packed", "Courier booked", "Dispatched", "Delivered"] as const;
+
+/** Current milestone index for the stepper; -1 before payment, cancelled has no place on the line. */
+function milestoneIndex(state: string, booked: boolean): number {
+  if (state === "delivered") return 4;
+  if (state === "shipped") return 3;
+  if (state === "packed") return booked ? 2 : 1;
+  if (state === "paid_processing") return 0;
+  return -1;
+}
+
+function MilestoneStepper({ state, booked }: { state: string; booked: boolean }) {
+  if (state === "cancelled" || state === "payment_failed" || state === "awaiting_payment") return null;
+  const current = milestoneIndex(state, booked);
+  return (
+    <ol className="flex items-center gap-1.5" aria-label="Fulfilment progress">
+      {MILESTONES.map((label, i) => (
+        <li key={label} className="flex items-center gap-1.5">
+          <span
+            className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${
+              i <= current ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-500"
+            }`}
+          >
+            {label}
+          </span>
+          {i < MILESTONES.length - 1 ? <span className="h-px w-3 bg-gray-300" aria-hidden /> : null}
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+const PACKAGE_PRESETS = [
+  { label: "Component parcel", weight_g: "300", length_cm: "20", width_cm: "15", height_cm: "10" },
+  { label: "Quadcopter kit", weight_g: "1200", length_cm: "40", width_cm: "30", height_cm: "15" },
+  { label: "Heavy UAV box", weight_g: "4500", length_cm: "60", width_cm: "50", height_cm: "30" },
+] as const;
+
 export function FulfilmentWorkbench({
   orderId,
   order,
@@ -32,19 +73,92 @@ export function FulfilmentWorkbench({
   paymentAttempts,
   bulkRequest,
   history,
+  shipmozoConfigured,
+  suggestedWeightG,
 }: Props) {
   const router = useRouter();
   const [courier, setCourier] = useState("");
   const [trackingNumber, setTrackingNumber] = useState("");
   const [trackingUrl, setTrackingUrl] = useState("");
-  const [busy, setBusy] = useState<"" | "pack" | "ship" | "deliver">("");
+  const [ewayBill, setEwayBill] = useState("");
+  const [serials, setSerials] = useState<Record<string, string>>({});
+  const [pkg, setPkg] = useState({
+    weight_g: suggestedWeightG ? String(suggestedWeightG) : "",
+    length_cm: "",
+    width_cm: "",
+    height_cm: "",
+  });
+  const [busy, setBusy] = useState<"" | "pack" | "book" | "ship" | "deliver" | "cancel" | "refund">("");
   const [message, setMessage] = useState<{ kind: "ok" | "error"; text: string } | null>(null);
+  const confirm = useConfirm();
 
   const state: string = order.fulfilment_state;
   const address = order.shipping_address || {};
   const isInvoiced = order.metadata?.payment_terms === "invoice";
 
-  async function run(action: "pack" | "ship" | "deliver", body: Record<string, unknown> = {}) {
+  const booked = fulfilments.find((f) => f.awb && !f.canceled_at);
+  const pkgReady = Object.values(pkg).every((v) => Number(v) > 0);
+
+  // GST Rule 138: an inter-state consignment over ₹50,000 needs an e-Way Bill before transport.
+  const interState = (address.province || "").trim().toLowerCase() !== "odisha";
+  const ewayBillRequired = interState && Number(order.total || 0) >= 50000;
+
+  // LiPo batteries are DGCA Class 9 dangerous goods (UN 3480/3481) — standard air
+  // express refuses standalone battery parcels, so the one-click air-courier path
+  // is blocked here; ops must arrange surface transport and enter tracking manually.
+  const hasStandaloneBattery = (order.items || []).some((i: any) => i.product?.metadata?.component_type === "BATTERY");
+
+  // Medusa's cancel-order workflow refuses once any fulfillment exists, i.e. once packed.
+  const cancellable = ["awaiting_payment", "payment_failed", "paid_processing"].includes(state);
+  const payment = order.payment_collections?.[0]?.payments?.find((p: any) => p.captured_at && !p.canceled_at);
+  const [refundAmount, setRefundAmount] = useState(String(payment?.amount ?? order.total ?? ""));
+  const [refundNote, setRefundNote] = useState("");
+
+  async function cancelOrder() {
+    if (!(await confirm({ title: "Cancel this order?", description: "This cannot be undone. Any captured payment is not refunded automatically.", confirmLabel: "Cancel order" }))) return;
+    setBusy("cancel");
+    setMessage(null);
+    try {
+      const res = await fetch(`/api/orders/${orderId}/cancel`, { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error?.message || data.error || "Could not cancel order.");
+      setMessage({ kind: "ok", text: "Order cancelled." });
+      router.refresh();
+    } catch (err: unknown) {
+      setMessage({ kind: "error", text: err instanceof Error ? err.message : "Could not cancel order." });
+    } finally {
+      setBusy("");
+    }
+  }
+
+  async function issueRefund() {
+    if (!payment) return;
+    const amount = Number(refundAmount);
+    if (!Number.isFinite(amount) || amount <= 0) {
+      setMessage({ kind: "error", text: "Enter a refund amount greater than 0." });
+      return;
+    }
+    if (!(await confirm({ title: `Refund ${amount} ${order.currency_code?.toUpperCase()}?`, description: "Sent to the customer's original payment method via Razorpay.", confirmLabel: "Issue refund" }))) return;
+    setBusy("refund");
+    setMessage(null);
+    try {
+      const res = await fetch(`/api/payments/${payment.id}/refund`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount, note: refundNote || undefined }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error?.message || data.error || "Could not issue refund.");
+      setMessage({ kind: "ok", text: "Refund issued." });
+      router.refresh();
+    } catch (err: unknown) {
+      setMessage({ kind: "error", text: err instanceof Error ? err.message : "Could not issue refund." });
+    } finally {
+      setBusy("");
+    }
+  }
+
+  async function run(action: "pack" | "book" | "ship" | "deliver", body: Record<string, unknown> = {}) {
     setBusy(action);
     setMessage(null);
     try {
@@ -56,6 +170,14 @@ export function FulfilmentWorkbench({
       const data = await res.json();
       if (!res.ok) {
         setMessage({ kind: "error", text: data.error || `Could not ${action} this order.` });
+        return;
+      }
+      if (action === "book") {
+        setMessage({
+          kind: "ok",
+          text: `${data.already_booked ? "Already booked" : "Booked"} with ${data.courier} · AWB ${data.awb}. Customer notified — print the label below.`,
+        });
+        router.refresh();
         return;
       }
       const already = data.already_packed || data.already_shipped || data.already_delivered;
@@ -84,10 +206,25 @@ export function FulfilmentWorkbench({
             </span>
           ) : null}
         </h1>
-        <span className="rounded bg-gray-900 px-2.5 py-1 font-mono text-xs font-medium text-white">
-          {STATE_LABELS[state] || state}
-        </span>
+        <div className="flex items-center gap-2">
+          {cancellable ? (
+            <button
+              type="button"
+              onClick={cancelOrder}
+              disabled={busy !== ""}
+              className="inline-flex items-center gap-1.5 rounded border border-rose-200 px-2.5 py-1 text-xs font-semibold text-rose-700 hover:bg-rose-50 disabled:opacity-40"
+            >
+              <Ban className="h-3.5 w-3.5" />
+              {busy === "cancel" ? "Cancelling…" : "Cancel order"}
+            </button>
+          ) : null}
+          <span className="rounded bg-gray-900 px-2.5 py-1 font-mono text-xs font-medium text-white">
+            {STATE_LABELS[state] || state}
+          </span>
+        </div>
       </div>
+
+      <MilestoneStepper state={state} booked={Boolean(booked)} />
 
       {message ? (
         <div
@@ -110,7 +247,8 @@ export function FulfilmentWorkbench({
                   <th className="pb-2 pr-4">Item</th>
                   <th className="pb-2 pr-4">SKU</th>
                   <th className="pb-2 pr-4 text-right">Qty</th>
-                  <th className="pb-2 text-right">Packed</th>
+                  <th className="pb-2 pr-4 text-right">Packed</th>
+                  <th className="pb-2">Serial # (optional)</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -134,7 +272,21 @@ export function FulfilmentWorkbench({
                     </td>
                     <td className="py-2 pr-4 font-mono text-xs text-gray-600">{item.sku || "—"}</td>
                     <td className="py-2 pr-4 text-right">{item.quantity}</td>
-                    <td className="py-2 text-right text-gray-600">{item.fulfilled_quantity}</td>
+                    <td className="py-2 pr-4 text-right text-gray-600">{item.fulfilled_quantity}</td>
+                    <td className="py-2">
+                      {state === "packed" || state === "shipped" || state === "delivered" ? (
+                        <span className="font-mono text-xs text-gray-700">
+                          {fulfilments.find((f) => !f.canceled_at)?.metadata?.serial_numbers?.[item.line_item_id] || "—"}
+                        </span>
+                      ) : (
+                        <input
+                          value={serials[item.line_item_id] || ""}
+                          onChange={(e) => setSerials({ ...serials, [item.line_item_id]: e.target.value })}
+                          placeholder="e.g. PX4-CUBEOR-00417"
+                          className="w-full rounded border border-gray-300 px-2 py-1 text-xs font-mono"
+                        />
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -143,7 +295,7 @@ export function FulfilmentWorkbench({
             <div className="mt-4 flex flex-wrap items-center gap-3">
               <button
                 type="button"
-                onClick={() => run("pack", isInvoiced ? { allow_unpaid: true } : {})}
+                onClick={() => run("pack", { ...(isInvoiced ? { allow_unpaid: true } : {}), serial_numbers: serials })}
                 disabled={busy !== "" || ["packed", "shipped", "delivered", "cancelled"].includes(state)}
                 className="inline-flex items-center gap-2 rounded bg-gray-900 px-3 py-2 text-xs font-semibold text-white disabled:opacity-40"
               >
@@ -159,7 +311,136 @@ export function FulfilmentWorkbench({
             </div>
           </Section>
 
-          <Section title="Shipping details">
+          <Section title="Courier booking & label">
+            {booked ? (
+              <div className="flex flex-wrap items-center gap-3 text-sm">
+                <span>
+                  <span className="font-medium text-gray-900">{booked.courier}</span>
+                  <span className="ml-2 font-mono text-xs text-gray-600">AWB {booked.awb}</span>
+                </span>
+                <a
+                  href={`/api/fulfilment/${orderId}/label`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 rounded bg-gray-900 px-3 py-2 text-xs font-semibold text-white"
+                >
+                  <Printer className="h-4 w-4" />
+                  Print label
+                </a>
+                {booked.tracking_urls?.[0] ? (
+                  <a href={booked.tracking_urls[0]} target="_blank" rel="noreferrer" className="text-xs text-gray-600 underline">
+                    Track parcel
+                  </a>
+                ) : null}
+              </div>
+            ) : !shipmozoConfigured ? (
+              <p className="text-sm text-gray-600">
+                Shipmozo is not configured, so couriers cannot be booked automatically. Set
+                <span className="font-mono text-xs"> SHIPMOZO_PUBLIC_KEY</span> and
+                <span className="font-mono text-xs"> SHIPMOZO_PRIVATE_KEY</span> on the backend, or ship manually below.
+              </p>
+            ) : hasStandaloneBattery ? (
+              <p className="rounded border border-amber-300 bg-amber-50 px-3 py-2.5 text-sm text-amber-900">
+                <strong>Contains a standalone LiPo battery</strong> — DGCA Class 9 dangerous goods (UN 3480/3481).
+                Standard air express refuses these. Arrange Surface Express transport with the courier directly,
+                then enter the tracking details in &quot;Ship manually&quot; below — one-click air booking is disabled for this order.
+              </p>
+            ) : (
+              <>
+                <p className="text-sm text-gray-600">
+                  Weigh and measure the packed box. Booking sends the order to Shipmozo, assigns the courier
+                  (Delhivery, per your auto-assign rule), generates the label and notifies the customer.
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {PACKAGE_PRESETS.map((preset) => (
+                    <button
+                      key={preset.label}
+                      type="button"
+                      onClick={() => setPkg({ weight_g: preset.weight_g, length_cm: preset.length_cm, width_cm: preset.width_cm, height_cm: preset.height_cm })}
+                      className="rounded border border-gray-300 px-2.5 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50"
+                    >
+                      {preset.label} ({preset.weight_g}g)
+                    </button>
+                  ))}
+                </div>
+                <div className="mt-3 grid gap-3 sm:grid-cols-4">
+                  {(
+                    [
+                      ["weight_g", "Weight (g)"],
+                      ["length_cm", "Length (cm)"],
+                      ["width_cm", "Width (cm)"],
+                      ["height_cm", "Height (cm)"],
+                    ] as const
+                  ).map(([key, label]) => (
+                    <label key={key} className="text-xs font-medium text-gray-600">
+                      {label}
+                      <input
+                        type="number"
+                        inputMode="numeric"
+                        min={1}
+                        value={pkg[key]}
+                        onChange={(e) => setPkg({ ...pkg, [key]: e.target.value })}
+                        className="mt-1 w-full rounded border border-gray-300 px-2 py-1.5 text-sm"
+                      />
+                    </label>
+                  ))}
+                </div>
+                {pkgReady ? (() => {
+                  const volumetricG = Math.round(((Number(pkg.length_cm) * Number(pkg.width_cm) * Number(pkg.height_cm)) / 5000) * 1000);
+                  const chargeableG = Math.max(Number(pkg.weight_g), volumetricG);
+                  return volumetricG > Number(pkg.weight_g) ? (
+                    <p className="mt-2 text-xs text-amber-700">
+                      Volumetric weight is {volumetricG}g (L×W×H ÷ 5000) — courier bills on the higher figure.
+                      Chargeable weight: <strong>{chargeableG}g</strong>.
+                    </p>
+                  ) : null;
+                })() : null}
+                {ewayBillRequired ? (
+                  <label className="mt-3 block text-xs font-medium text-gray-600">
+                    e-Way Bill number — required, order is ₹{Number(order.total).toLocaleString("en-IN")} shipping out of state (GST Rule 138)
+                    <input
+                      value={ewayBill}
+                      onChange={(e) => setEwayBill(e.target.value)}
+                      placeholder="12-digit e-Way Bill number"
+                      className="mt-1 w-full rounded border border-amber-300 bg-amber-50 px-2 py-1.5 text-sm"
+                    />
+                  </label>
+                ) : null}
+                <button
+                  type="button"
+                  onClick={() => run("book", { ...pkg, eway_bill_number: ewayBill || undefined })}
+                  disabled={busy !== "" || state !== "packed" || !pkgReady || (ewayBillRequired && !ewayBill.trim())}
+                  className="mt-4 inline-flex items-center gap-2 rounded bg-gray-900 px-3 py-2 text-xs font-semibold text-white disabled:opacity-40"
+                >
+                  <Printer className="h-4 w-4" />
+                  {busy === "book" ? "Booking courier…" : "Book courier & generate label"}
+                </button>
+                {state !== "packed" ? (
+                  <p className="mt-2 text-xs text-gray-500">Available once the order is marked packed.</p>
+                ) : null}
+              </>
+            )}
+            <div className="mt-4">
+              <button
+                type="button"
+                onClick={() => run("deliver")}
+                disabled={busy !== "" || state !== "shipped"}
+                className="inline-flex items-center gap-2 rounded border border-gray-300 px-3 py-2 text-xs font-semibold text-gray-800 disabled:opacity-40"
+              >
+                <CheckCircle2 className="h-4 w-4" />
+                {busy === "deliver" ? "Confirming…" : "Mark delivered"}
+              </button>
+              {booked ? (
+                <span className="ml-3 text-xs text-gray-500">Updates automatically when the courier reports delivery.</span>
+              ) : null}
+            </div>
+          </Section>
+
+          <details className="rounded-md border border-gray-200 bg-white p-5" open={!shipmozoConfigured}>
+            <summary className="cursor-pointer text-sm font-semibold uppercase tracking-wider text-gray-500">
+              Ship manually (own courier)
+            </summary>
+            <div className="mt-3">
             <div className="grid gap-3 sm:grid-cols-3">
               <label className="text-xs font-medium text-gray-600">
                 Courier
@@ -205,15 +486,6 @@ export function FulfilmentWorkbench({
                 <Truck className="h-4 w-4" />
                 {busy === "ship" ? "Marking shipped…" : "Mark shipped & notify customer"}
               </button>
-              <button
-                type="button"
-                onClick={() => run("deliver")}
-                disabled={busy !== "" || state !== "shipped"}
-                className="inline-flex items-center gap-2 rounded border border-gray-300 px-3 py-2 text-xs font-semibold text-gray-800 disabled:opacity-40"
-              >
-                <CheckCircle2 className="h-4 w-4" />
-                {busy === "deliver" ? "Confirming…" : "Mark delivered"}
-              </button>
             </div>
             <p className="mt-2 text-xs text-gray-500">
               Filling this form changes nothing on its own. The order moves to shipped only when you
@@ -238,7 +510,8 @@ export function FulfilmentWorkbench({
                 ))}
               </ul>
             ) : null}
-          </Section>
+            </div>
+          </details>
 
           <Section title="Status & transaction history">
             {history.length === 0 ? (
@@ -305,6 +578,38 @@ export function FulfilmentWorkbench({
             ) : (
               <p className="mt-3 text-xs text-gray-500">No payment attempts recorded for this order.</p>
             )}
+
+            {payment ? (
+              <div className="mt-4 border-t border-gray-100 pt-4">
+                <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">Issue refund</p>
+                <div className="mt-2 flex items-center gap-2">
+                  <input
+                    type="number"
+                    min={0}
+                    step="any"
+                    value={refundAmount}
+                    onChange={(e) => setRefundAmount(e.target.value)}
+                    className="w-28 rounded border border-gray-300 px-2 py-1 text-sm"
+                  />
+                  <span className="text-xs text-gray-500">{order.currency_code?.toUpperCase()}</span>
+                </div>
+                <input
+                  value={refundNote}
+                  onChange={(e) => setRefundNote(e.target.value)}
+                  placeholder="Note (optional)"
+                  className="mt-2 w-full rounded border border-gray-300 px-2 py-1 text-sm"
+                />
+                <button
+                  type="button"
+                  onClick={issueRefund}
+                  disabled={busy !== ""}
+                  className="mt-2 inline-flex items-center gap-1.5 rounded bg-gray-900 px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-40"
+                >
+                  <Undo2 className="h-3.5 w-3.5" />
+                  {busy === "refund" ? "Refunding…" : "Issue refund via Razorpay"}
+                </button>
+              </div>
+            ) : null}
           </Section>
 
           {bulkRequest ? (

@@ -90,6 +90,7 @@ export const COMPONENT_SPEC_TEMPLATES: Record<string, ComponentSpecificationTemp
       { key: "voltage_v", label: "Nominal Voltage", unit: "V", group: "Electrical", type: "number", isCanonical: true, required: true, min: 3.7, max: 70 },
       { key: "capacity_mah", label: "Capacity", unit: "mAh", group: "Electrical", type: "number", isCanonical: true, required: true, min: 100, max: 100000 },
       { key: "continuous_discharge_a", label: "Continuous Discharge", unit: "A", group: "Electrical", type: "number", isCanonical: true, min: 1, max: 1000 },
+      { key: "c_rating", label: "Discharge Rating", unit: "C", group: "Electrical", type: "number", isCanonical: false, min: 1, max: 300 },
       { key: "weight_g", label: "Pack Weight", unit: "g", group: "Mechanical", type: "number", isCanonical: true, required: true, min: 10, max: 20000 },
       { key: "connector", label: "Main Connector", group: "Mechanical", type: "string", isCanonical: false },
     ],
@@ -141,6 +142,21 @@ export const COMPONENT_SPEC_TEMPLATES: Record<string, ComponentSpecificationTemp
   },
 };
 
+// Key suffixes the catalogue uses for units ("max_thrust_g" -> "Max Thrust", g).
+const KEY_UNITS: Record<string, string> = {
+  g: "g", kg: "kg", a: "A", v: "V", w: "W", mm: "mm", cm: "cm", m: "m", in: "in",
+  hz: "Hz", mah: "mAh", min: "min", s: "s", c: "C", rpm: "RPM",
+};
+
+/** Readable label and unit for a metadata key no template describes. */
+export function labelFromKey(key: string): { label: string; unit?: string } {
+  const parts = key.split("_");
+  const unit = parts.length > 1 ? KEY_UNITS[parts[parts.length - 1]] : undefined;
+  const words = unit ? parts.slice(0, -1) : parts;
+  const label = words.join(" ").replace(/\b\w/g, (c) => c.toUpperCase()).replace(/\bKv\b/, "KV");
+  return { label, unit };
+}
+
 export function extractTechnicalSpecs(
   metadata?: Record<string, unknown> | null
 ): ProductTechnicalSpecifications | null {
@@ -173,7 +189,8 @@ export function extractTechnicalSpecs(
   let order = 1;
 
   for (const [key, val] of Object.entries(metadata)) {
-    if (key === "technical_specs" || key === "sku" || key === "id" || key === "thumbnail") continue;
+    // `listing` holds page copy (features, box contents, documents), not specs.
+    if (key === "technical_specs" || key === "listing" || key === "component_type" || key === "sku" || key === "id" || key === "thumbnail") continue;
     if (val === undefined || val === null || val === "") continue;
 
     const matched = template?.fields.find((f) => f.key === key);
@@ -192,12 +209,11 @@ export function extractTechnicalSpecs(
       });
     } else {
       fields[key] = val;
-      const label = key
-        .replace(/_/g, " ")
-        .replace(/\b\w/g, (c) => c.toUpperCase());
+      const { label, unit } = labelFromKey(key);
       additionalSpecifications.push({
         key,
         label,
+        unit,
         value: typeof val === "number" || typeof val === "boolean" ? val : String(val),
         group: "General",
         displayOrder: order++,
@@ -258,4 +274,71 @@ export function getProductTechnicalHighlights(metadata?: Record<string, unknown>
   }
 
   return highlights.slice(0, 2);
+}
+
+/**
+ * The attributes buyers actually narrow by, per component type, in the order
+ * they matter (e.g. motors: KV, stator size, mounting pattern, shaft — what
+ * specialist FPV/UAV stores filter on). Keys come from the templates above.
+ */
+export const SHOP_BY: Record<string, string[]> = {
+  MOTOR: ["kv", "stator_size", "mounting_holes_mm", "shaft_diameter_mm", "recommended_propeller_max_in"],
+  PROPELLER: ["diameter_in", "pitch_in", "blade_count", "material"],
+  ESC: ["continuous_current_a", "cell_count_max", "firmware", "protocols"],
+  BATTERY: ["cell_count", "capacity_mah", "c_rating", "connector"],
+  FRAME: ["wheelbase_mm", "max_propeller_size_in", "motor_count", "arm_material"],
+  FLIGHT_CONTROLLER: ["processor", "firmware_support"],
+  GPS: ["constellations", "compass"],
+};
+
+export type Facet = {
+  key: string;
+  label: string;
+  unit?: string;
+  values: Array<{ value: string; count: number }>;
+};
+
+const specValue = (metadata: Record<string, unknown> | null | undefined, key: string) => {
+  const v = metadata?.[key];
+  return v === undefined || v === null || v === "" ? null : String(v).trim();
+};
+
+/** "Shop by" facets for the products on screen; only attributes some product has. */
+export function buildFacets(products: Array<{ metadata?: Record<string, unknown> | null }>): Facet[] {
+  const types = new Set(products.map((p) => String(p.metadata?.component_type || "")).filter((t) => SHOP_BY[t]));
+  const facets: Facet[] = [];
+  for (const type of types) {
+    const template = COMPONENT_SPEC_TEMPLATES[type];
+    for (const key of SHOP_BY[type]) {
+      if (facets.some((f) => f.key === key)) continue;
+      const counts = new Map<string, number>();
+      for (const p of products) {
+        const v = specValue(p.metadata, key);
+        if (v) counts.set(v, (counts.get(v) ?? 0) + 1);
+      }
+      if (!counts.size) continue;
+      const field = template?.fields.find((f) => f.key === key);
+      const numeric = field?.type === "number";
+      facets.push({
+        key,
+        label: field?.label ?? key,
+        unit: field?.unit,
+        values: [...counts]
+          .map(([value, count]) => ({ value, count }))
+          .sort((a, b) => (numeric ? Number(a.value) - Number(b.value) : a.value.localeCompare(b.value))),
+      });
+    }
+  }
+  return facets;
+}
+
+/** Keeps products matching every selected facet value. */
+export function applyFacets<T extends { metadata?: Record<string, unknown> | null }>(
+  products: T[],
+  selected: Record<string, string>
+): T[] {
+  const entries = Object.entries(selected);
+  return entries.length
+    ? products.filter((p) => entries.every(([key, value]) => specValue(p.metadata, key) === value))
+    : products;
 }

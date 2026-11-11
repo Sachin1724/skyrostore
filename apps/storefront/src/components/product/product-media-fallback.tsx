@@ -66,31 +66,12 @@ export function ProductMediaFallback({
 
   return (
     <div
-      className={`relative flex h-full w-full flex-col items-center justify-center p-6 text-center select-none bg-surface-soft transition-colors ${className}`}
+      className={`relative flex h-full w-full flex-col items-center justify-center p-6 text-center select-none bg-surface-soft ${className}`}
     >
-      {/* Precision Blueprint Grid Watermark */}
-      <div
-        className="pointer-events-none absolute inset-0 opacity-[0.03]"
-        style={{
-          backgroundImage: `radial-gradient(var(--color-graphite) 1px, transparent 1px)`,
-          backgroundSize: "16px 16px",
-        }}
-      />
-
-      {/* Restrained Technical Icon Badge */}
-      <div
-        className="relative flex h-14 w-14 items-center justify-center bg-surface shadow-xs transition-transform group-hover:scale-105"
-        style={{
-          borderRadius: "var(--radius-sm)",
-          border: "1px solid var(--color-border)",
-        }}
-      >
-        <IconComponent className="h-6 w-6 text-text-muted stroke-[1.4]" />
-      </div>
-
-      {/* Technical Classification Label */}
-      <span className="relative mt-3 font-mono text-[10px] font-medium tracking-[0.12em] text-text-muted">
-        {typeLabel}
+      {/* Placeholder until the admin uploads a photo: the part's type, drawn flat. */}
+      <IconComponent className="h-12 w-12 text-text-muted stroke-[1.4]" aria-hidden="true" />
+      <span className="mt-3 text-[14px] font-medium text-text-secondary">
+        {typeLabel.charAt(0) + typeLabel.slice(1).toLowerCase()}
       </span>
     </div>
   );

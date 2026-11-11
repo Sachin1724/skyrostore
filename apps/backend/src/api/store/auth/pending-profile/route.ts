@@ -1,0 +1,56 @@
+import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http";
+import { Modules } from "@medusajs/framework/utils";
+
+/**
+ * Returns the verified profile attached to the caller's own auth identity.
+ *
+ * After a third-party sign-in the storefront holds a registration token but no
+ * customer yet, and it needs the provider's verified email to create one. Only
+ * the identity bound to the presented token is readable, and only the few
+ * fields needed to create the customer record are returned.
+ */
+export async function GET(req: MedusaRequest, res: MedusaResponse) {
+  const authContext = (req as any).auth_context;
+  const authIdentityId = authContext?.auth_identity_id;
+
+  if (!authIdentityId) {
+    return res.status(401).json({ error: "Authentication required" });
+  }
+
+  // An identity that already has a customer must not be re-registered.
+  if (authContext?.actor_id) {
+    return res.status(409).json({ error: "This identity already has a customer account." });
+  }
+
+  try {
+    const authModule = req.scope.resolve(Modules.AUTH) as any;
+    const identity = await authModule.retrieveAuthIdentity(authIdentityId, {
+      relations: ["provider_identities"],
+    });
+
+    const provider = (identity?.provider_identities || [])[0];
+    const metadata = provider?.user_metadata || {};
+    const candidate = metadata.email || provider?.entity_id;
+    const email = typeof candidate === "string" && candidate.includes("@") ? candidate : null;
+    // A phone sign-in has no email; the storefront asks the customer for one.
+    const phone = typeof metadata.phone === "string" ? metadata.phone : null;
+
+    if (!email && !phone) {
+      return res.status(422).json({
+        error: "The identity provider did not supply a usable email address.",
+      });
+    }
+
+    const [first, ...rest] = String(metadata.name || "").trim().split(/\s+/);
+    return res.json({
+      provider: provider?.provider ?? null,
+      email,
+      phone,
+      first_name: metadata.given_name ?? (first || null),
+      last_name: metadata.family_name ?? (rest.join(" ") || null),
+    });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    return res.status(500).json({ error: message });
+  }
+}

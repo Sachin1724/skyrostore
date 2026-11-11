@@ -16,7 +16,7 @@ export async function GET(
       return NextResponse.json({ error: "Authentication required" }, { status: 401 });
     }
 
-    const res = await fetch(`${BASE}/store/bulk-orders/${id}`, {
+    const res = await fetch(`${BASE}/store/bulk-orders/${encodeURIComponent(id)}`, {
       headers: {
         "x-publishable-api-key": PK,
         Authorization: `Bearer ${token}`,

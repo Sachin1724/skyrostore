@@ -41,7 +41,7 @@ export async function getProducts(
   const qs = new URLSearchParams({
     limit: String(params?.limit ?? 20),
     offset: String(params?.offset ?? 0),
-    fields: "id,title,handle,status,thumbnail,*variants,*categories,*collection",
+    fields: "id,title,handle,status,thumbnail,*variants,variants.inventory_quantity,*categories,*collection",
   });
   if (params?.category_id) qs.set("category_id", params.category_id);
   if (params?.collection_id) qs.set("collection_id", params.collection_id);
@@ -97,11 +97,10 @@ export async function getCustomers(token: string, params?: { limit?: number }) {
   );
 }
 
-export async function getInventoryItems(token: string, params?: { limit?: number }) {
-  return adminFetch(
-    `/admin/inventory-items?limit=${params?.limit ?? 50}`,
-    { headers: authHeaders(token) }
-  );
+export async function getInventoryItems(token: string, params?: { limit?: number; q?: string }) {
+  const qs = new URLSearchParams({ limit: String(params?.limit ?? 50), fields: "id,sku,title,*location_levels" });
+  if (params?.q) qs.set("q", params.q);
+  return adminFetch(`/admin/inventory-items?${qs}`, { headers: authHeaders(token) });
 }
 
 export async function getDashboardStats(token: string) {

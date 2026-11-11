@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { Select } from "@/components/ui/select";
 import {
   Boxes,
   Wrench,
@@ -325,9 +326,9 @@ export function BulkOrderRequestForm() {
   if (submittedData) {
     return (
       <div
-        className="rounded-md border border-border bg-white p-8 text-center shadow-sm"
+        className="rounded-md border border-border bg-white p-8 text-center"
       >
-        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-accent/20 text-graphite">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-brand-soft text-brand">
           <CheckCircle2 className="h-8 w-8 stroke-[2.2] text-graphite" />
         </div>
         <h2 className="mt-4 text-[24px] font-bold text-graphite">
@@ -336,7 +337,7 @@ export function BulkOrderRequestForm() {
         <p className="mt-2 text-[14px] text-text-secondary">
           Your formal request has been recorded under reference number:
         </p>
-        <div className="mt-3 inline-block rounded border border-border bg-surface-soft px-5 py-2.5 font-mono text-[18px] font-bold tracking-wider text-graphite">
+        <div className="mt-3 inline-block rounded border border-border bg-surface-soft px-5 py-2.5 font-mono text-[18px] font-bold text-graphite">
           {submittedData.reference_no}
         </div>
         <p className="mx-auto mt-4 max-w-lg text-[13px] leading-relaxed text-text-muted">
@@ -363,7 +364,7 @@ export function BulkOrderRequestForm() {
   }
 
   const inputClass =
-    "w-full px-3 py-2 text-[13px] text-graphite bg-surface placeholder:text-text-disabled focus:outline-none focus:ring-1 focus:ring-graphite focus:border-graphite rounded-sm border border-color-border";
+    "w-full px-3 py-2 text-[13px] text-graphite bg-surface placeholder:text-text-disabled focus:ring-1 focus:ring-graphite focus:border-graphite rounded-sm border border-color-border";
 
   return (
     <div className="space-y-6">
@@ -382,7 +383,7 @@ export function BulkOrderRequestForm() {
           onClick={() => setRequestType("BULK_PURCHASE")}
           className={`relative flex items-center justify-between rounded-lg border p-5 text-left transition-all ${
             requestType === "BULK_PURCHASE"
-              ? "border-[#84cc16] bg-[#f7fee7] ring-1 ring-[#84cc16]"
+              ? "border-brand bg-brand-soft ring-1 ring-brand"
               : "border-border bg-white hover:border-gray-300"
           }`}
         >
@@ -391,15 +392,15 @@ export function BulkOrderRequestForm() {
               <Boxes className="h-6 w-6 stroke-[1.8]" />
             </div>
             <div>
-              <h3 className="text-[15px] font-bold text-graphite">Bulk Purchase</h3>
-              <p className="mt-0.5 text-[12px] text-text-muted">
+              <h3 className="text-[16px] font-bold text-graphite">Bulk Purchase</h3>
+              <p className="mt-0.5 text-[14px] text-text-muted">
                 Multiple units of existing products
               </p>
             </div>
           </div>
           <div className="shrink-0 pl-3">
             {requestType === "BULK_PURCHASE" ? (
-              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#84cc16] text-white">
+              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-brand text-white">
                 <Check className="h-3.5 w-3.5 stroke-[3]" />
               </div>
             ) : (
@@ -414,7 +415,7 @@ export function BulkOrderRequestForm() {
           onClick={() => setRequestType("CUSTOM_BUILD")}
           className={`relative flex items-center justify-between rounded-lg border p-5 text-left transition-all ${
             requestType === "CUSTOM_BUILD"
-              ? "border-[#84cc16] bg-[#f7fee7] ring-1 ring-[#84cc16]"
+              ? "border-brand bg-brand-soft ring-1 ring-brand"
               : "border-border bg-white hover:border-gray-300"
           }`}
         >
@@ -423,15 +424,15 @@ export function BulkOrderRequestForm() {
               <Wrench className="h-6 w-6 stroke-[1.8]" />
             </div>
             <div>
-              <h3 className="text-[15px] font-bold text-graphite">Custom UAV Build</h3>
-              <p className="mt-0.5 text-[12px] text-text-muted">
+              <h3 className="text-[16px] font-bold text-graphite">Custom UAV Build</h3>
+              <p className="mt-0.5 text-[14px] text-text-muted">
                 Tailored configuration for your needs
               </p>
             </div>
           </div>
           <div className="shrink-0 pl-3">
             {requestType === "CUSTOM_BUILD" ? (
-              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#84cc16] text-white">
+              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-brand text-white">
                 <Check className="h-3.5 w-3.5 stroke-[3]" />
               </div>
             ) : (
@@ -446,7 +447,7 @@ export function BulkOrderRequestForm() {
           onClick={() => setRequestType("BULK_CUSTOM_BUILD")}
           className={`relative flex items-center justify-between rounded-lg border p-5 text-left transition-all ${
             requestType === "BULK_CUSTOM_BUILD"
-              ? "border-[#84cc16] bg-[#f7fee7] ring-1 ring-[#84cc16]"
+              ? "border-brand bg-brand-soft ring-1 ring-brand"
               : "border-border bg-white hover:border-gray-300"
           }`}
         >
@@ -455,15 +456,15 @@ export function BulkOrderRequestForm() {
               <Layers className="h-6 w-6 stroke-[1.8]" />
             </div>
             <div>
-              <h3 className="text-[15px] font-bold text-graphite">Bulk Custom Builds</h3>
-              <p className="mt-0.5 text-[12px] text-text-muted">
+              <h3 className="text-[16px] font-bold text-graphite">Bulk Custom Builds</h3>
+              <p className="mt-0.5 text-[14px] text-text-muted">
                 Multiple custom UAVs
               </p>
             </div>
           </div>
           <div className="shrink-0 pl-3">
             {requestType === "BULK_CUSTOM_BUILD" ? (
-              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#84cc16] text-white">
+              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-brand text-white">
                 <Check className="h-3.5 w-3.5 stroke-[3]" />
               </div>
             ) : (
@@ -477,7 +478,7 @@ export function BulkOrderRequestForm() {
       <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
         {/* LEFT COLUMN: Stepper + Active Step Content (8 cols) */}
         <div className="space-y-6 lg:col-span-8">
-          <div className="rounded-lg border border-border bg-white p-6 shadow-sm">
+          <div className="bg-white p-4 sm:p-6">
             {/* Horizontal or Sub-step progress indicators */}
             <div className="flex flex-wrap items-center justify-between border-b border-border pb-5">
               {[
@@ -497,9 +498,9 @@ export function BulkOrderRequestForm() {
                     className="flex items-center gap-2.5 py-1 text-left transition-opacity hover:opacity-80"
                   >
                     <div
-                      className={`flex h-7 w-7 items-center justify-center rounded-full text-[12px] font-bold ${
+                      className={`relative after:absolute after:-inset-2 after:content-[''] flex h-7 w-7 items-center justify-center rounded-full text-[14px] font-bold ${
                         isActive
-                          ? "bg-[#84cc16] text-white"
+                          ? "bg-brand text-white"
                           : isPassed
                           ? "bg-graphite text-white"
                           : "bg-surface-soft text-text-muted"
@@ -509,7 +510,7 @@ export function BulkOrderRequestForm() {
                     </div>
                     <div className="hidden sm:block">
                       <p
-                        className={`text-[12px] font-bold ${
+                        className={`text-[14px] font-bold ${
                           isActive ? "text-graphite" : "text-text-secondary"
                         }`}
                       >
@@ -540,7 +541,7 @@ export function BulkOrderRequestForm() {
                     onClick={() => setActiveTab("add")}
                     className={`pb-2.5 text-[13px] font-bold transition-all ${
                       activeTab === "add"
-                        ? "border-b-2 border-[#84cc16] text-graphite"
+                        ? "border-b-2 border-brand text-graphite"
                         : "text-text-muted hover:text-graphite"
                     }`}
                   >
@@ -551,7 +552,7 @@ export function BulkOrderRequestForm() {
                     onClick={() => setActiveTab("saved")}
                     className={`pb-2.5 text-[13px] font-bold transition-all ${
                       activeTab === "saved"
-                        ? "border-b-2 border-[#84cc16] text-graphite"
+                        ? "border-b-2 border-brand text-graphite"
                         : "text-text-muted hover:text-graphite"
                     }`}
                   >
@@ -566,7 +567,7 @@ export function BulkOrderRequestForm() {
                     }}
                     className={`pb-2.5 text-[13px] font-bold transition-all ${
                       activeTab === "custom"
-                        ? "border-b-2 border-[#84cc16] text-graphite"
+                        ? "border-b-2 border-brand text-graphite"
                         : "text-text-muted hover:text-graphite"
                     }`}
                   >
@@ -583,30 +584,32 @@ export function BulkOrderRequestForm() {
                       placeholder="Search products, parts or UAVs..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full rounded-md border border-border bg-white py-2 pl-9 pr-4 text-[13px] text-graphite placeholder:text-text-disabled focus:border-graphite focus:outline-none"
+                      className="w-full rounded-md border border-border bg-white py-2 pl-9 pr-4 text-[13px] text-graphite placeholder:text-text-disabled focus:border-graphite"
                     />
                   </div>
                   <div className="w-full sm:w-48">
-                    <select
+                    <Select
+                      ariaLabel="Filter by category"
                       value={categoryFilter}
-                      onChange={(e) => setCategoryFilter(e.target.value)}
-                      className="w-full rounded-md border border-border bg-white px-3 py-2 text-[13px] font-medium text-graphite focus:border-graphite focus:outline-none"
-                    >
-                      <option>All Categories</option>
-                      <option>Motors</option>
-                      <option>ESCs</option>
-                      <option>Frames</option>
-                      <option>Batteries</option>
-                      <option>Flight Controllers</option>
-                      <option>Propellers</option>
-                    </select>
+                      onChange={setCategoryFilter}
+                      className="w-full"
+                      options={[
+                        { value: "All Categories", label: "All Categories" },
+                        { value: "Motors", label: "Motors" },
+                        { value: "ESCs", label: "ESCs" },
+                        { value: "Frames", label: "Frames" },
+                        { value: "Batteries", label: "Batteries" },
+                        { value: "Flight Controllers", label: "Flight Controllers" },
+                        { value: "Propellers", label: "Propellers" },
+                      ]}
+                    />
                   </div>
                 </div>
 
-                {/* Products Table matching mockup */}
+                {/* A table from md up; below that each line stacks (name and remove, unit price, quantity and total). */}
                 <div className="overflow-x-auto rounded-lg border border-border">
-                  <table className="w-full text-left text-[13px]">
-                    <thead className="border-b border-border bg-surface-soft text-[11px] font-bold uppercase tracking-wider text-text-muted">
+                  <table className="w-full text-left text-[13px] max-md:block">
+                    <thead className="border-b border-border bg-surface-soft text-[13px] font-bold text-text-muted max-md:hidden">
                       <tr>
                         <th className="px-4 py-3">Product</th>
                         <th className="px-4 py-3">Unit Price</th>
@@ -615,10 +618,10 @@ export function BulkOrderRequestForm() {
                         <th className="px-3 py-3 text-center"></th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-border bg-white">
+                    <tbody className="divide-y divide-border bg-white max-md:block">
                       {filteredItems.map((item) => (
-                        <tr key={item.id} className="transition-colors hover:bg-surface-soft/50">
-                          <td className="px-4 py-3.5">
+                        <tr key={item.id} className="transition-colors hover:bg-surface-soft/50 max-md:grid max-md:grid-cols-[minmax(0,1fr)_auto] max-md:items-center max-md:gap-x-3 max-md:gap-y-2 max-md:p-4">
+                          <td className="px-4 py-3.5 max-md:order-1 max-md:p-0">
                             <div className="flex items-center gap-3">
                               <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded border border-border bg-surface-soft">
                                 <Image
@@ -630,19 +633,21 @@ export function BulkOrderRequestForm() {
                               </div>
                               <div>
                                 <p className="font-bold text-graphite">{item.title}</p>
-                                <p className="text-[11px] text-text-muted">{item.subtitle}</p>
+                                <p className="text-[13px] text-text-muted">{item.subtitle}</p>
                               </div>
                             </div>
                           </td>
-                          <td className="whitespace-nowrap px-4 py-3.5 font-bold text-graphite">
+                          <td className="whitespace-nowrap px-4 py-3.5 font-bold text-graphite max-md:order-3 max-md:col-span-2 max-md:p-0 max-md:font-medium max-md:text-text-secondary">
                             {formatINR(item.unit_price)}
+                            <span className="md:hidden"> each</span>
                           </td>
-                          <td className="px-4 py-3.5">
+                          <td className="px-4 py-3.5 max-md:order-4 max-md:p-0">
                             <div className="inline-flex items-center rounded border border-border bg-white">
                               <button
                                 type="button"
                                 onClick={() => handleUpdateQuantity(item.id, -1)}
-                                className="px-2.5 py-1 text-text-secondary transition-colors hover:bg-surface-soft hover:text-graphite"
+                                aria-label={`Fewer ${item.title}`}
+                                className="h-10 px-3 text-text-secondary transition-colors hover:bg-surface-soft hover:text-graphite"
                               >
                                 &minus;
                               </button>
@@ -652,20 +657,22 @@ export function BulkOrderRequestForm() {
                               <button
                                 type="button"
                                 onClick={() => handleUpdateQuantity(item.id, 1)}
-                                className="px-2.5 py-1 text-text-secondary transition-colors hover:bg-surface-soft hover:text-graphite"
+                                aria-label={`More ${item.title}`}
+                                className="h-10 px-3 text-text-secondary transition-colors hover:bg-surface-soft hover:text-graphite"
                               >
                                 +
                               </button>
                             </div>
                           </td>
-                          <td className="whitespace-nowrap px-4 py-3.5 text-right font-bold text-graphite">
+                          <td className="whitespace-nowrap px-4 py-3.5 text-right font-bold text-graphite max-md:order-5 max-md:p-0">
                             {formatINR(item.unit_price * item.requested_quantity)}
                           </td>
-                          <td className="px-3 py-3.5 text-center">
+                          <td className="px-3 py-3.5 text-center max-md:order-2 max-md:p-0">
                             <button
                               type="button"
                               onClick={() => handleRemoveItem(item.id)}
-                              className="text-text-muted transition-colors hover:text-rose-600"
+                              className="inline-flex h-10 w-10 items-center justify-center text-text-muted transition-colors hover:text-rose-600"
+                              aria-label={`Remove ${item.title}`}
                               title="Remove item"
                             >
                               <X className="h-4 w-4" />
@@ -674,15 +681,15 @@ export function BulkOrderRequestForm() {
                         </tr>
                       ))}
                       {items.length === 0 ? (
-                        <tr>
-                          <td colSpan={5} className="py-8 text-center text-text-muted">
+                        <tr className="max-md:block">
+                          <td colSpan={5} className="py-8 text-center text-text-muted max-md:block max-md:px-4">
                             <p className="font-semibold text-graphite text-[14px]">No components added to request yet</p>
-                            <p className="mt-1 text-[12px] text-text-secondary">Click &quot;Add Another Product&quot; below or define custom requirements in Step 2.</p>
+                            <p className="mt-1 text-[14px] text-text-secondary">Click &quot;Add Another Product&quot; below or define custom requirements in Step 2.</p>
                           </td>
                         </tr>
                       ) : filteredItems.length === 0 ? (
-                        <tr>
-                          <td colSpan={5} className="py-8 text-center text-text-muted">
+                        <tr className="max-md:block">
+                          <td colSpan={5} className="py-8 text-center text-text-muted max-md:block max-md:px-4">
                             No products found in this category filter.
                           </td>
                         </tr>
@@ -696,7 +703,7 @@ export function BulkOrderRequestForm() {
                   <button
                     type="button"
                     onClick={() => setShowAddCatalogModal(true)}
-                    className="inline-flex items-center gap-2 rounded border border-border bg-white px-4 py-2 text-[12px] font-bold text-graphite transition-colors hover:bg-surface-soft"
+                    className="inline-flex items-center gap-2 rounded border border-border bg-white px-4 py-2 text-[14px] font-bold text-graphite transition-colors hover:bg-surface-soft"
                   >
                     <Plus className="h-3.5 w-3.5" />
                     Add Another Product
@@ -705,7 +712,7 @@ export function BulkOrderRequestForm() {
                   <button
                     type="button"
                     onClick={handleClearAll}
-                    className="inline-flex items-center gap-1.5 text-[12px] font-medium text-rose-600 transition-colors hover:text-rose-700"
+                    className="inline-flex min-h-11 items-center gap-1.5 text-[14px] font-medium text-rose-600 transition-colors hover:text-rose-700"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                     Clear All
@@ -719,7 +726,7 @@ export function BulkOrderRequestForm() {
                       setRequestType("CUSTOM_BUILD");
                       setCurrentStep(2);
                     }}
-                    className="inline-flex items-center gap-2 rounded border border-border bg-white px-5 py-2.5 text-[12px] font-bold text-graphite transition-colors hover:bg-surface-soft"
+                    className="inline-flex items-center gap-2 rounded border border-border bg-white px-5 py-2.5 text-[14px] font-bold text-graphite transition-colors hover:bg-surface-soft"
                   >
                     Switch to Custom Build
                     <ArrowRight className="h-3.5 w-3.5" />
@@ -742,7 +749,7 @@ export function BulkOrderRequestForm() {
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div>
-                    <label className="text-[12px] font-medium text-text-secondary">
+                    <label className="text-[14px] font-medium text-text-secondary">
                       Intended Application
                     </label>
                     <input
@@ -754,7 +761,7 @@ export function BulkOrderRequestForm() {
                     />
                   </div>
                   <div>
-                    <label className="text-[12px] font-medium text-text-secondary">
+                    <label className="text-[14px] font-medium text-text-secondary">
                       Target Payload (grams)
                     </label>
                     <input
@@ -766,7 +773,7 @@ export function BulkOrderRequestForm() {
                     />
                   </div>
                   <div>
-                    <label className="text-[12px] font-medium text-text-secondary">
+                    <label className="text-[14px] font-medium text-text-secondary">
                       Target Flight Time (minutes)
                     </label>
                     <input
@@ -778,7 +785,7 @@ export function BulkOrderRequestForm() {
                     />
                   </div>
                   <div>
-                    <label className="text-[12px] font-medium text-text-secondary">
+                    <label className="text-[14px] font-medium text-text-secondary">
                       Operating Environment
                     </label>
                     <input
@@ -790,7 +797,7 @@ export function BulkOrderRequestForm() {
                     />
                   </div>
                   <div>
-                    <label className="text-[12px] font-medium text-text-secondary">
+                    <label className="text-[14px] font-medium text-text-secondary">
                       Required Sensors / Gimbal Payload
                     </label>
                     <input
@@ -802,7 +809,7 @@ export function BulkOrderRequestForm() {
                     />
                   </div>
                   <div>
-                    <label className="text-[12px] font-medium text-text-secondary">
+                    <label className="text-[14px] font-medium text-text-secondary">
                       Communication / Telemetry
                     </label>
                     <input
@@ -814,7 +821,7 @@ export function BulkOrderRequestForm() {
                     />
                   </div>
                   <div>
-                    <label className="text-[12px] font-medium text-text-secondary">
+                    <label className="text-[14px] font-medium text-text-secondary">
                       Planned Unit Fleet Count
                     </label>
                     <input
@@ -862,7 +869,7 @@ export function BulkOrderRequestForm() {
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div>
-                    <label className="text-[12px] font-medium text-text-secondary">Contact Name *</label>
+                    <label className="text-[14px] font-medium text-text-secondary">Contact Name *</label>
                     <input
                       type="text"
                       required
@@ -873,7 +880,7 @@ export function BulkOrderRequestForm() {
                     />
                   </div>
                   <div>
-                    <label className="text-[12px] font-medium text-text-secondary">Official Email Address *</label>
+                    <label className="text-[14px] font-medium text-text-secondary">Official Email Address *</label>
                     <input
                       type="email"
                       required
@@ -884,7 +891,7 @@ export function BulkOrderRequestForm() {
                     />
                   </div>
                   <div>
-                    <label className="text-[12px] font-medium text-text-secondary">Phone Number</label>
+                    <label className="text-[14px] font-medium text-text-secondary">Phone Number</label>
                     <input
                       type="tel"
                       value={phone}
@@ -894,7 +901,7 @@ export function BulkOrderRequestForm() {
                     />
                   </div>
                   <div>
-                    <label className="text-[12px] font-medium text-text-secondary">Company / Organization</label>
+                    <label className="text-[14px] font-medium text-text-secondary">Company / Organization</label>
                     <input
                       type="text"
                       value={companyName}
@@ -904,7 +911,7 @@ export function BulkOrderRequestForm() {
                     />
                   </div>
                   <div className="sm:col-span-2">
-                    <label className="text-[12px] font-medium text-text-secondary">GSTIN (for B2B Tax Credit)</label>
+                    <label className="text-[14px] font-medium text-text-secondary">GSTIN (for B2B Tax Credit)</label>
                     <input
                       type="text"
                       value={gstin}
@@ -949,7 +956,7 @@ export function BulkOrderRequestForm() {
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div>
-                    <label className="text-[12px] font-medium text-text-secondary">Delivery City</label>
+                    <label className="text-[14px] font-medium text-text-secondary">Delivery City</label>
                     <input
                       type="text"
                       value={deliveryCity}
@@ -959,7 +966,7 @@ export function BulkOrderRequestForm() {
                     />
                   </div>
                   <div>
-                    <label className="text-[12px] font-medium text-text-secondary">Delivery State</label>
+                    <label className="text-[14px] font-medium text-text-secondary">Delivery State</label>
                     <input
                       type="text"
                       value={deliveryState}
@@ -969,7 +976,7 @@ export function BulkOrderRequestForm() {
                     />
                   </div>
                   <div>
-                    <label className="text-[12px] font-medium text-text-secondary">Pincode</label>
+                    <label className="text-[14px] font-medium text-text-secondary">Pincode</label>
                     <input
                       type="text"
                       value={deliveryPincode}
@@ -979,7 +986,7 @@ export function BulkOrderRequestForm() {
                     />
                   </div>
                   <div>
-                    <label className="text-[12px] font-medium text-text-secondary">Required Lead Time (Weeks)</label>
+                    <label className="text-[14px] font-medium text-text-secondary">Required Lead Time (Weeks)</label>
                     <input
                       type="number"
                       min={1}
@@ -989,7 +996,7 @@ export function BulkOrderRequestForm() {
                     />
                   </div>
                   <div className="sm:col-span-2">
-                    <label className="text-[12px] font-medium text-text-secondary">Estimated Budget Range</label>
+                    <label className="text-[14px] font-medium text-text-secondary">Estimated Budget Range</label>
                     <input
                       type="text"
                       value={budgetRange}
@@ -998,7 +1005,7 @@ export function BulkOrderRequestForm() {
                     />
                   </div>
                   <div className="sm:col-span-2">
-                    <label className="text-[12px] font-medium text-text-secondary">Additional Notes &amp; Standards</label>
+                    <label className="text-[14px] font-medium text-text-secondary">Additional Notes &amp; Standards</label>
                     <textarea
                       rows={3}
                       value={additionalSpecifications}
@@ -1100,10 +1107,10 @@ export function BulkOrderRequestForm() {
         {/* RIGHT COLUMN: REQUEST SUMMARY & WHY CHOOSE BULK (4 cols) */}
         <div className="space-y-6 lg:col-span-4">
           {/* Card 1: Request Summary */}
-          <div className="rounded-lg border border-border bg-white p-6 shadow-sm">
+          <div className="bg-white p-4 sm:p-6">
             <div className="flex items-center justify-between border-b border-border pb-4">
               <h3 className="text-[16px] font-bold text-graphite">Request Summary</h3>
-              <span className="text-[12px] text-text-muted">{items.length} items</span>
+              <span className="text-[14px] text-text-muted">{items.length} items</span>
             </div>
 
             <div className="mt-4 space-y-3 text-[13px]">
@@ -1128,30 +1135,30 @@ export function BulkOrderRequestForm() {
             </div>
 
             {/* Blue Info Callout Box matching mockup */}
-            <div className="mt-5 flex gap-2.5 rounded-lg border border-sky-100 bg-[#f0f7ff] p-3.5 text-[12px] leading-relaxed text-[#1e40af]">
-              <Info className="h-4 w-4 shrink-0 text-[#2563eb]" />
+            <div className="mt-5 flex gap-2.5 rounded-lg border border-sky-100 bg-brand-soft p-3.5 text-[14px] leading-relaxed text-brand">
+              <Info className="h-4 w-4 shrink-0 text-brand" />
               <span>
                 This is a request for quotation. Final pricing, tax, shipping and availability will be confirmed by our team.
               </span>
             </div>
           </div>
 
-          {/* Card 2: Why Choose Bulk Orders? */}
-          <div className="rounded-lg border border-border bg-white p-6 shadow-sm">
-            <h3 className="text-[15px] font-bold text-graphite">
-              Why Choose Bulk Orders?
+          {/* Card 2: what the quotation includes */}
+          <div className="bg-white p-4 sm:p-6">
+            <h3 className="text-[16px] font-bold text-graphite">
+              What you get
             </h3>
-            <ul className="mt-4 space-y-3 text-[12px] text-text-secondary">
+            <ul className="mt-4 space-y-3 text-[14px] text-text-secondary">
               {[
-                "Special volume pricing",
+                "Prices for your quantities",
                 "Custom configuration support",
-                "Dedicated technical consultation",
-                "Priority production and delivery",
+                "A check that the parts work together",
+                "Delivery and lead time for each line",
                 "GST invoicing for businesses",
-                "After-sales support for fleet orders",
+                "Tracking once the order ships",
               ].map((benefit, i) => (
                 <li key={i} className="flex items-center gap-2.5">
-                  <div className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-[#84cc16] text-white">
+                  <div className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-brand text-white">
                     <Check className="h-2.5 w-2.5 stroke-[3]" />
                   </div>
                   <span>{benefit}</span>
@@ -1184,7 +1191,7 @@ export function BulkOrderRequestForm() {
       {/* Quick Add Catalog Modal */}
       {showAddCatalogModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-lg rounded-lg border border-border bg-white p-6 shadow-xl">
+          <div className="w-full max-w-lg bg-white p-6 shadow-xl">
             <div className="flex items-center justify-between border-b border-border pb-3">
               <h3 className="text-[16px] font-bold text-graphite">Add Catalog Component</h3>
               <button
@@ -1212,13 +1219,13 @@ export function BulkOrderRequestForm() {
                     </div>
                     <div>
                       <p className="text-[13px] font-bold text-graphite">{item.title}</p>
-                      <p className="text-[11px] text-text-muted">{item.subtitle}</p>
+                      <p className="text-[13px] text-text-muted">{item.subtitle}</p>
                     </div>
                   </div>
                   <button
                     type="button"
                     onClick={() => handleAddCatalogProduct(item)}
-                    className="rounded bg-graphite px-3 py-1.5 text-[12px] font-bold text-white hover:bg-graphite-soft"
+                    className="rounded bg-graphite px-3 py-1.5 text-[14px] font-bold text-white hover:bg-graphite-soft"
                   >
                     Add
                   </button>

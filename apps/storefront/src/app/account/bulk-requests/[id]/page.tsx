@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { RequestDetailClient } from "./request-detail-client";
 
-export const metadata = { title: "Request Details | Skyrostore" };
+export const metadata = { title: "Quotation request" };
 
 const BASE = process.env.NEXT_PUBLIC_MEDUSA_URL || "http://localhost:9000";
 const PK = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "pk_11e52cb93d15418c56289d434fee7c53a391460b6a393b72ad48192afe3c4816";
@@ -25,7 +25,7 @@ export default async function CustomerRequestDetailPage({
 
   let requestData: any = null;
   try {
-    const res = await fetch(`${BASE}/store/bulk-orders/${id}`, {
+    const res = await fetch(`${BASE}/store/bulk-orders/${encodeURIComponent(id)}`, {
       headers: {
         "x-publishable-api-key": PK,
         Authorization: `Bearer ${token}`,
@@ -52,8 +52,8 @@ export default async function CustomerRequestDetailPage({
   return (
     <>
       <Header />
-      <main className="mx-auto max-w-[1020px] px-8 py-10 md:px-10">
-        <nav className="text-[11px] font-mono uppercase tracking-[0.08em] text-text-muted">
+      <main id="main" className="mx-auto max-w-[1020px] px-8 py-10 md:px-10">
+        <nav className="text-[13px] font-mono tracking-[0.08em] text-text-muted">
           <Link href="/account" className="hover:text-text-secondary">Account</Link>
           <span className="mx-2 text-text-disabled">/</span>
           <Link href="/account/bulk-requests" className="hover:text-text-secondary">Bulk Requests</Link>

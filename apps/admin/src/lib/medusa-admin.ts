@@ -47,3 +47,22 @@ export function respond(result: { ok: boolean; status: number; data: Record<stri
   }
   return NextResponse.json({ ok: true, ...result.data });
 }
+
+/**
+ * The store's metadata holds small admin-owned documents (homepage copy, media index).
+ * Writes send the whole object so other keys survive whether Medusa merges or replaces.
+ * ponytail: read-modify-write without a lock; two admins saving the same second can lose one
+ * write. Move to a module with its own table if more than a couple of people edit at once.
+ */
+export async function getStoreMetadata() {
+  const res = await adminCall("GET", "/admin/stores?fields=id,metadata");
+  const store = res.data?.stores?.[0] as { id: string; metadata: Record<string, any> | null } | undefined;
+  if (!store) throw new Error(res.data?.message || "Store not found");
+  return { id: store.id, metadata: store.metadata ?? {} };
+}
+
+export async function setStoreMetadata(patch: Record<string, unknown>) {
+  const { id, metadata } = await getStoreMetadata();
+  const res = await adminCall("POST", `/admin/stores/${id}`, { metadata: { ...metadata, ...patch } });
+  if (!res.ok) throw new Error(res.data?.message || "Could not save");
+}

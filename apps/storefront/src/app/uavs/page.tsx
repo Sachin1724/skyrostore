@@ -1,32 +1,31 @@
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
-import { ProductGrid } from "@/components/product/product-grid";
-import { getProducts, getCollections } from "@/lib/data/products";
+import { CatalogView, type CatalogParams } from "@/components/catalog/catalog-view";
+import { getCategoryTree } from "@/lib/data/catalog";
 
-export const metadata = { title: "UAVs" };
+export const metadata = { title: "Drones" };
 
-export default async function UavsPage() {
-  const collections = await getCollections();
-  const uavCollection = collections.find(
-    (c) => c.handle === "uavs" || c.title?.toLowerCase().includes("uav")
-  );
-
-  const { products } = uavCollection
-    ? await getProducts({ collection_id: [uavCollection.id], limit: 40 })
-    : await getProducts({ limit: 40 });
-
+export default async function UavsPage({ searchParams }: { searchParams: Promise<CatalogParams> }) {
+  // Complete aircraft live in a top-level category named for UAVs or drones.
+  const uavs = (await getCategoryTree()).find((c) => /uav|drone/i.test(c.name));
   return (
     <>
       <Header />
-      <main className="mx-auto max-w-[1280px] px-8 py-6 md:px-10">
-        <h1 className="text-[28px] font-bold tracking-[-0.025em] text-graphite">UAVs</h1>
-        <p className="mt-1 text-[14px] text-text-secondary">
-          Professional unmanned aerial vehicles for mapping, inspection, agriculture, and custom applications.
-        </p>
-        <div className="mt-8">
-          <ProductGrid products={products} />
-        </div>
-      </main>
+      {uavs ? (
+        <CatalogView
+          params={await searchParams}
+          basePath="/uavs"
+          fixed={{ category: uavs.handle }}
+          heading="Drones"
+          intro="Ready-to-fly and kit aircraft for mapping, inspection, agriculture and research."
+          crumbs={[{ href: "/uavs", label: "Drones" }]}
+        />
+      ) : (
+        <main id="main" className="mx-auto min-h-[50vh] max-w-xl px-4 py-16 text-center">
+          <h1 className="text-[28px] font-extrabold text-navy">Drones</h1>
+          <p className="mt-3 text-text-secondary">No complete drones are listed yet.</p>
+        </main>
+      )}
       <Footer />
     </>
   );
