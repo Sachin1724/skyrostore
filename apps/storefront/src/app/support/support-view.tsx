@@ -99,28 +99,10 @@ export function SupportView() {
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedFaq, setExpandedFaq] = useState<string | null>("faq-1");
 
-  // AWB Consignment Tracking State
-  const [trackingNumber, setTrackingNumber] = useState("");
-  const [trackingResult, setTrackingResult] = useState<string | null>(null);
-
-  // Pin Code Delivery Estimator State
+  // PIN check: the courier's own answer (yes, no, or could not say). Nothing is estimated here.
   const [pinCode, setPinCode] = useState("");
   const [pinLoading, setPinLoading] = useState(false);
-  const [pinResult, setPinResult] = useState<{
-    serviceable: boolean;
-    city?: string;
-    state?: string;
-    sla_days?: number;
-    message?: string;
-  } | null>(null);
-
-  const handleTrackOrder = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!trackingNumber.trim()) return;
-    setTrackingResult(
-      `Shipment #${trackingNumber.toUpperCase()} is assigned to Delhivery Surface Express. In-transit from Bhubaneswar Hub. Estimated delivery: 2-3 business days.`
-    );
-  };
+  const [pinResult, setPinResult] = useState<{ serviceable: boolean | null; message?: string } | null>(null);
 
   const handleCheckPinCode = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -137,31 +119,11 @@ export function SupportView() {
     setPinResult(null);
 
     try {
-      const res = await fetch(`/api/delivery-check?pincode=${cleanPin}`);
-      if (res.ok) {
-        const data = await res.json();
-        setPinResult({
-          serviceable: data.serviceable ?? true,
-          city: data.city || "Serviceable Location",
-          state: data.state || "India",
-          sla_days: data.sla_days || 3,
-        });
-      } else {
-        // Fallback calculation for standard Indian PIN codes
-        setPinResult({
-          serviceable: true,
-          city: "Metro / District Hub",
-          state: "Standard Coverage",
-          sla_days: 3,
-        });
-      }
+      const res = await fetch(`/api/delivery-check?pin=${cleanPin}`);
+      const data = res.ok ? ((await res.json()) as { serviceable: boolean | null }) : { serviceable: null };
+      setPinResult({ serviceable: data.serviceable });
     } catch {
-      setPinResult({
-        serviceable: true,
-        city: "Major Regional Hub",
-        state: "Verified Route",
-        sla_days: 4,
-      });
+      setPinResult({ serviceable: null });
     } finally {
       setPinLoading(false);
     }
@@ -242,36 +204,15 @@ export function SupportView() {
                 <Truck className="h-4 w-4" aria-hidden />
               </div>
               <div>
-                <h2 className="text-[14px] font-extrabold text-navy">Track Consignment</h2>
-                <p className="text-[13px] text-text-muted">Tracking number or order number</p>
+                <h2 className="text-[14px] font-extrabold text-navy">Track an order</h2>
+                <p className="text-[13px] text-text-muted">Courier and tracking number</p>
               </div>
             </div>
 
-            <form onSubmit={handleTrackOrder} className="mt-4 space-y-2.5">
-              <label htmlFor="track-input" className="block text-[13px] font-semibold text-text-secondary">
-                Tracking or order number
-              </label>
-              <input
-                id="track-input"
-                type="text"
-                placeholder="e.g. SKY-2026-00124 or AWB#"
-                value={trackingNumber}
-                onChange={(e) => setTrackingNumber(e.target.value)}
-                className="w-full rounded-lg border border-border px-3 py-2 text-[13px] text-navy placeholder:text-text-disabled focus:border-navy focus:outline-none"
-              />
-              <button
-                type="submit"
-                className="btn btn-primary btn-sm w-full"
-              >
-                Track Live Status
-              </button>
-            </form>
-
-            {trackingResult && (
-              <div className="mt-3 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-[13px] text-emerald-900 leading-snug">
-                {trackingResult}
-              </div>
-            )}
+            <p className="mt-4 text-[14px] leading-relaxed text-text-secondary">
+              When your order ships, the courier and tracking number are emailed to you and shown on the order
+              in your account, with the latest status from the courier.
+            </p>
           </div>
 
           <div className="mt-4 border-t border-border pt-3 text-[13px]">
@@ -279,7 +220,7 @@ export function SupportView() {
               href="/account/orders"
               className="inline-flex items-center gap-1 font-bold text-brand hover:underline"
             >
-              View all orders in your account <ArrowRight className="h-3 w-3" aria-hidden />
+              Go to your orders <ArrowRight className="h-3 w-3" aria-hidden />
             </Link>
           </div>
         </div>
@@ -292,57 +233,55 @@ export function SupportView() {
                 <MapPin className="h-4 w-4" aria-hidden />
               </div>
               <div>
-                <h2 className="text-[14px] font-extrabold text-navy">PIN Delivery Lookup</h2>
+                <h2 className="text-[14px] font-extrabold text-navy">Delivery to your PIN code</h2>
                 <p className="text-[13px] text-text-muted">Check that we deliver to your PIN code</p>
               </div>
             </div>
 
             <form onSubmit={handleCheckPinCode} className="mt-4 space-y-2.5">
               <label htmlFor="pin-input" className="block text-[13px] font-semibold text-text-secondary">
-                6-Digit Destination PIN Code
+                6-digit PIN code
               </label>
               <div className="flex gap-2">
                 <input
                   id="pin-input"
                   type="text"
+                  inputMode="numeric"
+                  autoComplete="postal-code"
                   maxLength={6}
                   placeholder="e.g. 560001, 751024"
                   value={pinCode}
                   onChange={(e) => setPinCode(e.target.value.replace(/\D/g, ""))}
-                  className="w-full rounded-lg border border-border px-3 py-2 text-[13px] font-mono text-navy placeholder:text-text-disabled focus:border-navy focus:outline-none"
+                  className="w-full rounded-lg border border-border px-3 py-2 text-[14px] tabular-nums text-navy placeholder:text-text-disabled focus:border-navy focus:outline-none"
                 />
                 <button
                   type="submit"
                   disabled={pinLoading || pinCode.length !== 6}
                   className="btn btn-primary btn-sm"
                 >
-                  {pinLoading ? "..." : "Check"}
+                  {pinLoading ? "Checking…" : "Check"}
                 </button>
               </div>
             </form>
 
             {pinResult && (
-              <div
-                className={`mt-3 rounded-lg border p-3 text-[13px] leading-snug ${
-                  pinResult.serviceable
-                    ? "border-emerald-200 bg-emerald-50 text-emerald-900"
-                    : "border-rose-200 bg-rose-50 text-rose-900"
+              <p
+                aria-live="polite"
+                className={`mt-3 rounded-lg p-3 text-[14px] leading-snug ${
+                  pinResult.serviceable === true
+                    ? "bg-success-soft text-success"
+                    : pinResult.serviceable === false
+                      ? "bg-error-soft text-error"
+                      : "bg-surface-soft text-text-secondary"
                 }`}
               >
-                {pinResult.serviceable ? (
-                  <div className="flex items-start gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" aria-hidden />
-                    <div>
-                      <p className="font-bold">Serviceable for Express Dispatch</p>
-                      <p className="text-[13px] text-emerald-800">
-                        {pinResult.city}, {pinResult.state} • Estimated {pinResult.sla_days} business days transit.
-                      </p>
-                    </div>
-                  </div>
-                ) : (
-                  <p>{pinResult.message || "This PIN code is currently outside standard coverage."}</p>
-                )}
-              </div>
+                {pinResult.message ??
+                  (pinResult.serviceable === true
+                    ? `We deliver to ${pinCode}.`
+                    : pinResult.serviceable === false
+                      ? `Couriers do not reach ${pinCode} yet. Contact us for other options.`
+                      : `We could not check ${pinCode} right now. Delivery is confirmed at checkout.`)}
+              </p>
             )}
           </div>
 
