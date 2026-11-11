@@ -22,3 +22,8 @@ backups/
 
 # design-taste-frontend inspector output
 .taste-skill/
+
+# Demo and walkthrough video captures
+demo_video/
+*.mp4
+*.webm
