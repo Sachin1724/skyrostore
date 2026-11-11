@@ -93,7 +93,7 @@ export function HeaderBar({ categories }: { categories: Cat[] }) {
           <Menu className="h-6 w-6" aria-hidden />
         </button>
         <Link href="/" aria-label="Skyrostore home" className="shrink-0">
-          <SkyroLogo />
+          <SkyroLogo priority />
         </Link>
 
         <DeliverTo />

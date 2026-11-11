@@ -18,7 +18,7 @@ export function ProfileView() {
     fetch("/api/account/profile")
       .then(async (r) => {
         const d = await r.json();
-        if (!r.ok) throw new Error(d.error || "Could not load your details");
+        if (!r.ok || !d.customer) throw new Error(d.error || "Your session has ended. Sign in again.");
         setP({ ...EMPTY, ...d.customer });
       })
       .catch((e: Error) => setNote({ ok: false, text: e.message }));

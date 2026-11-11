@@ -10,6 +10,13 @@ export function emailConfigured(): boolean {
 
 const FROM = process.env.RESEND_FROM_EMAIL || "Skyrostore <onboarding@resend.dev>";
 
+/** Every email opens with the logo, served from the public storefront (mail clients cannot load localhost). */
+function withLogo(html: string): string {
+  const base = (process.env.STOREFRONT_URL || "").replace(/\/+$/, "");
+  if (!base || /localhost|127\.0\.0\.1/.test(base)) return html;
+  return `<p><img src="${base}/brand/skyro-logo.png" alt="Skyro" height="48" style="height:48px;width:auto"></p>${html}`;
+}
+
 export async function sendEmail(to: string, subject: string, html: string): Promise<void> {
   if (!to) return;
   if (!emailConfigured()) {
@@ -23,7 +30,7 @@ export async function sendEmail(to: string, subject: string, html: string): Prom
         Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ from: FROM, to, subject, html }),
+      body: JSON.stringify({ from: FROM, to, subject, html: withLogo(html) }),
       signal: AbortSignal.timeout(15000),
     });
     if (!res.ok) {

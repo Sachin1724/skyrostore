@@ -11,15 +11,19 @@ const headers = (token: string) => ({
   Authorization: `Bearer ${token}`,
 });
 
-/** The signed-in customer's own record. Addresses and cards are not here: Razorpay holds those. */
+/**
+ * The signed-in customer's own record, or { customer: null } when signed out. The header asks on every
+ * page, so signed out is a normal answer (200), not an error the browser logs. Addresses and cards are
+ * not here: Razorpay holds those.
+ */
 export async function GET() {
   const token = await auth();
-  if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!token) return NextResponse.json({ customer: null });
   try {
     const res = await fetch(`${BASE}/store/customers/me`, { headers: headers(token), cache: "no-store" });
     // An expired token: drop the cookie so every page and the header agree the visitor is signed out.
     if (res.status === 401) {
-      const out = NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      const out = NextResponse.json({ customer: null });
       out.cookies.delete("customer_token");
       return out;
     }

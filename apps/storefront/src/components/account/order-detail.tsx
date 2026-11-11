@@ -1,5 +1,6 @@
 "use client";
 
+import { SkyroLogo } from "@/components/brand/logo";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
@@ -411,6 +412,7 @@ export function OrderDetail({ orderId, gstin }: { orderId: string; gstin?: strin
             <div id="printable-invoice" className="flex-1 overflow-y-auto p-6 md:p-8 space-y-6 text-navy print:overflow-visible">
               <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 border-b border-border pb-6">
                 <div>
+                  <SkyroLogo className="mb-3" />
                   <span className="text-[18px] font-extrabold tracking-tight text-navy">
                     SKYROSTORE SYSTEMS PRIVATE LIMITED
                   </span>
