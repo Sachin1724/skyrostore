@@ -283,7 +283,12 @@ a, button, [role="button"], summary, label { touch-action: manipulation; }
   input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea { font-size: 16px; }
 }
 
-/* Compare and quick view stay out of the way until the card is hovered or focused; touch screens always show them. */
+/* Compare and quick view stay out of the way until the card is hovered or focused. Touch screens have no
+   hover and too little room: there the card keeps only its heart (tapping the card opens the product, and
+   the list view still offers compare). */
+@media (hover: none) {
+  .card-extra { display: none; }
+}
 @media (hover: hover) {
   .card-extra { opacity: 0; transition: opacity 150ms var(--ease-out); }
   .group:hover .card-extra, .group:focus-within .card-extra { opacity: 1; }
