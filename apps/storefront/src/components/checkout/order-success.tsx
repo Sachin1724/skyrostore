@@ -236,7 +236,7 @@ export function OrderSuccess({ orderId, summary, gstin }: { orderId?: string; su
               {/* Company & Invoice Meta */}
               <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 border-b border-border pb-6">
                 <div>
-                  <SkyroLogo className="mb-3" />
+                  <SkyroLogo variant="full" className="mb-3 !h-16" />
                   <span className="text-[20px] font-extrabold tracking-tight text-navy">
                     SKYROSTORE SYSTEMS
                   </span>

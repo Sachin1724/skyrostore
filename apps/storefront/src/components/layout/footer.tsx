@@ -48,7 +48,7 @@ export function Footer() {
     <footer className="bg-navy text-on-dark">
       <div className="mx-auto grid max-w-[1760px] gap-6 px-4 pb-8 pt-10 sm:grid-cols-2 sm:gap-10 sm:pb-10 sm:pt-14 md:px-8 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
         <div className="space-y-4">
-          <SkyroLogo light />
+          <SkyroLogo variant="full" />
           <p className="max-w-[34ch] text-[14px] leading-relaxed text-on-dark">
             Drone parts and complete UAVs, checked for compatibility before they ship from Odisha.
           </p>
