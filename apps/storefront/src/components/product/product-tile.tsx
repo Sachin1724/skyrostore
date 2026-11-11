@@ -46,7 +46,7 @@ export function ProductTile({
           fill
           priority={priority}
           sizes="(min-width: 1280px) 20vw, (min-width: 640px) 33vw, 50vw"
-          className="object-contain p-3 transition-transform duration-300 ease-out group-hover:scale-[1.04]"
+          className="object-contain p-1.5 transition-transform sm:p-3 duration-300 ease-out group-hover:scale-[1.04]"
         />
       ) : (
         fallback
@@ -71,8 +71,8 @@ export function ProductTile({
       ) : (
         <div className={mediaClass}>{media}</div>
       )}
-      <div className="flex flex-1 flex-col gap-1 p-3.5">
-        {eyebrow ? <p className="truncate text-[13px] text-text-muted">{eyebrow}</p> : null}
+      <div className="flex flex-1 flex-col gap-1 p-2.5 sm:p-3.5">
+        {eyebrow ? <p className="truncate text-[12px] text-text-muted sm:text-[13px]">{eyebrow}</p> : null}
         <h3 className="line-clamp-2 min-h-[2.6em] text-[14px] font-medium leading-snug text-navy">
           {href ? (
             <Link href={href} className="hover:text-brand">
@@ -82,7 +82,7 @@ export function ProductTile({
             title
           )}
         </h3>
-        {spec ? <p className="truncate text-[13px] tabular-nums text-text-secondary">{spec}</p> : null}
+        {spec ? <p className="hidden truncate text-[13px] tabular-nums text-text-secondary sm:block">{spec}</p> : null}
         {/* Price keeps its width; on a narrow card the action wraps under it instead of overlapping. */}
         <div className="mt-auto flex flex-wrap items-end justify-between gap-2 pt-2">
           <div className="whitespace-nowrap">
