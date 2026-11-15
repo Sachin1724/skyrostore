@@ -19,6 +19,12 @@ services:
       dockerfile: apps/backend/Dockerfile
     restart: unless-stopped
     depends_on: [redis]
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:9000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      start_period: 60s
+      retries: 3
     env_file: apps/backend/.env
     environment:
       NODE_ENV: production
