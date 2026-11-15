@@ -15,7 +15,7 @@ const SESSION_IDLE_MS = 30 * 60 * 1000;
 const FLUSH_DELAY_MS = 800;
 const MAX_BATCH = 20;
 
-import { adsFromTrack } from "@/lib/ads";
+import { adsFromTrack } from "./ads";
 
 export type TrackPayload = {
   cart_id?: string | null;
