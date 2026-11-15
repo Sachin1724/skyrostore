@@ -8,6 +8,38 @@ import { getCompatibleProducts } from "@/lib/data/compatible-products";
 import { ProductRail } from "@/components/home/product-rail";
 import { ProductDetailClient } from "./product-detail-client";
 import { getSiteSettings } from "@/lib/data/site-settings";
+import { cleanName } from "@/lib/utils";
+
+const SITE = (process.env.NEXT_PUBLIC_SITE_URL || "").replace(/\/+$/, "");
+
+/** schema.org Product built only from what the listing really has; no price or stock means no offer. */
+function productJsonLd(product: any, brandName: string | null) {
+  const variant = product.variants?.[0];
+  const amount = variant?.calculated_price?.calculated_amount;
+  const stock = variant?.manage_inventory === false ? null : variant?.inventory_quantity ?? null;
+  const images = ((product.images ?? []) as { url?: string }[]).map((i) => i.url).filter(Boolean);
+  if (!images.length && product.thumbnail) images.push(product.thumbnail);
+  return {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: cleanName(product.title ?? ""),
+    ...(images.length ? { image: images } : {}),
+    ...(product.description ? { description: product.description } : {}),
+    ...(variant?.sku ? { sku: variant.sku } : {}),
+    ...(brandName ? { brand: { "@type": "Brand", name: brandName } } : {}),
+    ...(amount != null
+      ? {
+          offers: {
+            "@type": "Offer",
+            url: `${SITE}/products/${product.handle}`,
+            priceCurrency: (variant.calculated_price.currency_code || "inr").toUpperCase(),
+            price: (amount / 100).toFixed(2), // amounts are stored in paise
+            availability: stock == null || stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+          },
+        }
+      : {}),
+  };
+}
 
 export async function generateMetadata({
   params,
@@ -19,8 +51,10 @@ export async function generateMetadata({
     const product = await getProductByHandle(handle);
     if (!product) return { title: "Product Not Found" };
     return {
-      title: `${product.title?.replace("[DEV] ", "")}`,
+      title: cleanName(product.title ?? "Product"),
       description: product.description || product.subtitle || "Professional UAV component with verified engineering specifications.",
+      alternates: { canonical: `/products/${handle}` },
+      openGraph: { title: cleanName(product.title ?? ""), ...(product.thumbnail ? { images: [product.thumbnail] } : {}) },
     };
   } catch (err) {
     console.error("generateMetadata error:", err);
@@ -63,6 +97,11 @@ export default async function ProductDetailPage({
     <>
       <Header />
       <main id="main" className="bg-page">
+        <script
+          type="application/ld+json"
+          // JSON only; "<" escaped so a title can never close the script tag.
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd(product, brand?.title ?? null)).replace(/</g, "\\u003c") }}
+        />
         <ProductDetailClient
           product={product}
           trail={trail}

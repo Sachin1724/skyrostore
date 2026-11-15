@@ -14,6 +14,7 @@ import { CompareDrawer } from "@/components/catalog/compare-drawer";
 import { AnalyticsTracker } from "@/components/analytics/tracker";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
   title: {
     default: "Skyrostore: drone parts and complete UAVs",
     template: "%s | Skyrostore",

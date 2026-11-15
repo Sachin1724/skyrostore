@@ -3,7 +3,11 @@ import { Footer } from "@/components/layout/footer";
 import { CatalogView, type CatalogParams } from "@/components/catalog/catalog-view";
 import { getCategoryTree } from "@/lib/data/catalog";
 
-export const metadata = { title: "Drones" };
+export const metadata = {
+  title: "Drones",
+  description: "Complete UAVs and drones, ready to fly, with specs, GST invoice and delivery across India.",
+  alternates: { canonical: "/uavs" },
+};
 
 export default async function UavsPage({ searchParams }: { searchParams: Promise<CatalogParams> }) {
   // Complete aircraft live in a top-level category named for UAVs or drones.
