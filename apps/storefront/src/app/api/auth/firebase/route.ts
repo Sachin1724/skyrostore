@@ -4,7 +4,6 @@ import { NextRequest, NextResponse } from "next/server";
 const BASE = process.env.NEXT_PUBLIC_MEDUSA_URL || "http://localhost:9000";
 const PK = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "";
 const SESSION_MAX_AGE = 60 * 60 * 24 * 7;
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /** Reads the unverified claims of a token we just received over TLS from our own backend. */
 function readClaims(token: string): { actor_id?: string } {
@@ -62,9 +61,8 @@ export async function POST(request: NextRequest) {
     }
     const profile = await profileRes.json();
 
-    // A phone sign-in has no email; order and shipping updates need one.
-    const typedEmail = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
-    const email = profile.email || typedEmail;
+    // Only an email Firebase has verified may create an account; a typed one could belong to someone else.
+    const email = profile.email;
     if (!email) {
       return NextResponse.json({
         ok: false,
@@ -74,10 +72,6 @@ export async function POST(request: NextRequest) {
         last_name: profile.last_name,
       });
     }
-    if (!EMAIL_RE.test(email)) {
-      return NextResponse.json({ error: "Enter a valid email address." }, { status: 400 });
-    }
-
     const createRes = await fetch(`${BASE}/store/customers`, {
       method: "POST",
       headers: {

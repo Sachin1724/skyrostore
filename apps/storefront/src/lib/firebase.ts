@@ -30,7 +30,7 @@ export type SessionResult =
 /** Swaps a Firebase ID token for our own httpOnly session cookie. */
 export async function startSession(
   idToken: string,
-  profile?: { email: string; first_name?: string; last_name?: string }
+  profile?: { first_name?: string; last_name?: string }
 ): Promise<SessionResult> {
   const res = await fetch("/api/auth/firebase", {
     method: "POST",
@@ -55,6 +55,8 @@ export function firebaseMessage(err: unknown): string {
     "auth/cancelled-popup-request": "Google sign-in was cancelled.",
     "auth/popup-blocked": "Your browser blocked the Google window. Allow pop-ups for this site and try again.",
     "auth/invalid-email": "Enter a valid email address.",
+    "auth/email-already-in-use": "An account already uses this email. Sign in the way you did before.",
+    "auth/requires-recent-login": "Please sign in again with your mobile number.",
     "auth/invalid-action-code": "This sign-in link has expired or was already used. Request a new one.",
     "auth/expired-action-code": "This sign-in link has expired. Request a new one.",
     "auth/network-request-failed": "Network problem. Check your connection and try again.",

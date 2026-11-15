@@ -56,6 +56,12 @@ class FirebaseAuthProvider extends AbstractAuthModuleProvider {
 
     try {
       const authIdentity = await authIdentityProviderService.retrieve({ entity_id: claims.sub });
+      // A phone sign-in starts without an email; once the customer verifies one in Firebase it shows up here.
+      const stored = authIdentity.provider_identities?.find((p: any) => p.provider === this.identifier)?.user_metadata;
+      if (user_metadata.email && stored?.email !== user_metadata.email) {
+        const updated = await authIdentityProviderService.update(claims.sub, { user_metadata: { ...stored, ...user_metadata } });
+        return { success: true, authIdentity: updated };
+      }
       return { success: true, authIdentity };
     } catch (err: any) {
       if (err?.type !== MedusaError.Types.NOT_FOUND) return { success: false, error: err?.message };
