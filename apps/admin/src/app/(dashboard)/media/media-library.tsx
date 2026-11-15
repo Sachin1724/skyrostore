@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
 import { UploadButton, uploadImages } from "../products/image-uploader";
 import { useConfirm } from "@/components/ui/confirm-dialog";
 
@@ -69,7 +70,12 @@ function MediaCard({ item, reload, setError }: { item: Item; reload: () => Promi
 
 export function MediaLibrary() {
   const [items, setItems] = useState<Item[] | null>(null);
-  const [error, setError] = useState("");
+  const [error, setErrorState] = useState("");
+  // Failures also pop a toast so they are seen when the list is scrolled.
+  const setError = (m: string) => {
+    setErrorState(m);
+    if (m) toast.error(m);
+  };
   const [dragging, setDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
 

@@ -89,7 +89,7 @@ export default async function OrdersPage({
           type="search"
           name="q"
           defaultValue={q || ""}
-          placeholder="Order id, number, email or bulk reference"
+          placeholder="Order no., email, phone, AWB or payment id"
           className="w-80 rounded border border-gray-300 px-2.5 py-1.5 text-sm"
         />
         <button type="submit" className="rounded bg-gray-900 px-3 py-1.5 text-xs font-semibold text-white">

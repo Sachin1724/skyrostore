@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 type ProductSummary = { title: string; handle: string; thumbnail: string | null };
 
@@ -48,7 +49,12 @@ export function ModerationView() {
   const [questions, setQuestions] = useState<Question[] | null>(null);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setErrorState] = useState<string | null>(null);
+  // Failures also pop a toast so they are seen when the list is scrolled.
+  const setError = (m: string | null) => {
+    setErrorState(m);
+    if (m) toast.error(m);
+  };
 
   function loadReviews() {
     fetch("/api/moderation/reviews?status=PENDING")

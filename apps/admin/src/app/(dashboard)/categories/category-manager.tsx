@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
 import { Plus, Trash2, Pencil, Check, X } from "lucide-react";
 import { buildTree, type Category, type CategoryNode } from "@/lib/catalog";
 import { useConfirm } from "@/components/ui/confirm-dialog";
@@ -125,7 +126,12 @@ function Row({
 
 export function CategoryManager() {
   const [tree, setTree] = useState<CategoryNode[] | null>(null);
-  const [error, setError] = useState("");
+  const [error, setErrorState] = useState("");
+  // Failures also pop a toast so they are seen when the list is scrolled.
+  const setError = (m: string) => {
+    setErrorState(m);
+    if (m) toast.error(m);
+  };
 
   const reload = useCallback(async () => {
     try {

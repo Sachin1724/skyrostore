@@ -11,8 +11,10 @@ Source: an external review of `apps/admin` (51 screens/components). Status as of
 - [x] **Toasts** (`sonner`): `<Toaster>` in the shell; the order fulfilment workbench and the bulk-quote workbench now toast every result.
 - [x] Bulk-quote conversion uses `ConfirmDialog` instead of `window.confirm`.
 - [x] "Delivered" order badge uses the same tinted style as the other states.
-- [ ] Toasts in the remaining ~15 screens that still use only inline `setError` (categories, promotions, moderation, media, customers, brands, product editor, settings, content).
-- [ ] Search on Customers, Quotations, Returns, Support. Order search by phone, AWB and Razorpay payment id (needs backend fields in `/admin/fulfilment/orders`).
+- [x] Error toasts on brands, categories, promotions, media and moderation.
+- [ ] Toasts on the remaining screens (customers, product editor, settings, content, returns, stock cell).
+- [x] Order search matches phone (digits only), customer name, AWB and Razorpay payment/order id.
+- [ ] Search on Customers, Quotations, Returns, Support.
 - [ ] Bulk actions on Orders and Products (select, then act).
 - [ ] Split the three 600+ line workbenches into panels.
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
 import { Trash2 } from "lucide-react";
 import { useConfirm } from "@/components/ui/confirm-dialog";
 
@@ -84,7 +85,12 @@ function PromotionRow({ promo, reload, setError }: { promo: Promotion; reload: (
 
 export function PromotionManager() {
   const [promotions, setPromotions] = useState<Promotion[] | null>(null);
-  const [error, setError] = useState("");
+  const [error, setErrorState] = useState("");
+  // Failures also pop a toast so they are seen when the list is scrolled.
+  const setError = (m: string) => {
+    setErrorState(m);
+    if (m) toast.error(m);
+  };
   const [code, setCode] = useState("");
   const [methodType, setMethodType] = useState<"percentage" | "fixed">("percentage");
   const [value, setValue] = useState("");
