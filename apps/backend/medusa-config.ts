@@ -10,6 +10,20 @@ if (process.env.NODE_ENV === "production") {
       throw new Error(`${key} must be set to a real value in production`);
     }
   }
+  // Payments and links fail silently when these are missing, so refuse to boot instead.
+  for (const key of [
+    "RAZORPAY_KEY_ID",
+    "RAZORPAY_KEY_SECRET",
+    "RAZORPAY_WEBHOOK_SECRET",
+    "STOREFRONT_PROXY_SECRET",
+    "STORE_CORS",
+    "STOREFRONT_URL",
+  ]) {
+    if (!process.env[key]) throw new Error(`${key} must be set in production`);
+  }
+  for (const key of ["JWT_SECRET", "COOKIE_SECRET"]) {
+    if (process.env[key]!.length < 32) throw new Error(`${key} must be at least 32 characters in production`);
+  }
 }
 
 export default defineConfig({

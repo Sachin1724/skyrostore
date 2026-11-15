@@ -15,7 +15,16 @@ async function storeApi(path: string, method = "GET", body?: unknown) {
   });
   if (!res.ok) {
     const text = await res.text();
-    throw new Error(text);
+    console.error(`checkout ${method} ${path} -> ${res.status}: ${text.slice(0, 500)}`);
+    // 4xx messages are meant for the shopper (stock, coupon, address); 5xx detail stays in the server log.
+    let message = "Something went wrong. Please try again.";
+    if (res.status < 500) {
+      try {
+        const m = JSON.parse(text)?.message;
+        if (typeof m === "string" && m.length <= 200) message = m;
+      } catch {}
+    }
+    throw new Error(message);
   }
   return res.json();
 }
