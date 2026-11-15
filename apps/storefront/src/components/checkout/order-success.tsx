@@ -246,7 +246,7 @@ export function OrderSuccess({ orderId, summary, seller }: { orderId?: string; s
                     Invoice #{summary?.display_id ?? orderId ?? "PENDING"}
                   </p>
                   <p className="text-[13px] text-text-secondary">Date: {today}</p>
-                  <p className="text-[13px] text-text-secondary">Payment: Razorpay / Prepaid</p>
+                  <p className="text-[13px] text-text-secondary">Payment: Paid online</p>
                 </div>
               </div>
 

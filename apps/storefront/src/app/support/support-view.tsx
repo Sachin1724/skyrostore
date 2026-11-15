@@ -55,7 +55,7 @@ const FAQS: FAQItem[] = [
     id: "faq-4",
     question: "Can I claim 18% GST Input Tax Credit (ITC) on my order?",
     answer:
-      "Yes. Skyrostore is registered in Odisha under GSTIN 21AAECS9821R1ZM. Enter your enterprise or institutional GSTIN during checkout, and a statutory B2B Tax Invoice with HSN code 88069000 and ITC breakdown will be automatically generated and filed on the GST portal.",
+      "Yes, for business purchases. Enter your GSTIN during checkout and your tax invoice will carry it, with the HSN code and the GST breakdown, so you can use it for your own input tax credit filing.",
   },
   {
     id: "faq-5",

@@ -417,7 +417,7 @@ export function OrderDetail({ orderId, seller }: { orderId: string; seller: Sell
                 <div className="text-left sm:text-right text-[13px]">
                   <p className="font-bold text-navy text-[14px]">Invoice #{order.display_id}</p>
                   <p className="text-text-secondary">Date: {formattedDate}</p>
-                  <p className="text-text-secondary">Payment: Prepaid (Razorpay)</p>
+                  <p className="text-text-secondary">Payment: Paid online</p>
                 </div>
               </div>
 
