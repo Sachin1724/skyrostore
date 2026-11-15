@@ -15,7 +15,7 @@ import {
 
 // GST Rule 138 (CGST Rules): an inter-state consignment over ₹50,000 needs an
 // e-Way Bill before transport, or the courier risks seizure + a 100% penalty.
-const EWAY_BILL_THRESHOLD = 50000;
+const EWAY_BILL_THRESHOLD = 5_000_000; // paise (₹50,000)
 
 const FIELDS = [
   "id",
@@ -104,7 +104,7 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
       const interState = (order.shipping_address?.province || "").trim().toLowerCase() !== "odisha";
       if (Number(order.total || 0) >= EWAY_BILL_THRESHOLD && interState && !ewayBillNumber) {
         return res.status(400).json({
-          error: `This order is ₹${Number(order.total).toLocaleString("en-IN")} and ships out of state, so an e-Way Bill number is required before booking (GST Rule 138).`,
+          error: `This order is ₹${(Number(order.total) / 100).toLocaleString("en-IN")} and ships out of state, so an e-Way Bill number is required before booking (GST Rule 138).`,
           requires_eway_bill: true,
         });
       }

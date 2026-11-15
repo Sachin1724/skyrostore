@@ -131,6 +131,12 @@ export async function confirmRazorpayCart(
     // The other confirmer (browser vs webhook) may have won the race.
     const order = await existingOrderId(container, cart_id);
     if (order) return { order_id: order };
+    // Paid but the units are gone (hold expired, someone else bought them): retrying can never succeed,
+    // so give the money back instead of leaving a paid cart with no order.
+    if (/inventory|stock|available/i.test(err instanceof Error ? err.message : String(err))) {
+      await razorpay().payments.refund(razorpay_payment_id, { notes: { reason: "stock_unavailable_after_payment", cart_id } });
+      console.error(`Auto-refunded ${razorpay_payment_id}: stock gone after payment for cart ${cart_id}`);
+    }
     throw err;
   }
 }

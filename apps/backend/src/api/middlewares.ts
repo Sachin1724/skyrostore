@@ -39,6 +39,10 @@ export default defineMiddlewares({
     { matcher: "/razorpay/shipping-info", method: ["POST"], middlewares: [rateLimit("rzp-shipping", 120, 60)] },
     { matcher: "/store/bulk-orders", method: ["POST"], middlewares: [rateLimit("bulk-orders", 10, 3600)] },
     { matcher: "/store/delivery-check", method: ["GET"], middlewares: [rateLimit("delivery-check", 30, 60)] },
+    { matcher: "/store/products/:id/reviews", method: ["POST"], middlewares: [rateLimit("review-create", 5, 3600)] },
+    { matcher: "/store/products/:id/questions", method: ["POST"], middlewares: [rateLimit("question-create", 5, 3600)] },
+    { matcher: "/store/newsletter", method: ["POST"], middlewares: [rateLimit("newsletter", 10, 3600)] },
+    { matcher: "/store/uav/order-snapshot", method: ["POST"], middlewares: [rateLimit("order-snapshot", 30, 300)] },
     { matcher: "/store/customers", method: ["POST"], middlewares: [rateLimit("customer-create", 10, 3600)] },
     // A stock hold per checkout attempt: a real shopper needs a few, a script locking stock needs many.
     { matcher: "/store/carts/:id/reserve", method: ["POST"], middlewares: [rateLimit("cart-reserve", 8, 900)] },

@@ -138,7 +138,8 @@ class RazorpayProviderService extends AbstractPaymentProvider<RazorpayOptions> {
 
     if (payment.status === "captured" || payment.status === "authorized") {
       return {
-        status: PaymentSessionStatus.AUTHORIZED,
+        // captured => Medusa records captured_at, which refunds and self-cancel rely on
+        status: payment.status === "captured" ? PaymentSessionStatus.CAPTURED : PaymentSessionStatus.AUTHORIZED,
         data: {
           razorpay_order_id,
           razorpay_payment_id,

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { visitorHeaders } from "@/lib/visitor-headers";
 
 const BASE = process.env.NEXT_PUBLIC_MEDUSA_URL || "http://localhost:9000";
 const PK = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "";
@@ -22,6 +23,7 @@ export async function POST(request: NextRequest) {
       headers: {
         "Content-Type": "application/json",
         "x-publishable-api-key": PK,
+        ...visitorHeaders(request),
       },
       body: JSON.stringify({ callback_url: callbackUrl }),
     });

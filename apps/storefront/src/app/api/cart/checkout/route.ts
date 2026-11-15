@@ -199,19 +199,23 @@ export async function POST(request: NextRequest) {
         const pcId = pcData.payment_collection.id;
 
         // List available payment providers for this cart
-        let providerId = requestedProvider || "pp_system_default";
+        // Never trust the client's provider choice: production pays through Razorpay only.
+        let providerId = "pp_razorpay";
         try {
           const { payment_providers } = await storeApi(
             `/store/payment-providers?region_id=${(await storeApi(`/store/carts/${encodeURIComponent(cart_id)}`)).cart.region_id}`
           );
           const available = (payment_providers || []).map((p: any) => p.id);
-          if (available.includes("pp_razorpay") && !requestedProvider) {
-            providerId = "pp_razorpay";
-          } else if (requestedProvider && !available.includes(requestedProvider)) {
-            providerId = available[0] || "pp_system_default";
+          if (!available.includes("pp_razorpay")) {
+            if (process.env.NODE_ENV === "production") {
+              return NextResponse.json({ error: "Payments are temporarily unavailable." }, { status: 503 });
+            }
+            providerId = requestedProvider && available.includes(requestedProvider) ? requestedProvider : available[0] || "pp_system_default";
           }
         } catch {
-          // Fall back to requested or default
+          if (process.env.NODE_ENV === "production") {
+            return NextResponse.json({ error: "Payments are temporarily unavailable." }, { status: 503 });
+          }
         }
 
         // Magic Checkout needs the items; built here from the server-side cart,

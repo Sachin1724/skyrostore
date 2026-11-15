@@ -43,7 +43,7 @@ export async function sendEmail(to: string, subject: string, html: string): Prom
 }
 
 const money = (cents: number, currency: string) =>
-  new Intl.NumberFormat("en-IN", { style: "currency", currency: currency.toUpperCase() }).format(cents);
+  new Intl.NumberFormat("en-IN", { style: "currency", currency: currency.toUpperCase() }).format(cents / 100);
 
 /** HTML-escapes any value interpolated into an email body — admin_note, courier name etc. are free text, not system-generated. */
 const esc = (value: unknown): string =>

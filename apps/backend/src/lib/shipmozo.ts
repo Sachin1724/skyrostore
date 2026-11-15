@@ -95,7 +95,7 @@ export function buildPushOrder(order: any, pkg: PackageDetails, warehouseId: str
       quantity: Number(item.quantity ?? item.detail?.quantity ?? 1),
       discount: "",
       hsn: item.metadata?.hsn || "",
-      unit_price: Number(item.unit_price || 0),
+      unit_price: Number(item.unit_price || 0) / 100, // paise -> rupees
       product_category: "Other",
     })),
     // Checkout only takes Razorpay, so every order is prepaid.

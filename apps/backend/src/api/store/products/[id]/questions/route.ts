@@ -57,7 +57,7 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
       question: body.question.trim(),
       answer: null,
       answered_by: null,
-      status: "APPROVED",
+      status: "PENDING", // shown after admin moderation
       created_at: new Date(),
       answered_at: null,
     };

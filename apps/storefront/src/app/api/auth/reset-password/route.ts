@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { visitorHeaders } from "@/lib/visitor-headers";
 import { passwordProblem } from "@/lib/password";
 
 const BASE = process.env.NEXT_PUBLIC_MEDUSA_URL || "http://localhost:9000";
@@ -17,6 +18,7 @@ export async function POST(request: NextRequest) {
     headers: {
       "Content-Type": "application/json",
       "x-publishable-api-key": PK,
+      ...visitorHeaders(request),
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({ password }),
