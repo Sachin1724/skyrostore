@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getAuthToken } from "@/lib/auth";
+import { formatPrice } from "@/lib/utils";
 import { PAGE_SIZE, Pagination, pageOf } from "@/components/ui/pagination";
 import {
   FULFILMENT_STATES,
@@ -146,7 +147,7 @@ export default async function OrdersPage({
                   </td>
                   <td className="py-2.5 pr-4 font-mono text-xs text-gray-600">{order.payment_status}</td>
                   <td className="py-2.5 text-right font-medium">
-                    {order.total} {order.currency_code?.toUpperCase()}
+                    {formatPrice(Number(order.total || 0), order.currency_code?.toUpperCase() || "INR")}
                   </td>
                   <td className="py-2.5 pl-4 text-right">
                     <Link

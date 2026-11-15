@@ -19,7 +19,8 @@ Source: an external review of `apps/admin` (51 screens/components). Status as of
 - [ ] Split the three 600+ line workbenches into panels.
 
 ## Phase 3 - polish
-- [ ] Dashboard: today's revenue, 7-day trend, low-stock list.
+- [x] Dashboard: today's and 7-day sales, daily bar chart, low-stock list (from the 200 most recent orders).
+- [x] Order totals, refund box and e-way bill check in the admin now treat amounts as paise (they showed raw paise before).
 - [ ] Phone: orders as stacked cards.
 - [ ] Empty states with a next-step button.
 - [ ] Labels and tooltips on icon-only buttons.
