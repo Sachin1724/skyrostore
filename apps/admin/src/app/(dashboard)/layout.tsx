@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getAuthToken, getOperatorEmail } from "@/lib/auth";
+import { getAuthToken, getOperatorEmail, getOperatorRole } from "@/lib/auth";
 import { adminCall } from "@/lib/medusa-admin";
 import { getFulfilmentOrders } from "@/lib/data/fulfilment";
 import type { NavCounts } from "@/components/layout/sidebar";
@@ -28,10 +28,10 @@ export default async function DashboardLayout({
   const token = await getAuthToken();
   if (!token) redirect("/login");
 
-  const [counts, operatorEmail] = await Promise.all([getNavCounts(token), getOperatorEmail()]);
+  const [counts, operatorEmail, role] = await Promise.all([getNavCounts(token), getOperatorEmail(), getOperatorRole()]);
 
   return (
-    <AdminShell counts={counts} storefrontUrl={process.env.STOREFRONT_URL || "http://localhost:3000"} operatorEmail={operatorEmail}>
+    <AdminShell counts={counts} storefrontUrl={process.env.STOREFRONT_URL || "http://localhost:3000"} operatorEmail={operatorEmail} role={role}>
       {children}
     </AdminShell>
   );

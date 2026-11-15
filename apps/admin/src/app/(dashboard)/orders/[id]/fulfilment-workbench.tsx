@@ -18,6 +18,7 @@ type Props = {
   history: Array<{ at: string; event: string; detail?: string | null }>;
   shipmozoConfigured: boolean;
   suggestedWeightG: number;
+  canRefund: boolean;
 };
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -77,6 +78,7 @@ export function FulfilmentWorkbench({
   history,
   shipmozoConfigured,
   suggestedWeightG,
+  canRefund,
 }: Props) {
   const router = useRouter();
   const [courier, setCourier] = useState("");
@@ -587,7 +589,7 @@ export function FulfilmentWorkbench({
               <p className="mt-3 text-xs text-gray-500">No payment attempts recorded for this order.</p>
             )}
 
-            {payment ? (
+            {payment && canRefund ? (
               <div className="mt-4 border-t border-gray-100 pt-4">
                 <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">Issue refund</p>
                 <div className="mt-2 flex items-center gap-2">

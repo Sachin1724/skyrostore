@@ -28,4 +28,5 @@ Source: an external review of `apps/admin` (51 screens/components). Status as of
 
 ## Security (before giving anyone else a login)
 - [ ] Put the admin domain behind Cloudflare Access.
-- [ ] Roles: "staff" (fulfil orders) and "owner" (refunds, settings). Today every login can refund.
+- [x] Roles: "staff" (fulfil orders) and "owner" (refunds, settings, promotions, users). Role lives in the Medusa user's metadata; no role counts as owner. Set it with `ADMIN_EMAIL=... ADMIN_ROLE=staff npx medusa exec ./src/scripts/set-admin-role.ts` in `apps/backend`. The backend refuses owner-only calls from staff; the admin screens also hide them.
+- Side effect: staff also cannot save homepage copy or media-index changes, because those write the store record (owner-only).

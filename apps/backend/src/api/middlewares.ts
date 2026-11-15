@@ -1,6 +1,7 @@
 import { defineMiddlewares, authenticate } from "@medusajs/framework/http";
 import { requireOrderOwner } from "./middlewares/require-order-owner";
 import { rateLimit } from "./middlewares/rate-limit";
+import { requireOwner } from "./middlewares/require-owner";
 import { releaseCheckoutHold } from "../lib/inventory-hold";
 
 /**
@@ -43,6 +44,12 @@ export default defineMiddlewares({
     { matcher: "/store/products/:id/questions", method: ["POST"], middlewares: [rateLimit("question-create", 5, 3600)] },
     { matcher: "/store/newsletter", method: ["POST"], middlewares: [rateLimit("newsletter", 10, 3600)] },
     { matcher: "/store/uav/order-snapshot", method: ["POST"], middlewares: [rateLimit("order-snapshot", 30, 300)] },
+    // Owner-only: refunds, store settings, promotions and user management. Staff can fulfil orders.
+    { matcher: "/admin/payments/:id/refund", method: ["POST"], middlewares: [requireOwner] },
+    { matcher: "/admin/stores/*", method: ["POST", "DELETE"], middlewares: [requireOwner] },
+    { matcher: "/admin/promotions*", method: ["POST", "DELETE"], middlewares: [requireOwner] },
+    { matcher: "/admin/users*", method: ["POST", "DELETE"], middlewares: [requireOwner] },
+    { matcher: "/admin/invites*", method: ["POST", "DELETE"], middlewares: [requireOwner] },
     { matcher: "/store/customers", method: ["POST"], middlewares: [rateLimit("customer-create", 10, 3600)] },
     // A stock hold per checkout attempt: a real shopper needs a few, a script locking stock needs many.
     { matcher: "/store/carts/:id/reserve", method: ["POST"], middlewares: [rateLimit("cart-reserve", 8, 900)] },

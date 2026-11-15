@@ -25,7 +25,7 @@ import {
   X,
 } from "lucide-react";
 
-type NavItem = { href: string; label: string; icon: typeof LayoutDashboard; countKey?: keyof NavCounts };
+type NavItem = { href: string; label: string; icon: typeof LayoutDashboard; countKey?: keyof NavCounts; ownerOnly?: boolean };
 export type NavCounts = { ordersAwaiting: number; bulkSubmitted: number; moderationPending: number; returnsPending: number };
 
 const GROUPS: { label: string; items: NavItem[] }[] = [
@@ -54,7 +54,7 @@ const GROUPS: { label: string; items: NavItem[] }[] = [
     label: "Merchandising",
     items: [
       { href: "/content", label: "Homepage", icon: PenLine },
-      { href: "/promotions", label: "Promotions", icon: Percent },
+      { href: "/promotions", label: "Promotions", icon: Percent, ownerOnly: true },
       { href: "/moderation", label: "Reviews & questions", icon: ShieldCheck, countKey: "moderationPending" },
       { href: "/analytics", label: "Analytics", icon: BarChart3 },
       { href: "/customers", label: "Customers", icon: Users },
@@ -65,7 +65,7 @@ const GROUPS: { label: string; items: NavItem[] }[] = [
     label: "System",
     items: [
       { href: "/payments", label: "Payments", icon: CreditCard },
-      { href: "/settings", label: "Settings", icon: Settings },
+      { href: "/settings", label: "Settings", icon: Settings, ownerOnly: true },
     ],
   },
 ];
@@ -79,7 +79,7 @@ function Badge({ count }: { count: number }) {
   );
 }
 
-export function AdminSidebar({ counts, open, onClose }: { counts: NavCounts; open: boolean; onClose: () => void }) {
+export function AdminSidebar({ counts, role, open, onClose }: { counts: NavCounts; role: "owner" | "staff"; open: boolean; onClose: () => void }) {
   const pathname = usePathname();
 
   return (
@@ -100,7 +100,7 @@ export function AdminSidebar({ counts, open, onClose }: { counts: NavCounts; ope
         {GROUPS.map((group) => (
           <div key={group.label} className="mb-3">
             <p className="px-4 pb-1 text-[11px] font-semibold uppercase tracking-wider text-gray-400">{group.label}</p>
-            {group.items.map((item) => {
+            {group.items.filter((item) => role === "owner" || !item.ownerOnly).map((item) => {
               const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
               return (
                 <Link
