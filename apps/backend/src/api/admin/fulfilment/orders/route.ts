@@ -23,6 +23,9 @@ const LIST_FIELDS = [
   "items.id",
   "items.title",
   "items.quantity",
+  // Search only: matched against, then stripped from the response.
+  "fulfillments.metadata",
+  "payment_collections.payments.data",
 ];
 
 /**
@@ -60,8 +63,28 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
     });
     const orders = Array.isArray(result) ? result : (result as any).rows;
 
-    const enriched = (orders as any[]).map((order) => ({
+    // What staff type to find an order: its AWB, the Razorpay payment id, the customer's phone or name.
+    const searchText = (order: any): string =>
+      [
+        order.email,
+        order.display_id,
+        order.id,
+        order.metadata?.bulk_order_reference,
+        order.shipping_address?.phone,
+        order.customer?.first_name,
+        order.customer?.last_name,
+        ...(order.fulfillments ?? []).map((f: any) => f.metadata?.shipmozo_awb),
+        ...(order.payment_collections ?? []).flatMap((pc: any) =>
+          (pc.payments ?? []).flatMap((p: any) => [p.id, p.data?.razorpay_payment_id, p.data?.razorpay_order_id])
+        ),
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+
+    const enriched = (orders as any[]).map(({ fulfillments: _f, payment_collections: _p, ...order }) => ({
       ...order,
+      _search: searchText({ ...order, fulfillments: _f, payment_collections: _p }),
       fulfilment_state: deriveFulfilmentState(order),
       item_count: (order.items || []).reduce((sum: number, i: any) => sum + Number(i.quantity || 0), 0),
       is_bulk_order: Boolean(order.metadata?.bulk_order_request_id),
@@ -71,11 +94,10 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
       if (state && order.fulfilment_state !== state) return false;
       if (paymentStatus && order.payment_status !== paymentStatus) return false;
       if (search) {
-        const haystack = [order.email, order.display_id, order.id, order.metadata?.bulk_order_reference]
-          .filter(Boolean)
-          .join(" ")
-          .toLowerCase();
-        if (!haystack.includes(search)) return false;
+        // Phone numbers are typed with spaces, dashes or +91; compare digits too.
+        const digits = search.replace(/\D/g, "");
+        const phoneHit = digits.length >= 6 && String(order.shipping_address?.phone ?? "").replace(/\D/g, "").includes(digits);
+        if (!order._search.includes(search) && !phoneHit) return false;
       }
       return true;
     });
@@ -86,7 +108,7 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
     }, {});
 
     return res.json({
-      orders: filtered.slice(offset, offset + limit),
+      orders: filtered.slice(offset, offset + limit).map(({ _search, ...order }) => order),
       count: filtered.length,
       limit,
       offset,

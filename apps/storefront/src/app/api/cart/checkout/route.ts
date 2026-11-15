@@ -15,7 +15,16 @@ async function storeApi(path: string, method = "GET", body?: unknown) {
   });
   if (!res.ok) {
     const text = await res.text();
-    throw new Error(text);
+    console.error(`checkout ${method} ${path} -> ${res.status}: ${text.slice(0, 500)}`);
+    // 4xx messages are meant for the shopper (stock, coupon, address); 5xx detail stays in the server log.
+    let message = "Something went wrong. Please try again.";
+    if (res.status < 500) {
+      try {
+        const m = JSON.parse(text)?.message;
+        if (typeof m === "string" && m.length <= 200) message = m;
+      } catch {}
+    }
+    throw new Error(message);
   }
   return res.json();
 }
@@ -199,19 +208,23 @@ export async function POST(request: NextRequest) {
         const pcId = pcData.payment_collection.id;
 
         // List available payment providers for this cart
-        let providerId = requestedProvider || "pp_system_default";
+        // Never trust the client's provider choice: production pays through Razorpay only.
+        let providerId = "pp_razorpay";
         try {
           const { payment_providers } = await storeApi(
             `/store/payment-providers?region_id=${(await storeApi(`/store/carts/${encodeURIComponent(cart_id)}`)).cart.region_id}`
           );
           const available = (payment_providers || []).map((p: any) => p.id);
-          if (available.includes("pp_razorpay") && !requestedProvider) {
-            providerId = "pp_razorpay";
-          } else if (requestedProvider && !available.includes(requestedProvider)) {
-            providerId = available[0] || "pp_system_default";
+          if (!available.includes("pp_razorpay")) {
+            if (process.env.NODE_ENV === "production") {
+              return NextResponse.json({ error: "Payments are temporarily unavailable." }, { status: 503 });
+            }
+            providerId = requestedProvider && available.includes(requestedProvider) ? requestedProvider : available[0] || "pp_system_default";
           }
         } catch {
-          // Fall back to requested or default
+          if (process.env.NODE_ENV === "production") {
+            return NextResponse.json({ error: "Payments are temporarily unavailable." }, { status: 503 });
+          }
         }
 
         // Magic Checkout needs the items; built here from the server-side cart,

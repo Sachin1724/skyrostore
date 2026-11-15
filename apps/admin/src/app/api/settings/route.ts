@@ -3,7 +3,16 @@ import { getStoreMetadata, setStoreMetadata } from "@/lib/medusa-admin";
 
 // Business settings only. Razorpay keys and other secrets stay in the
 // backend's own env vars — never editable or readable from a web form.
-export type SiteSettings = { gstin: string; freeShippingThreshold: number };
+export type SiteSettings = {
+  legalName: string;
+  address: string;
+  gstin: string;
+  phone: string;
+  supportEmail: string;
+  freeShippingThreshold: number;
+};
+
+const text = (v: unknown, max: number) => (typeof v === "string" ? v.trim().slice(0, max) : "");
 
 const fail = (err: unknown) => NextResponse.json({ error: err instanceof Error ? err.message : "Request failed" }, { status: 502 });
 
@@ -11,7 +20,11 @@ function clean(input: unknown): SiteSettings {
   const v = (input ?? {}) as Record<string, unknown>;
   const threshold = Number(v.freeShippingThreshold);
   return {
-    gstin: typeof v.gstin === "string" ? v.gstin.trim().slice(0, 15).toUpperCase() : "",
+    legalName: text(v.legalName, 200),
+    address: text(v.address, 500),
+    gstin: text(v.gstin, 15).toUpperCase(),
+    phone: text(v.phone, 30),
+    supportEmail: text(v.supportEmail, 200),
     freeShippingThreshold: Number.isFinite(threshold) && threshold >= 0 ? Math.round(threshold) : 0,
   };
 }
@@ -24,7 +37,7 @@ export async function GET() {
       .then((j) => j.configured)
       .catch(() => null);
     return NextResponse.json({
-      settings: (metadata.site_settings as SiteSettings | undefined) ?? { gstin: "", freeShippingThreshold: 0 },
+      settings: clean(metadata.site_settings),
       configured,
     });
   } catch (err) {

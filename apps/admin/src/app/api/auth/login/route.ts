@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { visitorHeaders } from "@/lib/visitor-headers";
 
 const BASE_URL = process.env.NEXT_PUBLIC_MEDUSA_URL || "http://localhost:9000";
 
@@ -8,7 +9,7 @@ export async function POST(request: NextRequest) {
 
   const res = await fetch(`${BASE_URL}/auth/user/emailpass`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...visitorHeaders(request) },
     body: JSON.stringify({ email, password }),
   });
 

@@ -13,7 +13,7 @@ export function B2BBanner({
   return (
     <section
       aria-labelledby="b2b-procurement-heading"
-      className="reveal relative overflow-hidden rounded-2xl bg-navy px-6 py-10 text-white md:px-12 md:py-14"
+      className="relative overflow-hidden rounded-2xl bg-navy px-6 py-10 text-white md:px-12 md:py-14"
     >
       <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
         <div className="max-w-[700px]">
@@ -40,7 +40,7 @@ export function B2BBanner({
           </Link>
           <Link
             href="/bulk-orders"
-            className="inline-flex h-12 items-center rounded-full px-5 text-[16px] font-medium text-white hover:bg-white/10"
+            className="inline-flex h-12 items-center rounded-md px-5 text-[16px] font-medium text-white hover:bg-white/10"
           >
             How bulk orders work
           </Link>

@@ -5,6 +5,7 @@ import {
   GoogleAuthProvider,
   RecaptchaVerifier,
   sendSignInLinkToEmail,
+  verifyBeforeUpdateEmail,
   signInWithPhoneNumber,
   signInWithPopup,
   type ConfirmationResult,
@@ -39,6 +40,7 @@ export function FirebaseSignIn({ onSignedIn, onError }: { onSignedIn: () => void
   const [linkSentTo, setLinkSentTo] = useState("");
   // First phone sign-in: we still need an email for order and shipping updates.
   const [profile, setProfile] = useState<{ email: string; first_name: string; last_name: string } | null>(null);
+  const [verifySentTo, setVerifySentTo] = useState("");
   const recaptcha = useRef<RecaptchaVerifier | null>(null);
 
   useEffect(() => () => recaptcha.current?.clear(), []);
@@ -107,20 +109,36 @@ export function FirebaseSignIn({ onSignedIn, onError }: { onSignedIn: () => void
     });
   };
 
-  const saveProfile = (e: React.FormEvent) => {
+  // The email must be proven before it can own an account: Firebase mails a link, and the
+  // account is only created once the refreshed token carries the verified address.
+  const sendVerification = (e: React.FormEvent) => {
     e.preventDefault();
     run(async () => {
       const user = firebaseAuth().currentUser;
       if (!user) throw { code: "auth/code-expired" };
-      await finish(await startSession(await user.getIdToken(), profile!));
+      const address = profile!.email.trim().toLowerCase();
+      await verifyBeforeUpdateEmail(user, address, { url: `${window.location.origin}/account` });
+      setVerifySentTo(address);
     });
   };
 
+  const finishProfile = () =>
+    run(async () => {
+      const user = firebaseAuth().currentUser;
+      if (!user) throw { code: "auth/code-expired" };
+      await user.reload();
+      const result = await startSession(await user.getIdToken(true), profile!);
+      if (!result.ok && "needs_profile" in result) {
+        return onError("We have not seen your email confirmation yet. Open the link we sent, then try again.");
+      }
+      await finish(result);
+    });
+
   if (profile) {
     return (
-      <form onSubmit={saveProfile} className="mt-6 space-y-4">
+      <form onSubmit={sendVerification} className="mt-6 space-y-4">
         <p className="text-[13px] text-text-secondary">
-          Almost done. Add your name and email so we can send order and delivery updates.
+          Almost done. Add your name and email; we will send a link to confirm the email before creating your account.
         </p>
         <div className="grid grid-cols-2 gap-3">
           <input
@@ -154,9 +172,21 @@ export function FirebaseSignIn({ onSignedIn, onError }: { onSignedIn: () => void
           className={inputClass}
           style={inputStyle}
         />
-        <button type="submit" disabled={busy} className={primary} style={{ borderRadius: "var(--radius-sm)" }}>
-          {busy ? "Creating your account…" : "Continue"}
-        </button>
+        {verifySentTo ? (
+          <>
+            <p className="text-[13px] text-text-secondary" role="status">
+              We sent a confirmation link to <span className="font-semibold text-graphite">{verifySentTo}</span>. Open it,
+              then come back here.
+            </p>
+            <button type="button" onClick={finishProfile} disabled={busy} className={primary} style={{ borderRadius: "var(--radius-sm)" }}>
+              {busy ? "Checking…" : "I have confirmed my email"}
+            </button>
+          </>
+        ) : (
+          <button type="submit" disabled={busy} className={primary} style={{ borderRadius: "var(--radius-sm)" }}>
+            {busy ? "Sending link…" : "Send confirmation link"}
+          </button>
+        )}
       </form>
     );
   }

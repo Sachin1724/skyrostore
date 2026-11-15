@@ -57,6 +57,26 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
   }
 
   const rating = Math.min(5, Math.max(1, Math.round(Number(body.rating))));
+  if (!Number.isFinite(rating)) return res.status(400).json({ error: "Rating must be a number from 1 to 5" });
+  if (
+    [body.author_name, body.title, body.content, body.hardware_setup].some((v) => v != null && typeof v !== "string") ||
+    body.author_name.length > 80 ||
+    body.title.length > 150 ||
+    body.content.length > 3000 ||
+    (body.hardware_setup?.length ?? 0) > 500
+  ) {
+    return res.status(400).json({ error: "One of the fields is too long or not text" });
+  }
+
+  // Verified only when this customer has actually ordered the product.
+  let verified = false;
+  if (customerId) {
+    const query = req.scope.resolve(ContainerRegistrationKeys.QUERY) as any;
+    const { data: orders } = await query
+      .graph({ entity: "order", fields: ["id", "items.product_id"], filters: { customer_id: customerId } })
+      .catch(() => ({ data: [] }));
+    verified = (orders as any[]).some((o) => (o.items ?? []).some((i: any) => i.product_id === productId));
+  }
 
   try {
     await ensureReviewsTables(db);
@@ -70,9 +90,9 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
       rating,
       title: body.title.trim(),
       content: body.content.trim(),
-      verified_purchase: Boolean(customerId),
+      verified_purchase: verified,
       hardware_setup: body.hardware_setup ? body.hardware_setup.trim() : null,
-      status: "APPROVED",
+      status: "PENDING", // shown after admin moderation
       created_at: new Date(),
     };
 

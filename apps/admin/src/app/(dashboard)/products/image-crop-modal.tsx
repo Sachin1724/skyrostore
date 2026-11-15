@@ -187,7 +187,7 @@ export function ImageCropModal({
           </div>
 
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">Live preview — storefront card</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">Live preview, storefront card</p>
             <div className="mt-2 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm" style={{ width: PREVIEW_W }}>
               <canvas ref={previewCanvasRef} width={PREVIEW_W} height={PREVIEW_H} className="block w-full" />
               <div className="space-y-1 p-2.5">

@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 
 function formatINR(val: number | string | null | undefined): string {
-  if (val === null || val === undefined || isNaN(Number(val))) return "—";
+  if (val === null || val === undefined || isNaN(Number(val))) return "Not set";
   return new Intl.NumberFormat("en-IN", {
     style: "currency",
     currency: "INR",
@@ -178,7 +178,7 @@ export function RequestDetailClient({ initialRequest }: RequestDetailClientProps
                         {item.quoted_unit_price ? formatINR(item.quoted_unit_price) : "Pending"}
                       </td>
                       <td className="py-2.5 px-4 text-right font-mono font-bold text-graphite">
-                        {item.quoted_total ? formatINR(item.quoted_total) : "—"}
+                        {item.quoted_total ? formatINR(item.quoted_total) : "Pending"}
                       </td>
                     </tr>
                   ))}

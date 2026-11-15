@@ -112,7 +112,7 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
   )`).catch(() => {});
 
   // Idempotency: check if we've processed this event
-  const eventId = (req.body as any)?.event_id || `${event.event}_${Date.now()}`;
+  const eventId = (req.headers["x-razorpay-event-id"] as string | undefined) || (req.body as any)?.event_id || `${event.event}_${Date.now()}`;
   const existing = await db("razorpay_webhook_log")
     .where({ event_id: eventId })
     .first()

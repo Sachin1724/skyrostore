@@ -43,7 +43,7 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
     // Self-cancel is only allowed pre-pack; if a payment was already captured, refund it in full automatically.
     const payment = (order.payment_collections ?? [])
       .flatMap((pc: any) => pc.payments ?? [])
-      .find((p: any) => p.captured_at && !p.canceled_at);
+      .find((p: any) => (p.captured_at || p.data?.razorpay_status === "captured") && !p.canceled_at);
     if (payment) {
       try {
         await refundPaymentWorkflow(req.scope).run({

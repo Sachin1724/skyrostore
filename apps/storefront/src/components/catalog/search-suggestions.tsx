@@ -12,7 +12,7 @@ export function SearchSuggestions({ currentQuery, terms }: { currentQuery?: stri
           <Link
             key={term}
             href={`/search?q=${encodeURIComponent(term)}`}
-            className={`rounded-full px-3 py-1.5 text-[13px] ${on ? "bg-navy text-white" : "bg-white text-navy hover:bg-surface-muted"}`}
+            className={`rounded-md px-3 py-1.5 text-[13px] ${on ? "bg-navy text-white" : "bg-white text-navy hover:bg-surface-muted"}`}
           >
             {term}
           </Link>

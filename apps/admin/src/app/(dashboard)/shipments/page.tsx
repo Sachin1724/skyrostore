@@ -26,8 +26,8 @@ export default async function ShipmentsPage() {
   }
 
   const groups = [
-    { title: "Packed — ready to ship", orders: packed.orders },
-    { title: "Shipped — in transit", orders: shipped.orders },
+    { title: "Packed, ready to ship", orders: packed.orders },
+    { title: "Shipped, in transit", orders: shipped.orders },
   ];
 
   return (
@@ -61,11 +61,11 @@ export default async function ShipmentsPage() {
                         #{order.display_id ?? order.id}
                       </Link>
                     </td>
-                    <td className="py-2.5 pr-4 text-gray-700">{order.email || "—"}</td>
+                    <td className="py-2.5 pr-4 text-gray-700">{order.email || "-"}</td>
                     <td className="py-2.5 pr-4 text-gray-600">
                       {[order.shipping_address?.city, order.shipping_address?.province]
                         .filter(Boolean)
-                        .join(", ") || "—"}
+                        .join(", ") || "-"}
                     </td>
                     <td className="py-2.5 pr-4 text-gray-600">{order.item_count}</td>
                     <td className="py-2.5 text-gray-500">

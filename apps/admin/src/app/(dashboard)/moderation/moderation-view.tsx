@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 type ProductSummary = { title: string; handle: string; thumbnail: string | null };
 
@@ -48,7 +49,12 @@ export function ModerationView() {
   const [questions, setQuestions] = useState<Question[] | null>(null);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setErrorState] = useState<string | null>(null);
+  // Failures also pop a toast so they are seen when the list is scrolled.
+  const setError = (m: string | null) => {
+    setErrorState(m);
+    if (m) toast.error(m);
+  };
 
   function loadReviews() {
     fetch("/api/moderation/reviews?status=PENDING")
@@ -136,7 +142,7 @@ export function ModerationView() {
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="text-sm font-semibold text-gray-900">
-                    {r.title} — {r.rating}★ {r.verified_purchase && <span className="text-xs text-green-700">verified purchase</span>}
+                    {r.title}, {r.rating}★ {r.verified_purchase && <span className="text-xs text-green-700">verified purchase</span>}
                   </p>
                   <p className="mt-1 text-sm text-gray-700">{r.content}</p>
                   <p className="mt-1 flex items-center gap-1.5 text-xs text-gray-400">

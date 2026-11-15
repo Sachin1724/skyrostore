@@ -59,7 +59,7 @@ export default async function ConfirmationPage({
   searchParams: Promise<{ order_id?: string }>;
 }) {
   const { order_id } = await searchParams;
-  const [summary, { gstin }] = await Promise.all([
+  const [summary, { seller }] = await Promise.all([
     order_id ? orderSummary(order_id) : Promise.resolve(null),
     getSiteSettings(),
   ]);
@@ -69,7 +69,7 @@ export default async function ConfirmationPage({
       <Header />
       <main id="main" className="bg-surface-soft">
         <div className="mx-auto max-w-[1120px] px-5 py-16 md:px-10 md:py-24">
-          <OrderSuccess orderId={order_id} summary={summary} gstin={gstin} />
+          <OrderSuccess orderId={order_id} summary={summary} seller={seller} />
         </div>
       </main>
       <Footer />

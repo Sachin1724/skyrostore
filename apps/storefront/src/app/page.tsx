@@ -7,6 +7,7 @@ import { TrustGrid } from "@/components/home/trust-grid";
 import { B2BBanner } from "@/components/home/b2b-banner";
 import { RecommendedForYou } from "@/components/home/recommended-for-you";
 import { ProductRail } from "@/components/home/product-rail";
+import { CategoryPicks } from "@/components/home/category-picks";
 import { HomeFaq } from "@/components/home/home-faq";
 import { NewsletterCard } from "@/components/home/newsletter-card";
 import { RecentlyViewed } from "@/components/product/recently-viewed";
@@ -24,13 +25,18 @@ export default async function HomePage() {
     getSiteContent(),
   ]);
 
-  // A shelf per category, only where there is enough to fill one.
-  const categoryShelves = tree
+  // Products under each top-level category: a card per category with any, a full shelf where there are 6+.
+  const byCategory = tree
     .map((node) => ({ node, items: products.filter((p) => p.categories?.some((c) => c.handle === node.handle || node.children?.some((ch) => ch.handle === c.handle))) }))
-    .filter((s) => s.items.length >= 3);
+    .filter((s) => s.items.length > 0);
+  const categoryShelves = byCategory.filter((s) => s.items.length >= 6);
 
   const categories = tree
-    .map((node) => ({ node, count: countForNode(node, index) }))
+    .map((node) => ({
+      node,
+      count: countForNode(node, index),
+      image: byCategory.find((c) => c.node.id === node.id)?.items.find((p) => p.thumbnail)?.thumbnail ?? null,
+    }))
     .filter((c) => c.count > 0);
 
   const brandRow = brands
@@ -49,6 +55,8 @@ export default async function HomePage() {
 
           {/* Admin order; a best-sellers shelf joins once order analytics can back it. */}
           <ProductRail title="Popular parts" href="/parts" products={products.slice(0, 12)} />
+
+          <CategoryPicks picks={byCategory} />
 
           {/* This browser's own history; both render nothing on a first visit. */}
           <RecentlyViewed />

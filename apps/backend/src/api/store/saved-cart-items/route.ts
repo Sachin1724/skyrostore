@@ -7,6 +7,7 @@ import { getEffectiveCustomerId } from "../../../lib/customer-id";
 // instead of localStorage, so it survives a cleared browser or a new device.
 export async function GET(req: MedusaRequest, res: MedusaResponse) {
   const customerId = getEffectiveCustomerId(req);
+  if (!customerId) return res.status(200).json({ items: [] });
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const db = req.scope.resolve(ContainerRegistrationKeys.PG_CONNECTION) as any;
 
@@ -24,6 +25,7 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
 
 export async function POST(req: MedusaRequest, res: MedusaResponse) {
   const customerId = getEffectiveCustomerId(req);
+  if (!customerId) return res.status(400).json({ error: "Missing visitor id" });
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const db = req.scope.resolve(ContainerRegistrationKeys.PG_CONNECTION) as any;
   const body = req.body as Partial<SavedCartItem>;
@@ -59,6 +61,7 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
 
 export async function DELETE(req: MedusaRequest, res: MedusaResponse) {
   const customerId = getEffectiveCustomerId(req);
+  if (!customerId) return res.status(400).json({ error: "Missing visitor id" });
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const db = req.scope.resolve(ContainerRegistrationKeys.PG_CONNECTION) as any;
   const body = req.body as { variant_id?: string };

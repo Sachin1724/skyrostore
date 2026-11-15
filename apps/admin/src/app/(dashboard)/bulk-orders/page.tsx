@@ -155,7 +155,7 @@ export default async function AdminBulkOrdersPage({
                     {r.items?.length || 1} item(s) &bull; Qty: {r.target_unit_count || 1}
                   </td>
                   <td className="py-3 px-4 font-mono font-bold text-gray-900">
-                    {r.quote_total ? `₹${Number(r.quote_total).toLocaleString("en-IN")}` : "—"}
+                    {r.quote_total ? `₹${Number(r.quote_total).toLocaleString("en-IN")}` : "-"}
                   </td>
                   <td className="py-3 px-4">
                     {getStatusBadge(r.status)}

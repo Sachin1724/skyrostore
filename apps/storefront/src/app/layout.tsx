@@ -12,10 +12,12 @@ const inter = Inter({
 import { QuickViewModal } from "@/components/catalog/quick-view-modal";
 import { CompareDrawer } from "@/components/catalog/compare-drawer";
 import { AnalyticsTracker } from "@/components/analytics/tracker";
+import { AdScripts } from "@/components/analytics/ad-scripts";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
   title: {
-    default: "Skyrostore — Professional UAVs & Components",
+    default: "Skyrostore: drone parts and complete UAVs",
     template: "%s | Skyrostore",
   },
   description:
@@ -42,6 +44,7 @@ export default function RootLayout({
         {children}
         <QuickViewModal />
         <CompareDrawer />
+        <AdScripts />
         <Suspense fallback={null}>
           <AnalyticsTracker />
         </Suspense>

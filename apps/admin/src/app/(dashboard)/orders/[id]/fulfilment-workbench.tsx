@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { Package, Truck, CheckCircle2, AlertTriangle, Printer, Ban, Undo2 } from "lucide-react";
 import { useConfirm } from "@/components/ui/confirm-dialog";
 import { STATE_LABELS } from "@/lib/data/fulfilment";
+import { formatPrice } from "@/lib/utils";
 
 type Props = {
   orderId: string;
@@ -16,6 +18,7 @@ type Props = {
   history: Array<{ at: string; event: string; detail?: string | null }>;
   shipmozoConfigured: boolean;
   suggestedWeightG: number;
+  canRefund: boolean;
 };
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -75,6 +78,7 @@ export function FulfilmentWorkbench({
   history,
   shipmozoConfigured,
   suggestedWeightG,
+  canRefund,
 }: Props) {
   const router = useRouter();
   const [courier, setCourier] = useState("");
@@ -89,7 +93,12 @@ export function FulfilmentWorkbench({
     height_cm: "",
   });
   const [busy, setBusy] = useState<"" | "pack" | "book" | "ship" | "deliver" | "cancel" | "refund">("");
-  const [message, setMessage] = useState<{ kind: "ok" | "error"; text: string } | null>(null);
+  const [message, setMessageState] = useState<{ kind: "ok" | "error"; text: string } | null>(null);
+  // Every result also pops a toast, so it is seen even when the panel is scrolled out of view.
+  const setMessage = (m: { kind: "ok" | "error"; text: string } | null) => {
+    setMessageState(m);
+    if (m) (m.kind === "ok" ? toast.success : toast.error)(m.text);
+  };
   const confirm = useConfirm();
 
   const state: string = order.fulfilment_state;
@@ -101,7 +110,7 @@ export function FulfilmentWorkbench({
 
   // GST Rule 138: an inter-state consignment over ₹50,000 needs an e-Way Bill before transport.
   const interState = (address.province || "").trim().toLowerCase() !== "odisha";
-  const ewayBillRequired = interState && Number(order.total || 0) >= 50000;
+  const ewayBillRequired = interState && Number(order.total || 0) >= 5_000_000; // amounts are in paise (₹50,000)
 
   // LiPo batteries are DGCA Class 9 dangerous goods (UN 3480/3481) — standard air
   // express refuses standalone battery parcels, so the one-click air-courier path
@@ -111,7 +120,7 @@ export function FulfilmentWorkbench({
   // Medusa's cancel-order workflow refuses once any fulfillment exists, i.e. once packed.
   const cancellable = ["awaiting_payment", "payment_failed", "paid_processing"].includes(state);
   const payment = order.payment_collections?.[0]?.payments?.find((p: any) => p.captured_at && !p.canceled_at);
-  const [refundAmount, setRefundAmount] = useState(String(payment?.amount ?? order.total ?? ""));
+  const [refundAmount, setRefundAmount] = useState(String(Number(payment?.amount ?? order.total ?? 0) / 100));
   const [refundNote, setRefundNote] = useState("");
 
   async function cancelOrder() {
@@ -133,12 +142,13 @@ export function FulfilmentWorkbench({
 
   async function issueRefund() {
     if (!payment) return;
-    const amount = Number(refundAmount);
-    if (!Number.isFinite(amount) || amount <= 0) {
+    const rupees = Number(refundAmount);
+    const amount = Math.round(rupees * 100); // the API takes paise
+    if (!Number.isFinite(rupees) || amount <= 0) {
       setMessage({ kind: "error", text: "Enter a refund amount greater than 0." });
       return;
     }
-    if (!(await confirm({ title: `Refund ${amount} ${order.currency_code?.toUpperCase()}?`, description: "Sent to the customer's original payment method via Razorpay.", confirmLabel: "Issue refund" }))) return;
+    if (!(await confirm({ title: `Refund ${formatPrice(amount, order.currency_code?.toUpperCase() || "INR")}?`, description: "Sent to the customer's original payment method via Razorpay.", confirmLabel: "Issue refund" }))) return;
     setBusy("refund");
     setMessage(null);
     try {
@@ -175,7 +185,7 @@ export function FulfilmentWorkbench({
       if (action === "book") {
         setMessage({
           kind: "ok",
-          text: `${data.already_booked ? "Already booked" : "Booked"} with ${data.courier} · AWB ${data.awb}. Customer notified — print the label below.`,
+          text: `${data.already_booked ? "Already booked" : "Booked"} with ${data.courier} · AWB ${data.awb}. Customer notified, print the label below.`,
         });
         router.refresh();
         return;
@@ -184,7 +194,7 @@ export function FulfilmentWorkbench({
       setMessage({
         kind: "ok",
         text: already
-          ? `Already ${action === "pack" ? "packed" : action === "ship" ? "shipped" : "delivered"} — no change made.`
+          ? `Already ${action === "pack" ? "packed" : action === "ship" ? "shipped" : "delivered"}, no change made.`
           : `Order ${action === "pack" ? "marked packed" : action === "ship" ? "marked shipped and customer notified" : "marked delivered"}.`,
       });
       router.refresh();
@@ -270,13 +280,13 @@ export function FulfilmentWorkbench({
                         </ul>
                       ) : null}
                     </td>
-                    <td className="py-2 pr-4 font-mono text-xs text-gray-600">{item.sku || "—"}</td>
+                    <td className="py-2 pr-4 font-mono text-xs text-gray-600">{item.sku || "-"}</td>
                     <td className="py-2 pr-4 text-right">{item.quantity}</td>
                     <td className="py-2 pr-4 text-right text-gray-600">{item.fulfilled_quantity}</td>
                     <td className="py-2">
                       {state === "packed" || state === "shipped" || state === "delivered" ? (
                         <span className="font-mono text-xs text-gray-700">
-                          {fulfilments.find((f) => !f.canceled_at)?.metadata?.serial_numbers?.[item.line_item_id] || "—"}
+                          {fulfilments.find((f) => !f.canceled_at)?.metadata?.serial_numbers?.[item.line_item_id] || "-"}
                         </span>
                       ) : (
                         <input
@@ -305,7 +315,7 @@ export function FulfilmentWorkbench({
               {isInvoiced ? (
                 <span className="inline-flex items-center gap-1 text-xs text-amber-800">
                   <AlertTriangle className="h-3.5 w-3.5" />
-                  Invoiced bulk order — packing is allowed before payment capture.
+                  Invoiced bulk order, packing is allowed before payment capture.
                 </span>
               ) : null}
             </div>
@@ -341,9 +351,9 @@ export function FulfilmentWorkbench({
               </p>
             ) : hasStandaloneBattery ? (
               <p className="rounded border border-amber-300 bg-amber-50 px-3 py-2.5 text-sm text-amber-900">
-                <strong>Contains a standalone LiPo battery</strong> — DGCA Class 9 dangerous goods (UN 3480/3481).
+                <strong>Contains a standalone LiPo battery</strong>, DGCA Class 9 dangerous goods (UN 3480/3481).
                 Standard air express refuses these. Arrange Surface Express transport with the courier directly,
-                then enter the tracking details in &quot;Ship manually&quot; below — one-click air booking is disabled for this order.
+                then enter the tracking details in &quot;Ship manually&quot; below, one-click air booking is disabled for this order.
               </p>
             ) : (
               <>
@@ -390,14 +400,14 @@ export function FulfilmentWorkbench({
                   const chargeableG = Math.max(Number(pkg.weight_g), volumetricG);
                   return volumetricG > Number(pkg.weight_g) ? (
                     <p className="mt-2 text-xs text-amber-700">
-                      Volumetric weight is {volumetricG}g (L×W×H ÷ 5000) — courier bills on the higher figure.
+                      Volumetric weight is {volumetricG}g (L×W×H ÷ 5000), courier bills on the higher figure.
                       Chargeable weight: <strong>{chargeableG}g</strong>.
                     </p>
                   ) : null;
                 })() : null}
                 {ewayBillRequired ? (
                   <label className="mt-3 block text-xs font-medium text-gray-600">
-                    e-Way Bill number — required, order is ₹{Number(order.total).toLocaleString("en-IN")} shipping out of state (GST Rule 138)
+                    e-Way Bill number, required, order is ₹{(Number(order.total) / 100).toLocaleString("en-IN")} shipping out of state (GST Rule 138)
                     <input
                       value={ewayBill}
                       onChange={(e) => setEwayBill(e.target.value)}
@@ -555,7 +565,7 @@ export function FulfilmentWorkbench({
               <div className="flex justify-between">
                 <dt className="text-gray-500">Order total</dt>
                 <dd className="font-medium">
-                  {order.total} {order.currency_code?.toUpperCase()}
+                  {formatPrice(Number(order.total || 0), order.currency_code?.toUpperCase() || "INR")}
                 </dd>
               </div>
             </dl>
@@ -579,7 +589,7 @@ export function FulfilmentWorkbench({
               <p className="mt-3 text-xs text-gray-500">No payment attempts recorded for this order.</p>
             )}
 
-            {payment ? (
+            {payment && canRefund ? (
               <div className="mt-4 border-t border-gray-100 pt-4">
                 <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">Issue refund</p>
                 <div className="mt-2 flex items-center gap-2">
@@ -591,7 +601,7 @@ export function FulfilmentWorkbench({
                     onChange={(e) => setRefundAmount(e.target.value)}
                     className="w-28 rounded border border-gray-300 px-2 py-1 text-sm"
                   />
-                  <span className="text-xs text-gray-500">{order.currency_code?.toUpperCase()}</span>
+                  <span className="text-xs text-gray-500">{order.currency_code?.toUpperCase()} (rupees)</span>
                 </div>
                 <input
                   value={refundNote}

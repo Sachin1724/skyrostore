@@ -1,14 +1,16 @@
 import { getAuthToken } from "@/lib/auth";
 import { getCustomers } from "@/lib/data/admin";
 import { redirect } from "next/navigation";
+import { PAGE_SIZE, Pagination, pageOf } from "@/components/ui/pagination";
 
 export const metadata = { title: "Customers" };
 
-export default async function CustomersPage() {
+export default async function CustomersPage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
   const token = await getAuthToken();
   if (!token) redirect("/login");
 
-  const { customers, count } = await getCustomers(token);
+  const page = pageOf((await searchParams).page);
+  const { customers, count } = await getCustomers(token, { limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE });
 
   return (
     <div>
@@ -36,11 +38,11 @@ export default async function CustomersPage() {
                       href={`/customers/${c.id as string}`}
                       className="text-gray-900 hover:underline"
                     >
-                      {[c.first_name, c.last_name].filter(Boolean).join(" ") || "—"}
+                      {[c.first_name, c.last_name].filter(Boolean).join(" ") || "-"}
                     </a>
                   </td>
                   <td className="py-2.5 pr-4 text-gray-500">
-                    {(c.email as string) || "—"}
+                    {(c.email as string) || "-"}
                   </td>
                   <td className="py-2.5 pr-4 text-gray-500">
                     {new Date(c.created_at as string).toLocaleDateString()}
@@ -59,6 +61,7 @@ export default async function CustomersPage() {
           </table>
         </div>
       )}
+      <Pagination basePath="/customers" query={{}} page={page} pageSize={PAGE_SIZE} total={count} />
     </div>
   );
 }

@@ -16,6 +16,10 @@ COPY --from=build /repo /repo
 # Compiled output; node resolves dependencies from apps/backend/node_modules above it.
 WORKDIR /repo/apps/backend/.medusa/server
 RUN cp /repo/apps/backend/supabase-ca.crt . 2>/dev/null || true
+# Run unprivileged; only the compiled server dir (uploads, static) needs to be writable.
+RUN chown -R node:node /repo/apps/backend/.medusa
+USER node
 EXPOSE 9000
+HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3   CMD node -e "fetch('http://127.0.0.1:9000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
 # Migrations run once per deploy (RUN_MIGRATIONS=1 on a single instance), never on every replica.
 CMD ["sh", "-c", "if [ \"$RUN_MIGRATIONS\" = \"1\" ]; then npx medusa db:migrate; fi && exec npx medusa start --port 9000"]

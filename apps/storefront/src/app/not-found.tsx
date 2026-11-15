@@ -9,7 +9,7 @@ export default function NotFound() {
       <Header />
       <main id="main" className="min-h-[70vh] bg-surface-soft py-16">
         <div className="mx-auto max-w-[800px] px-4 text-center">
-          <div className="inline-flex items-center gap-1.5 rounded-full border border-border bg-white px-3 py-1 text-[13px] font-mono font-bold text-text-muted">
+          <div className="inline-flex items-center gap-1.5 rounded-md border border-border bg-white px-3 py-1 text-[13px] font-mono font-bold text-text-muted">
             HTTP Status: 404
           </div>
 

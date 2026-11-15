@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
 import { Trash2, Pencil, Check, X } from "lucide-react";
 import type { Brand } from "@/lib/catalog";
 import { UploadButton, LibraryButton } from "../products/image-uploader";
@@ -59,7 +60,12 @@ function BrandRow({ brand, reload, setError }: { brand: Brand; reload: () => Pro
 
 export function BrandManager() {
   const [brands, setBrands] = useState<Brand[] | null>(null);
-  const [error, setError] = useState("");
+  const [error, setErrorState] = useState("");
+  // Failures also pop a toast so they are seen when the list is scrolled.
+  const setError = (m: string) => {
+    setErrorState(m);
+    if (m) toast.error(m);
+  };
   const [name, setName] = useState("");
   const [newLogo, setNewLogo] = useState("");
 

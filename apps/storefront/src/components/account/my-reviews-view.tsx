@@ -73,7 +73,7 @@ export function MyReviewsView() {
                   </Link>
                 ) : null}
                 <p className="mt-1 text-[14px] font-bold text-navy">
-                  {r.title} — {r.rating}★
+                  {r.title} · {r.rating} of 5
                 </p>
               </div>
               <p className="flex items-center gap-1.5 text-[12px] font-semibold">

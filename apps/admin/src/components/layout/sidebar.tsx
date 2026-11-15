@@ -21,9 +21,11 @@ import {
   ShieldCheck,
   Undo2,
   Percent,
+  Mail,
+  X,
 } from "lucide-react";
 
-type NavItem = { href: string; label: string; icon: typeof LayoutDashboard; countKey?: keyof NavCounts };
+type NavItem = { href: string; label: string; icon: typeof LayoutDashboard; countKey?: keyof NavCounts; ownerOnly?: boolean };
 export type NavCounts = { ordersAwaiting: number; bulkSubmitted: number; moderationPending: number; returnsPending: number };
 
 const GROUPS: { label: string; items: NavItem[] }[] = [
@@ -33,7 +35,7 @@ const GROUPS: { label: string; items: NavItem[] }[] = [
       { href: "/", label: "Dashboard", icon: LayoutDashboard },
       { href: "/orders", label: "Orders", icon: ShoppingCart, countKey: "ordersAwaiting" },
       { href: "/shipments", label: "Shipments", icon: Truck },
-      { href: "/bulk-orders", label: "Bulk & Quotes", icon: FileText, countKey: "bulkSubmitted" },
+      { href: "/bulk-orders", label: "Quotations", icon: FileText, countKey: "bulkSubmitted" },
       { href: "/returns", label: "Returns", icon: Undo2, countKey: "returnsPending" },
       { href: "/support", label: "Support", icon: MessageSquare },
     ],
@@ -52,17 +54,18 @@ const GROUPS: { label: string; items: NavItem[] }[] = [
     label: "Merchandising",
     items: [
       { href: "/content", label: "Homepage", icon: PenLine },
-      { href: "/promotions", label: "Promotions", icon: Percent },
-      { href: "/moderation", label: "Moderation", icon: ShieldCheck, countKey: "moderationPending" },
+      { href: "/promotions", label: "Promotions", icon: Percent, ownerOnly: true },
+      { href: "/moderation", label: "Reviews & questions", icon: ShieldCheck, countKey: "moderationPending" },
       { href: "/analytics", label: "Analytics", icon: BarChart3 },
       { href: "/customers", label: "Customers", icon: Users },
+      { href: "/subscribers", label: "Subscribers", icon: Mail },
     ],
   },
   {
     label: "System",
     items: [
       { href: "/payments", label: "Payments", icon: CreditCard },
-      { href: "/settings", label: "Settings", icon: Settings },
+      { href: "/settings", label: "Settings", icon: Settings, ownerOnly: true },
     ],
   },
 ];
@@ -76,19 +79,28 @@ function Badge({ count }: { count: number }) {
   );
 }
 
-export function AdminSidebar({ counts }: { counts: NavCounts }) {
+export function AdminSidebar({ counts, role, open, onClose }: { counts: NavCounts; role: "owner" | "staff"; open: boolean; onClose: () => void }) {
   const pathname = usePathname();
 
   return (
-    <aside className="flex w-56 shrink-0 flex-col border-r border-gray-200 bg-white">
-      <div className="flex h-14 items-center border-b border-gray-200 px-4">
+    <>
+      {open ? <div className="fixed inset-0 z-30 bg-black/40 md:hidden" onClick={onClose} aria-hidden /> : null}
+    <aside
+      className={`fixed inset-y-0 left-0 z-40 flex w-56 shrink-0 flex-col border-r border-gray-200 bg-white transition-transform md:static md:translate-x-0 ${
+        open ? "translate-x-0" : "-translate-x-full"
+      }`}
+    >
+      <div className="flex h-14 items-center justify-between border-b border-gray-200 px-4">
         <span className="text-sm font-semibold tracking-tight text-nearblack">SKYROSTORE</span>
+        <button type="button" onClick={onClose} aria-label="Close menu" className="rounded p-1 text-gray-500 hover:bg-gray-100 md:hidden">
+          <X className="h-4 w-4" aria-hidden />
+        </button>
       </div>
       <nav className="flex-1 overflow-y-auto py-3">
         {GROUPS.map((group) => (
           <div key={group.label} className="mb-3">
             <p className="px-4 pb-1 text-[11px] font-semibold uppercase tracking-wider text-gray-400">{group.label}</p>
-            {group.items.map((item) => {
+            {group.items.filter((item) => role === "owner" || !item.ownerOnly).map((item) => {
               const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
               return (
                 <Link
@@ -109,5 +121,6 @@ export function AdminSidebar({ counts }: { counts: NavCounts }) {
         ))}
       </nav>
     </aside>
+    </>
   );
 }

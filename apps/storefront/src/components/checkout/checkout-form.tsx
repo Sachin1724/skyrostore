@@ -162,7 +162,7 @@ export function CheckoutForm() {
         checkout_step: "payment",
         metadata: { reason: /cancel/i.test(msg) ? "customer_cancelled" : "client_error" },
       });
-      setError(/cancel/i.test(msg) ? "Payment window closed. Your cart is saved — pay whenever you are ready." : msg);
+      setError(/cancel/i.test(msg) ? "Payment window closed. Your cart is saved. Pay whenever you are ready." : msg);
     } finally {
       setSubmitting(false);
     }

@@ -30,6 +30,15 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
       return res.json({ snapshot_ids: existing.map((s: any) => s.id), already_exists: true });
     }
 
+    // The order must exist, and the snapshot may only cover variants that were actually bought in it.
+    const { data: orderRows } = await query.graph({ entity: "order", fields: ["id", "items.variant_id"], filters: { id: order_id } });
+    const order = (orderRows as any[])?.[0];
+    if (!order) return res.status(404).json({ error: "Order not found" });
+    const orderVariants = new Set((order.items ?? []).map((i: any) => i.variant_id));
+    if (items.some((i) => !orderVariants.has(i.variant_id))) {
+      return res.status(400).json({ error: "Items do not match this order" });
+    }
+
     // Fetch variant + product metadata for all items
     const variantIds = items.map((i) => i.variant_id);
     const { data: variants } = await query.graph({

@@ -15,7 +15,7 @@ import {
 
 // GST Rule 138 (CGST Rules): an inter-state consignment over ₹50,000 needs an
 // e-Way Bill before transport, or the courier risks seizure + a 100% penalty.
-const EWAY_BILL_THRESHOLD = 50000;
+const EWAY_BILL_THRESHOLD = 5_000_000; // paise (₹50,000)
 
 const FIELDS = [
   "id",
@@ -84,10 +84,13 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
 
     // DGCA Class 9 dangerous goods (UN 3480/3481): standalone LiPo batteries can't
     // go through standard air express. Arrange surface transport and ship manually.
-    const hasStandaloneBattery = (order.items || []).some((i: any) => i.product?.metadata?.component_type === "BATTERY");
+    // The admin can also flag any product "surface only" (metadata.surface_only), e.g. a pack sold under another type.
+    const hasStandaloneBattery = (order.items || []).some(
+      (i: any) => i.product?.metadata?.component_type === "BATTERY" || i.product?.metadata?.surface_only === true
+    );
     if (hasStandaloneBattery) {
       return res.status(400).json({
-        error: "This order contains a standalone LiPo battery (DGCA Class 9 dangerous goods). Air courier booking is disabled — arrange surface transport and enter tracking details manually.",
+        error: "This order contains a surface-only item such as a LiPo battery (DGCA Class 9 dangerous goods). Air courier booking is disabled. Arrange surface transport and enter tracking details manually.",
         dangerous_goods: true,
       });
     }
@@ -104,7 +107,7 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
       const interState = (order.shipping_address?.province || "").trim().toLowerCase() !== "odisha";
       if (Number(order.total || 0) >= EWAY_BILL_THRESHOLD && interState && !ewayBillNumber) {
         return res.status(400).json({
-          error: `This order is ₹${Number(order.total).toLocaleString("en-IN")} and ships out of state — an e-Way Bill number is required before booking (GST Rule 138).`,
+          error: `This order is ₹${(Number(order.total) / 100).toLocaleString("en-IN")} and ships out of state, so an e-Way Bill number is required before booking (GST Rule 138).`,
           requires_eway_bill: true,
         });
       }

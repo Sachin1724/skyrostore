@@ -62,16 +62,16 @@ export default async function EventsPage({
                   </td>
                   <td className="py-2 pr-3 font-medium text-gray-900">{event.event_type}</td>
                   <td className="py-2 pr-3 font-mono text-xs text-gray-500">{event.session_id}</td>
-                  <td className="py-2 pr-3 font-mono text-xs text-gray-500">{event.visitor_id || "—"}</td>
+                  <td className="py-2 pr-3 font-mono text-xs text-gray-500">{event.visitor_id || "-"}</td>
                   <td className="py-2 pr-3 font-mono text-xs text-gray-600">
-                    {event.checkout_step || event.page_path || "—"}
+                    {event.checkout_step || event.page_path || "-"}
                   </td>
-                  <td className="py-2 pr-3 font-mono text-xs text-gray-600">{event.cart_id || "—"}</td>
+                  <td className="py-2 pr-3 font-mono text-xs text-gray-600">{event.cart_id || "-"}</td>
                   <td className="py-2 pr-3 font-mono text-xs text-gray-600">
-                    {event.product_id || event.search_query || "—"}
+                    {event.product_id || event.search_query || "-"}
                   </td>
                   <td className="py-2 font-mono text-xs text-gray-600">
-                    {[event.utm_source, event.utm_medium, event.utm_campaign].filter(Boolean).join(" / ") || "—"}
+                    {[event.utm_source, event.utm_medium, event.utm_campaign].filter(Boolean).join(" / ") || "-"}
                   </td>
                 </tr>
               ))}

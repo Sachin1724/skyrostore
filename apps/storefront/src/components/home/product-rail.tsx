@@ -38,7 +38,7 @@ export function ProductRail({ title, href, products }: { title: string; href: st
   const fade = FADE[!edge.start && !edge.end ? "both" : !edge.end ? "right" : !edge.start ? "left" : "none"];
 
   return (
-    <section aria-label={title} className="reveal">
+    <section aria-label={title}>
       <div className="flex items-center justify-between gap-4">
         <h2 className="text-[clamp(1.4rem,1.1rem+1vw,1.75rem)] font-semibold text-navy">{title}</h2>
         <div className="flex items-center gap-3">

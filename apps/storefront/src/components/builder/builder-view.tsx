@@ -349,7 +349,7 @@ export function BuilderView({
         setSaveMessage({ ok: false, text: data.error || "Could not save this build." });
         return;
       }
-      setSaveMessage({ ok: true, text: "Saved — view it under Account > Saved builds." });
+      setSaveMessage({ ok: true, text: "Saved. Find it under Account, Saved builds." });
     } catch {
       setSaveMessage({ ok: false, text: "Could not save this build." });
     } finally {
@@ -383,7 +383,7 @@ export function BuilderView({
               type="button"
               aria-current={current ? "step" : undefined}
               onClick={() => goToStep(idx)}
-              className={`flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 font-medium ${
+              className={`flex shrink-0 items-center gap-1.5 rounded-md px-3.5 py-1.5 font-medium ${
                 current ? "bg-navy text-white" : "bg-white text-text-secondary hover:text-navy"
               }`}
             >
@@ -461,7 +461,7 @@ export function BuilderView({
                       key={tab.id}
                       type="button"
                       onClick={() => setFrameFilter(tab.id)}
-                      className={`rounded-full px-3.5 py-1.5 font-medium ${frameFilter === tab.id ? "bg-navy text-white" : "bg-surface-soft text-text-secondary hover:text-navy"}`}
+                      className={`rounded-md px-3.5 py-1.5 font-medium ${frameFilter === tab.id ? "bg-navy text-white" : "bg-surface-soft text-text-secondary hover:text-navy"}`}
                     >
                       {tab.label}
                     </button>
@@ -515,7 +515,7 @@ export function BuilderView({
               <button
                 type="button"
                 onClick={() => goToStep(activeStepIdx + 1)}
-                className="flex items-center gap-1 rounded-full bg-navy px-5 py-2 text-[14px] font-medium text-white hover:bg-brand"
+                className="flex items-center gap-1 rounded-md bg-navy px-5 py-2 text-[14px] font-medium text-white hover:bg-brand"
               >
                 {!hasPart && !currentStep.required ? "Skip" : "Next"} <ChevronRight className="h-4 w-4" aria-hidden />
               </button>
@@ -581,7 +581,7 @@ export function BuilderView({
             type="button"
             disabled={bomLines.length === 0 || cartAdding || (isReview && hasBlockingErrors)}
             onClick={() => (isReview ? handleBatchAddToCart() : goToStep(BUILDER_STEPS.length - 1))}
-            className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-navy py-3 text-[14px] font-medium text-white hover:bg-brand disabled:opacity-40"
+            className="mt-4 flex w-full items-center justify-center gap-2 rounded-md bg-navy py-3 text-[14px] font-medium text-white hover:bg-brand disabled:opacity-40"
           >
             {isReview ? (
               <>
@@ -599,7 +599,7 @@ export function BuilderView({
                 type="button"
                 disabled={savingConfig}
                 onClick={handleSaveConfiguration}
-                className="mt-2 flex w-full items-center justify-center gap-2 rounded-full border border-border py-3 text-[14px] font-medium text-navy hover:border-brand disabled:opacity-40"
+                className="mt-2 flex w-full items-center justify-center gap-2 rounded-md border border-border py-3 text-[14px] font-medium text-navy hover:border-brand disabled:opacity-40"
               >
                 <Save className="h-4 w-4" aria-hidden />
                 {savingConfig ? "Saving…" : "Save configuration"}

@@ -11,13 +11,13 @@ export default async function OrderDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const { gstin } = await getSiteSettings();
+  const { seller } = await getSiteSettings();
 
   return (
     <>
       <Header />
       <main id="main" className="mx-auto max-w-[960px] px-8 py-8 md:px-10">
-        <OrderDetail orderId={id} gstin={gstin} />
+        <OrderDetail orderId={id} seller={seller} />
       </main>
       <Footer />
     </>

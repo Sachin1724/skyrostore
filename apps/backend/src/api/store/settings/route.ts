@@ -9,7 +9,9 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
   const query = req.scope.resolve(ContainerRegistrationKeys.QUERY);
   const { data } = await query.graph({ entity: "store", fields: ["metadata"] });
   const metadata = (data[0]?.metadata as Record<string, unknown> | null) ?? {};
-  const settings = metadata.site_settings as { gstin?: string; freeShippingThreshold?: number } | undefined;
+  const settings = metadata.site_settings as
+    | { gstin?: string; legalName?: string; address?: string; phone?: string; supportEmail?: string; freeShippingThreshold?: number }
+    | undefined;
 
   // Codes the admin chose to show shoppers ("Show on product pages"), only while active.
   const publicIds = Array.isArray(metadata.public_offers) ? (metadata.public_offers as string[]) : [];
@@ -39,6 +41,10 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
 
   res.json({
     gstin: settings?.gstin || null,
+    legalName: settings?.legalName || null,
+    address: settings?.address || null,
+    phone: settings?.phone || null,
+    supportEmail: settings?.supportEmail || null,
     freeShippingThreshold: typeof settings?.freeShippingThreshold === "number" ? settings.freeShippingThreshold : null,
     deliveryCharge: flat.length ? Math.min(...flat) : null,
     offers,

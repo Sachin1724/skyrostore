@@ -1,9 +1,13 @@
 import Link from "next/link";
+import { getSiteSettings } from "@/lib/data/site-settings";
 import { BackLink } from "@/components/layout/back-link";
 import { notFound } from "next/navigation";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { ShieldCheck, Truck, RotateCcw, FileText, Lock, ChevronRight } from "lucide-react";
+
+// Replaced at render time with the registered business details from admin Settings.
+const SELLER_PLACEHOLDER = "{{seller}}";
 
 type Policy = {
   title: string;
@@ -78,11 +82,11 @@ const POLICIES: Record<string, Policy> = {
     sections: [
       [
         "Pricing & Statutory Taxation",
-        "All catalogue prices are listed in Indian Rupees (INR) and are inclusive of 18% Goods and Services Tax (GST) under HSN Code 88069000. An official B2B Tax Invoice with input tax credit (ITC) breakdown and company GSTIN is issued automatically with every completed transaction.",
+        "All prices are in Indian Rupees (INR) and include Goods and Services Tax (GST) at the rate that applies to each product. A GST tax invoice is issued with every completed order, showing the tax on each line; add your GSTIN at checkout to claim input tax credit.",
       ],
       [
         "Payment Processing & Security",
-        "Payments are processed securely through Razorpay using PCI-DSS Level 1 compliant tokenization. We accept UPI (Google Pay, PhonePe, Paytm, BHIM), all major RuPay, Visa, and Mastercard credit/debit cards, and corporate net banking. Orders are confirmed only upon successful authorization.",
+        "Payments are processed by Razorpay. You can pay by UPI, debit or credit card, or net banking. Card and UPI details are entered with Razorpay and never on this site. An order is confirmed only after the payment succeeds.",
       ],
       [
         "Compatibility Engine & Spec Disclaimers",
@@ -93,8 +97,8 @@ const POLICIES: Record<string, Policy> = {
         "Operation of unmanned aircraft systems (UAS) in Indian airspace is strictly governed by the Ministry of Civil Aviation (MoCA) Drone Rules, 2021 and Directorate General of Civil Aviation (DGCA) guidelines. The purchaser assumes full statutory responsibility for UIN registration on the DigitalSky platform, remote pilot licensing, and adherence to designated Green, Yellow, and Red flight zones.",
       ],
       [
-        "Statutory Corporate Entity",
-        "Skyro Aerial Technologies Pvt. Ltd., Technology Corridor, Chandaka Industrial Estate, Patia, Bhubaneswar, Odisha 751024, India. GSTIN: 21AAECS9821R1ZM. Contact: support@skyrostore.com.",
+        "Who you are buying from",
+        SELLER_PLACEHOLDER,
       ],
     ],
   },
@@ -110,19 +114,19 @@ const POLICIES: Record<string, Policy> = {
       ],
       [
         "Third-Party Service Providers",
-        "Customer delivery details are shared exclusively with certified logistical partners (Delhivery, BlueDart, DTDC) for delivery routing, and Razorpay for payment reconciliation. We do not sell, rent, or trade customer data to third-party advertising brokers.",
+        "We share only what each service needs to do its job: your delivery details with our shipping partner Shipmozo and the courier it books (such as Delhivery), payment details with Razorpay, sign-in details with Google Firebase, and your email address with our email provider for order messages. We do not sell, rent or trade customer data.",
       ],
       [
         "Authentication & Security",
-        "User sessions are authenticated via Firebase Auth using encrypted tokens. Passwords and biometrics are never stored in plain text. All web traffic is strictly encrypted over TLS 1.3 with automated HSTS security headers.",
+        "Sign-in uses Google Firebase or an email and password; passwords are stored only as secure hashes, never in plain text. Pages and payments are served over encrypted HTTPS connections.",
       ],
       [
         "Customer Rights & Data Rectification",
-        "Customers may inspect, update, or request erasure of personal data by contacting privacy@skyrostore.com. Statutory transactional records and GST tax invoices are retained in accordance with Indian tax retention regulations for the mandatory statutory period.",
+        "You can see and update your details under Your account, and ask us to delete your personal data by writing to SUPPORT_EMAIL. Order records and GST invoices are kept for the period Indian tax law requires.",
       ],
       [
         "Cookie Usage",
-        "We utilize essential session cookies for authentication, shopping cart persistence, and anonymous performance analytics. No invasive third-party cross-site advertising tracking cookies are utilized.",
+        "We use cookies and browser storage only to keep you signed in, remember your cart and delivery PIN code, and count page visits for our own statistics. We do not use advertising or cross-site tracking cookies.",
       ],
     ],
   },
@@ -149,8 +153,17 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function PolicyPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const policy = POLICIES[slug];
-  if (!policy) notFound();
+  const base = POLICIES[slug];
+  if (!base) notFound();
+  const { seller } = await getSiteSettings();
+  const sellerText =
+    [seller.legalName, seller.address, seller.gstin ? `GSTIN: ${seller.gstin}` : "", seller.email ? `Contact: ${seller.email}` : ""]
+      .filter(Boolean)
+      .join(". ") || "Skyrostore. Contact details are on the support page.";
+  const policy = {
+    ...base,
+    sections: base.sections.map(([h, body]) => [h, body === SELLER_PLACEHOLDER ? sellerText : body.replace("SUPPORT_EMAIL", seller.email || "our support email")] as [string, string]),
+  };
 
   return (
     <>

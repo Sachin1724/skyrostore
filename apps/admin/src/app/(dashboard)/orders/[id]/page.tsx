@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { getAuthToken } from "@/lib/auth";
+import { getAuthToken, getOperatorRole } from "@/lib/auth";
 import { getFulfilmentOrder } from "@/lib/data/fulfilment";
 import { FulfilmentWorkbench } from "./fulfilment-workbench";
 
@@ -48,6 +48,7 @@ export default async function OrderDetailPage({
         history={data.history}
         shipmozoConfigured={data.shipmozo_configured}
         suggestedWeightG={data.suggested_weight_g}
+        canRefund={(await getOperatorRole()) === "owner"}
       />
     </div>
   );

@@ -55,10 +55,12 @@
   --font-weight-bold: 600;
   --font-weight-extrabold: 600;
 
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
-  --radius-xl: 20px;
+  /* Tight corners: square-ish controls and cards read as a parts catalogue, not a template. */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 10px;
+  --radius-2xl: 12px;
   --shadow-card: 0 1px 2px rgba(0,0,0,.04), 0 8px 24px rgba(0,0,0,.06);
 
   /* Motion. Overrides Tailwind's weak built-in ease-out / ease-in-out. */
@@ -247,7 +249,7 @@ details[open]::details-content { block-size: auto; }
 
   .btn {
     display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
-    height: 2.75rem; padding-inline: 1.5rem; border-radius: 9999px; white-space: nowrap;
+    height: 2.75rem; padding-inline: 1.5rem; border-radius: var(--radius-md); white-space: nowrap;
     font-size: 14px; font-weight: 500; line-height: 1;
     transition: background-color 150ms var(--ease-out), color 150ms var(--ease-out), box-shadow 150ms var(--ease-out), scale 150ms var(--ease-out);
   }
@@ -312,13 +314,8 @@ a, button, [role="button"], summary, label { touch-action: manipulation; }
 
   /* First screen of a page rises into place. */
   @keyframes rise { from { opacity: 0; transform: translateY(14px); } }
-  .hero-in { animation: rise 600ms var(--ease-out) both; }
+  .hero-in { animation: rise 300ms var(--ease-out) both; }
 
-  /* Sections fade up as they scroll into view. */
-  @supports (animation-timeline: view()) {
-    @keyframes reveal { from { opacity: 0; transform: translateY(24px); } }
-    .reveal { animation: reveal linear both; animation-timeline: view(); animation-range: entry 0% entry 28%; }
-  }
 }
 
 /* GST invoice "Print / Save as PDF": print only the invoice, not the app shell.

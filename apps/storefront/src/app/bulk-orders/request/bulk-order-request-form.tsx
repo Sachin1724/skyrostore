@@ -259,7 +259,7 @@ export function BulkOrderRequestForm() {
           : [
               {
                 title: intendedApplication
-                  ? `Custom UAV Build — ${intendedApplication}`
+                  ? `Custom UAV build: ${intendedApplication}`
                   : "Custom Enterprise UAV Build Specification",
                 requested_quantity: Math.max(1, Number(targetUnitCount) || 1),
                 notes: operatingEnvironment || "Bespoke platform engineering",

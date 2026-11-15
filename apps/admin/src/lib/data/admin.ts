@@ -90,15 +90,15 @@ export async function updateProduct(
   });
 }
 
-export async function getCustomers(token: string, params?: { limit?: number }) {
+export async function getCustomers(token: string, params?: { limit?: number; offset?: number }) {
   return adminFetch(
-    `/admin/customers?limit=${params?.limit ?? 20}`,
+    `/admin/customers?limit=${params?.limit ?? 20}&offset=${params?.offset ?? 0}`,
     { headers: authHeaders(token) }
   );
 }
 
-export async function getInventoryItems(token: string, params?: { limit?: number; q?: string }) {
-  const qs = new URLSearchParams({ limit: String(params?.limit ?? 50), fields: "id,sku,title,*location_levels" });
+export async function getInventoryItems(token: string, params?: { limit?: number; offset?: number; q?: string }) {
+  const qs = new URLSearchParams({ limit: String(params?.limit ?? 50), offset: String(params?.offset ?? 0), fields: "id,sku,title,*location_levels" });
   if (params?.q) qs.set("q", params.q);
   return adminFetch(`/admin/inventory-items?${qs}`, { headers: authHeaders(token) });
 }

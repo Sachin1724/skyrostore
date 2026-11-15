@@ -113,7 +113,7 @@ export default async function PaymentsPage({
                   </td>
                   <td className="py-2.5 pr-4 font-mono text-xs">{attempt.provider_id}</td>
                   <td className="py-2.5 pr-4 font-mono text-xs text-gray-600">
-                    {attempt.provider_reference || "—"}
+                    {attempt.provider_reference || "-"}
                   </td>
                   <td className="py-2.5 pr-4 font-mono text-xs">
                     {attempt.order_id ? (
@@ -121,17 +121,17 @@ export default async function PaymentsPage({
                         {attempt.order_id}
                       </Link>
                     ) : (
-                      attempt.cart_id || "—"
+                      attempt.cart_id || "-"
                     )}
                   </td>
                   <td className="py-2.5 pr-4">
-                    {attempt.amount ?? "—"} {attempt.currency_code?.toUpperCase() || ""}
+                    {attempt.amount ?? "-"} {attempt.currency_code?.toUpperCase() || ""}
                   </td>
                   <td className="py-2.5 pr-4 text-gray-600">
                     #{attempt.attempt_no}
                     {attempt.is_retry ? " (retry)" : ""}
                   </td>
-                  <td className="py-2.5 text-gray-700">{attempt.error_category || "—"}</td>
+                  <td className="py-2.5 text-gray-700">{attempt.error_category || "-"}</td>
                 </tr>
               ))}
             </tbody>

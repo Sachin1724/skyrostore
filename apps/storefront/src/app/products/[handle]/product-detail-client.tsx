@@ -190,7 +190,7 @@ export function ProductDetailClient({
           {highlights.length ? (
             <ul className="mt-3 flex flex-wrap gap-1.5">
               {highlights.map((h) => (
-                <li key={h} className="rounded-full bg-surface-muted px-3 py-1 text-[13px] font-medium tabular-nums text-navy">
+                <li key={h} className="rounded-md bg-surface-muted px-3 py-1 text-[13px] font-medium tabular-nums text-navy">
                   {h}
                 </li>
               ))}
@@ -216,6 +216,11 @@ export function ProductDetailClient({
               {sku ? <span className="ml-3 font-normal text-text-secondary">SKU: {sku}</span> : null}
             </p>
 
+            {metadata.surface_only === true || metadata.component_type === "BATTERY" ? (
+              <p className="mt-2 text-[13px] text-text-secondary">
+                Ships by surface courier only (lithium batteries cannot go by air), so delivery takes a little longer.
+              </p>
+            ) : null}
             {!inStock ? <ProductAlternatives productId={product.id} /> : null}
 
             {/* Fulfillment and Warranty Signals */}

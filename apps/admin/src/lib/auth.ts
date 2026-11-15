@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { adminCall } from "@/lib/medusa-admin";
 
 export async function getAuthToken(): Promise<string | null> {
   const cookieStore = await cookies();
@@ -16,4 +17,13 @@ export async function getOperatorEmail(): Promise<string | null> {
   } catch {
     return null;
   }
+}
+
+/**
+ * "owner" can refund and change settings; "staff" can fulfil orders. This only decides what the
+ * screens show: the backend refuses owner-only calls from staff on its own.
+ */
+export async function getOperatorRole(): Promise<"owner" | "staff"> {
+  const res = await adminCall("GET", "/admin/users/me?fields=id,metadata").catch(() => null);
+  return res?.data?.user?.metadata?.role === "staff" ? "staff" : "owner";
 }

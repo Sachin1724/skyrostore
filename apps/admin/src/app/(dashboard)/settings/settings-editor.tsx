@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import type { SiteSettings } from "@/app/api/settings/route";
 
 const input = "mt-1 w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-gray-900 focus:outline-none";
-const EMPTY: SiteSettings = { gstin: "", freeShippingThreshold: 0 };
+const EMPTY: SiteSettings = { legalName: "", address: "", gstin: "", phone: "", supportEmail: "", freeShippingThreshold: 0 };
 
 function StatusDot({ ok }: { ok: boolean | null }) {
   if (ok === null) return <span className="text-gray-400">unknown</span>;
@@ -59,19 +59,76 @@ export function SettingsEditor() {
   return (
     <div className="mt-6 max-w-lg space-y-6">
       <section className="space-y-4 rounded border border-gray-200 p-4">
-        <h2 className="text-sm font-semibold text-gray-900">Billing &amp; shipping</h2>
+        <div>
+          <h2 className="text-sm font-semibold text-gray-900">Business details</h2>
+          <p className="mt-1 text-xs text-gray-500">
+            Printed on every GST tax invoice and shown in the storefront footer. Leave a field empty to hide it.
+          </p>
+        </div>
         <label className="block text-sm font-medium text-gray-700">
-          Company GSTIN
+          Registered business name
           <input
-            maxLength={15}
-            value={settings.gstin}
-            onChange={(e) => setSettings({ ...settings, gstin: e.target.value })}
-            placeholder="21AAECS9821R1ZM"
+            maxLength={200}
+            value={settings.legalName}
+            onChange={(e) => setSettings({ ...settings, legalName: e.target.value })}
+            placeholder="As on your GST registration"
             className={input}
           />
         </label>
         <label className="block text-sm font-medium text-gray-700">
-          Free shipping threshold (₹, whole rupees)
+          Registered address
+          <textarea
+            rows={3}
+            maxLength={500}
+            value={settings.address}
+            onChange={(e) => setSettings({ ...settings, address: e.target.value })}
+            placeholder="Street, city, state and PIN code"
+            className={input}
+          />
+        </label>
+        <label className="block text-sm font-medium text-gray-700">
+          GSTIN
+          <input
+            maxLength={15}
+            value={settings.gstin}
+            onChange={(e) => setSettings({ ...settings, gstin: e.target.value.toUpperCase() })}
+            placeholder="15 characters"
+            className={input}
+          />
+        </label>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <label className="block text-sm font-medium text-gray-700">
+            Support email
+            <input
+              type="email"
+              maxLength={200}
+              value={settings.supportEmail}
+              onChange={(e) => setSettings({ ...settings, supportEmail: e.target.value })}
+              placeholder="support@skyrostore.com"
+              className={input}
+            />
+          </label>
+          <label className="block text-sm font-medium text-gray-700">
+            Support phone
+            <input
+              type="tel"
+              maxLength={30}
+              value={settings.phone}
+              onChange={(e) => setSettings({ ...settings, phone: e.target.value })}
+              placeholder="Leave empty to hide"
+              className={input}
+            />
+          </label>
+        </div>
+      </section>
+
+      <section className="space-y-4 rounded border border-gray-200 p-4">
+        <h2 className="text-sm font-semibold text-gray-900">Delivery</h2>
+        <label className="block text-sm font-medium text-gray-700">
+          Free delivery from (₹, whole rupees)
+          <span className="mt-0.5 block text-xs font-normal text-gray-500">
+            Shown in the cart as &quot;add ₹x more for free delivery&quot;. Hidden while delivery itself costs ₹0.
+          </span>
           <input
             type="number"
             min={0}
@@ -93,7 +150,7 @@ export function SettingsEditor() {
       <section className="space-y-2 rounded border border-gray-200 p-4">
         <h2 className="text-sm font-semibold text-gray-900">Integrations</h2>
         <p className="text-xs text-gray-500">
-          Keys live in the backend&apos;s environment, never in this form — this only shows whether each is set.
+          Keys live in the backend&apos;s environment, never in this form. This only shows whether each is set.
         </p>
         <dl className="space-y-1 text-sm">
           <div className="flex justify-between"><dt>Razorpay</dt><dd><StatusDot ok={configured?.razorpay ?? null} /></dd></div>

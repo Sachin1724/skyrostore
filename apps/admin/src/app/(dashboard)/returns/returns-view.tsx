@@ -73,7 +73,7 @@ export function ReturnsView() {
                 <Link href={`/orders/${r.order_id}`} className="underline hover:text-gray-700">
                   #{r.display_id ?? r.order_id}
                 </Link>{" "}
-                — {r.resolution === "REFUND" ? "Refund requested" : "Replacement requested"}
+               , {r.resolution === "REFUND" ? "Refund requested" : "Replacement requested"}
               </p>
               <p className="mt-1 text-xs text-gray-500">{r.reason.replace(/_/g, " ")} · {new Date(r.created_at).toLocaleString()}</p>
               <p className="mt-2 text-sm text-gray-700">{r.description}</p>

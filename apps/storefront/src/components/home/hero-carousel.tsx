@@ -50,8 +50,10 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
             aria-roledescription="slide"
             aria-label={`${i + 1} of ${slides.length}`}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={s.image} alt="" className="absolute inset-0 h-full w-full object-cover object-center md:object-[72%_center]" loading={i === 0 ? "eager" : "lazy"} />
+            {s.image ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={s.image} alt="" className="absolute inset-0 h-full w-full object-cover object-center md:object-[72%_center]" loading={i === 0 ? "eager" : "lazy"} />
+            ) : null}
             {s.title || s.text || s.cta ? (
               <>
                 <span

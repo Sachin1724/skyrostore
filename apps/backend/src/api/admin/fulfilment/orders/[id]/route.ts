@@ -131,7 +131,7 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
       ...(paymentAttempts as any[]).map((a) => ({
         at: a.attempted_at,
         event: `payment_${a.status}`,
-        detail: `${a.provider_id}${a.error_category ? ` — ${a.error_category}` : ""}${a.is_retry ? " (retry)" : ""}`,
+        detail: `${a.provider_id}${a.error_category ? `: ${a.error_category}` : ""}${a.is_retry ? " (retry)" : ""}`,
       })),
       ...(events as any[]).map((e) => ({ at: e.occurred_at, event: e.event_type, detail: e.checkout_step || e.page_path || null })),
     ]

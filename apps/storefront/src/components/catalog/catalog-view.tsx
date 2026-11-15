@@ -242,7 +242,7 @@ export async function CatalogView({
                         key={r.label}
                         href={href({ min: on ? undefined : r.min, max: on ? undefined : r.max })}
                         aria-current={on ? "true" : undefined}
-                        className={`rounded-full px-3 py-1.5 text-[13px] ${on ? "bg-navy text-white" : "bg-surface-soft text-navy hover:bg-surface-muted"}`}
+                        className={`rounded-md px-3 py-1.5 text-[13px] ${on ? "bg-navy text-white" : "bg-surface-soft text-navy hover:bg-surface-muted"}`}
                       >
                         {r.label}
                       </Link>
@@ -288,7 +288,7 @@ export async function CatalogView({
                             key={value}
                             href={href({ [`f_${facet.key}`]: selected ? undefined : value })}
                             aria-current={selected ? "true" : undefined}
-                            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[13px] ${
+                            className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[13px] ${
                               selected ? "bg-navy text-white" : "bg-surface-soft text-navy hover:bg-surface-muted"
                             }`}
                           >
