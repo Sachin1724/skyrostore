@@ -30,11 +30,11 @@ describe("visitor id", () => {
   it("prefers the signed-in customer", () => expect(getEffectiveCustomerId(req({ "x-visitor-id": "vis_abcdefgh" }, "cus_1"))).toBe("cus_1"));
   it("accepts a normal visitor id", () => expect(getEffectiveCustomerId(req({ "x-visitor-id": "vis_1234abcd-5678" }))).toBe("vis_1234abcd-5678"));
   it("never lets a caller claim a customer or admin id", () => {
-    expect(getEffectiveCustomerId(req({ "x-visitor-id": "cus_01HABCDEFGH" }))).toBe("guest_default");
-    expect(getEffectiveCustomerId(req({ "x-visitor-id": "user_01HABCDEFGH" }))).toBe("guest_default");
+    expect(getEffectiveCustomerId(req({ "x-visitor-id": "cus_01HABCDEFGH" }))).toBeNull();
+    expect(getEffectiveCustomerId(req({ "x-visitor-id": "user_01HABCDEFGH" }))).toBeNull();
   });
-  it("falls back for junk ids", () => {
-    expect(getEffectiveCustomerId(req({ "x-visitor-id": "a b;drop" }))).toBe("guest_default");
-    expect(getEffectiveCustomerId(req({}))).toBe("guest_default");
+  it("has no id for junk ids", () => {
+    expect(getEffectiveCustomerId(req({ "x-visitor-id": "a b;drop" }))).toBeNull();
+    expect(getEffectiveCustomerId(req({}))).toBeNull();
   });
 });

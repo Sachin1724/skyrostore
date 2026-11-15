@@ -5,6 +5,7 @@ import { getEffectiveCustomerId } from "../../../lib/customer-id";
 
 export async function GET(req: MedusaRequest, res: MedusaResponse) {
   const customerId = getEffectiveCustomerId(req);
+  if (!customerId) return res.status(200).json({ customer_id: null, product_ids: [], items: [] });
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const db = req.scope.resolve(ContainerRegistrationKeys.PG_CONNECTION) as any;
 
@@ -61,6 +62,7 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
 
 export async function POST(req: MedusaRequest, res: MedusaResponse) {
   const customerId = getEffectiveCustomerId(req);
+  if (!customerId) return res.status(400).json({ error: "Missing visitor id" });
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const db = req.scope.resolve(ContainerRegistrationKeys.PG_CONNECTION) as any;
   const body = req.body as { product_id?: string };
@@ -99,6 +101,7 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
 
 export async function DELETE(req: MedusaRequest, res: MedusaResponse) {
   const customerId = getEffectiveCustomerId(req);
+  if (!customerId) return res.status(400).json({ error: "Missing visitor id" });
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const db = req.scope.resolve(ContainerRegistrationKeys.PG_CONNECTION) as any;
   const body = req.body as { product_id?: string };
