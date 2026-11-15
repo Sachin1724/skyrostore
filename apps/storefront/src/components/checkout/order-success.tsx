@@ -9,6 +9,7 @@ import { useIconHover } from "@animateicons/react";
 import { PackageCheckIcon, TruckIcon, ClipboardCheckIcon, ArrowRightIcon } from "@animateicons/react/lucide";
 import { Printer, FileText, CheckCircle2, ShieldCheck, MapPin } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
+import { adsPurchase } from "@/lib/ads";
 import { hsnForItem, isIntraState, splitGst } from "@/lib/hsn";
 
 type Summary = {
@@ -69,6 +70,10 @@ export function OrderSuccess({ orderId, summary, seller }: { orderId?: string; s
   const timeline = useRef<ReturnType<typeof createTimeline> | null>(null);
   const [done, setDone] = useState(false);
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
+
+  useEffect(() => {
+    if (orderId && summary) adsPurchase({ id: orderId, total: summary.total, currency_code: summary.currency_code, items: summary.items });
+  }, [orderId, summary]);
 
   useEffect(() => {
     const el = root.current;

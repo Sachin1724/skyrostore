@@ -15,6 +15,8 @@ const SESSION_IDLE_MS = 30 * 60 * 1000;
 const FLUSH_DELAY_MS = 800;
 const MAX_BATCH = 20;
 
+import { adsFromTrack } from "@/lib/ads";
+
 export type TrackPayload = {
   cart_id?: string | null;
   order_id?: string | null;
@@ -182,6 +184,7 @@ export function track(eventType: string, payload: TrackPayload = {}) {
       ...getAttribution(),
       ...payload,
     };
+    adsFromTrack(eventType, payload);
     queue.push(event);
     bindLifecycleFlush();
 
