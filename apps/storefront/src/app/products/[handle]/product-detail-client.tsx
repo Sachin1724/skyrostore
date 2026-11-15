@@ -216,6 +216,11 @@ export function ProductDetailClient({
               {sku ? <span className="ml-3 font-normal text-text-secondary">SKU: {sku}</span> : null}
             </p>
 
+            {metadata.surface_only === true || metadata.component_type === "BATTERY" ? (
+              <p className="mt-2 text-[13px] text-text-secondary">
+                Ships by surface courier only (lithium batteries cannot go by air), so delivery takes a little longer.
+              </p>
+            ) : null}
             {!inStock ? <ProductAlternatives productId={product.id} /> : null}
 
             {/* Fulfillment and Warranty Signals */}

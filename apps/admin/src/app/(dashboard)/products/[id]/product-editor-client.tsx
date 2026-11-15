@@ -77,6 +77,7 @@ export function ProductEditorClient({ initialProduct, categories, brands, storef
   });
 
   // UI state
+  const [surfaceOnly, setSurfaceOnly] = useState(metadata.surface_only === true || componentType === "BATTERY");
   const [isSaving, setIsSaving] = useState(false);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -186,6 +187,7 @@ export function ProductEditorClient({ initialProduct, categories, brands, storef
           fields: templateValues,
         },
         customFields: cleanedCustom,
+        surfaceOnly,
       };
 
       const res = await fetch(`/api/products/${initialProduct.id}`, {
@@ -602,6 +604,15 @@ export function ProductEditorClient({ initialProduct, categories, brands, storef
       {/* TAB 3: COMMERCIAL & VARIANTS */}
       {activeTab === "commercial" && (
         <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-xs space-y-4">
+          <label className="flex items-start gap-3 rounded-md border border-gray-200 p-3 text-sm">
+            <input type="checkbox" checked={surfaceOnly} onChange={(e) => setSurfaceOnly(e.target.checked)} className="mt-0.5 h-4 w-4" />
+            <span>
+              <span className="font-semibold text-gray-900">Surface shipping only</span>
+              <span className="block text-xs text-gray-500">
+                For LiPo batteries and other dangerous goods. Courier booking is blocked for orders with this item, and the store tells the customer it ships by surface. Save with a button below to apply.
+              </span>
+            </span>
+          </label>
           <div className="rounded-md bg-amber-50 p-3 border border-amber-200 text-xs text-amber-800 flex items-center gap-2">
             <ShieldAlert className="h-4 w-4 text-amber-600 shrink-0" />
             <span>

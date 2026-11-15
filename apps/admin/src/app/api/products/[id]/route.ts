@@ -135,7 +135,7 @@ export async function POST(
 
   try {
     const body = await request.json();
-    const { title, handle, description, technicalSpecs, customFields, status } = body;
+    const { title, handle, description, technicalSpecs, customFields, status, surfaceOnly } = body;
     if (status !== undefined && status !== "published" && status !== "draft") {
       return NextResponse.json({ error: "Invalid status" }, { status: 400 });
     }
@@ -155,7 +155,11 @@ export async function POST(
     };
 
     // Serialize metadata ensuring backward compatibility with compatibility engine
-    const mergedMetadata = serializeMetadataWithSpecs(existingMetadata, finalSpecs);
+    const mergedMetadata: Record<string, unknown> = { ...serializeMetadataWithSpecs(existingMetadata, finalSpecs) };
+    if (typeof surfaceOnly === "boolean") {
+      if (surfaceOnly) mergedMetadata.surface_only = true;
+      else delete mergedMetadata.surface_only;
+    }
 
     // Call Medusa Admin API to persist product updates
     const updatePayload: Record<string, unknown> = {
