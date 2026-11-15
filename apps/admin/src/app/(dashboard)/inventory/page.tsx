@@ -2,6 +2,9 @@ import { getAuthToken } from "@/lib/auth";
 import { getInventoryItems } from "@/lib/data/admin";
 import { redirect } from "next/navigation";
 import { StockCell } from "./stock-cell";
+import { Pagination, pageOf } from "@/components/ui/pagination";
+
+const INVENTORY_PAGE_SIZE = 50;
 
 export const metadata = { title: "Inventory" };
 
@@ -10,13 +13,14 @@ const LOW_STOCK_THRESHOLD = 5;
 export default async function InventoryPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; low_stock?: string }>;
+  searchParams: Promise<{ q?: string; low_stock?: string; page?: string }>;
 }) {
   const token = await getAuthToken();
   if (!token) redirect("/login");
 
-  const { q, low_stock } = await searchParams;
-  const { inventory_items, count } = await getInventoryItems(token, { limit: 200, q });
+  const { q, low_stock, page: rawPage } = await searchParams;
+  const page = pageOf(rawPage);
+  const { inventory_items, count } = await getInventoryItems(token, { limit: INVENTORY_PAGE_SIZE, offset: (page - 1) * INVENTORY_PAGE_SIZE, q });
 
   const stockOf = (item: Record<string, unknown>) =>
     ((item.location_levels as Array<Record<string, unknown>> | undefined)?.[0]?.stocked_quantity as number) ?? 0;
@@ -84,6 +88,7 @@ export default async function InventoryPage({
           </table>
         </div>
       )}
+      <Pagination basePath="/inventory" query={{ q, low_stock }} page={page} pageSize={INVENTORY_PAGE_SIZE} total={count} />
     </div>
   );
 }

@@ -2,10 +2,13 @@ import { getAuthToken } from "@/lib/auth";
 import { getProducts, getCatalogOptions } from "@/lib/data/admin";
 import { redirect } from "next/navigation";
 import { VisibilityToggle } from "./visibility-toggle";
+import { Pagination, pageOf } from "@/components/ui/pagination";
+
+const PRODUCT_PAGE_SIZE = 50;
 
 export const metadata = { title: "Products" };
 
-type Search = { category?: string; brand?: string; status?: string; q?: string; low_stock?: string };
+type Search = { category?: string; brand?: string; status?: string; q?: string; low_stock?: string; page?: string };
 
 const LOW_STOCK_THRESHOLD = 5;
 
@@ -21,9 +24,11 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
   if (!token) redirect("/login");
 
   const filters = await searchParams;
+  const page = pageOf(filters.page);
   const [{ products, count }, { categories, brands }] = await Promise.all([
     getProducts(token, {
-      limit: 50,
+      limit: PRODUCT_PAGE_SIZE,
+      offset: (page - 1) * PRODUCT_PAGE_SIZE,
       category_id: filters.category,
       collection_id: filters.brand,
       status: filters.status,
@@ -144,6 +149,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
           </table>
         </div>
       )}
+      <Pagination basePath="/products" query={{ category: filters.category, brand: filters.brand, status: filters.status, q: filters.q, low_stock: filters.low_stock }} page={page} pageSize={PRODUCT_PAGE_SIZE} total={count} />
     </div>
   );
 }

@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "sonner";
+import { useConfirm } from "@/components/ui/confirm-dialog";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -40,7 +42,12 @@ const ALLOWED_STATUS_TRANSITIONS: Record<string, string[]> = {
 export function BulkOrderWorkbench({ initialRequest, storefrontUrl }: BulkOrderWorkbenchProps) {
   const [request, setRequest] = useState(initialRequest);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [notification, setNotification] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const confirm = useConfirm();
+  const [notification, setNotificationState] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const setNotification = (n: { type: "success" | "error"; text: string } | null) => {
+    setNotificationState(n);
+    if (n) (n.type === "success" ? toast.success : toast.error)(n.text);
+  };
   const [fetchingPriceFor, setFetchingPriceFor] = useState<string | null>(null);
 
   const quoteLink = `${storefrontUrl}/account/bulk-requests/${request.id}`;
@@ -183,7 +190,7 @@ export function BulkOrderWorkbench({ initialRequest, storefrontUrl }: BulkOrderW
 
   // Order Conversion Handler
   const handleConvertToOrder = async () => {
-    if (!confirm("Convert this accepted quotation to an active order in Medusa?")) return;
+    if (!(await confirm({ title: "Convert this accepted quotation to an active order?", confirmLabel: "Convert" }))) return;
     setIsProcessing(true);
     setNotification(null);
 

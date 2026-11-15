@@ -1,0 +1,28 @@
+# Admin panel fix plan
+
+Source: an external review of `apps/admin` (51 screens/components). Status as of this commit.
+
+## Phase 1 - breaks with real data (done)
+- [x] **Pagination** on Orders, Products, Customers, Inventory: `?page=N`, "Showing 21-40 of 312", filters kept in the URL (`components/ui/pagination.tsx`). Orders page size 25, products 50, customers 25, inventory 50.
+- [x] **Phone layout**: sidebar becomes a slide-in drawer below `md` (menu button in the top bar); top bar and padding shrink. Tables still scroll sideways on a phone.
+- [x] **`error.tsx` + `loading.tsx`** in `(dashboard)/`: retry button and a skeleton for every admin page.
+
+## Phase 2 - daily workflow
+- [x] **Toasts** (`sonner`): `<Toaster>` in the shell; the order fulfilment workbench and the bulk-quote workbench now toast every result.
+- [x] Bulk-quote conversion uses `ConfirmDialog` instead of `window.confirm`.
+- [x] "Delivered" order badge uses the same tinted style as the other states.
+- [ ] Toasts in the remaining ~15 screens that still use only inline `setError` (categories, promotions, moderation, media, customers, brands, product editor, settings, content).
+- [ ] Search on Customers, Quotations, Returns, Support. Order search by phone, AWB and Razorpay payment id (needs backend fields in `/admin/fulfilment/orders`).
+- [ ] Bulk actions on Orders and Products (select, then act).
+- [ ] Split the three 600+ line workbenches into panels.
+
+## Phase 3 - polish
+- [ ] Dashboard: today's revenue, 7-day trend, low-stock list.
+- [ ] Phone: orders as stacked cards.
+- [ ] Empty states with a next-step button.
+- [ ] Labels and tooltips on icon-only buttons.
+- [ ] Keyboard shortcuts (`/` search, `g o` orders).
+
+## Security (before giving anyone else a login)
+- [ ] Put the admin domain behind Cloudflare Access.
+- [ ] Roles: "staff" (fulfil orders) and "owner" (refunds, settings). Today every login can refund.

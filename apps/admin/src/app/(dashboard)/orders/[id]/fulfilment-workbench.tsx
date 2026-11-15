@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { Package, Truck, CheckCircle2, AlertTriangle, Printer, Ban, Undo2 } from "lucide-react";
 import { useConfirm } from "@/components/ui/confirm-dialog";
@@ -89,7 +90,12 @@ export function FulfilmentWorkbench({
     height_cm: "",
   });
   const [busy, setBusy] = useState<"" | "pack" | "book" | "ship" | "deliver" | "cancel" | "refund">("");
-  const [message, setMessage] = useState<{ kind: "ok" | "error"; text: string } | null>(null);
+  const [message, setMessageState] = useState<{ kind: "ok" | "error"; text: string } | null>(null);
+  // Every result also pops a toast, so it is seen even when the panel is scrolled out of view.
+  const setMessage = (m: { kind: "ok" | "error"; text: string } | null) => {
+    setMessageState(m);
+    if (m) (m.kind === "ok" ? toast.success : toast.error)(m.text);
+  };
   const confirm = useConfirm();
 
   const state: string = order.fulfilment_state;

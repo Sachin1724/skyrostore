@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getAuthToken } from "@/lib/auth";
+import { PAGE_SIZE, Pagination, pageOf } from "@/components/ui/pagination";
 import {
   FULFILMENT_STATES,
   STATE_LABELS,
@@ -16,7 +17,7 @@ const STATE_BADGE: Record<string, string> = {
   paid_processing: "bg-lime-100 text-gray-900 border border-lime-300",
   packed: "bg-blue-50 text-blue-800 border border-blue-200",
   shipped: "bg-emerald-50 text-emerald-800 border border-emerald-200",
-  delivered: "bg-gray-900 text-white",
+  delivered: "bg-emerald-50 text-emerald-800 border border-emerald-200",
   cancelled: "bg-gray-100 text-gray-600",
 };
 
@@ -33,16 +34,17 @@ function StateBadge({ state }: { state: string }) {
 export default async function OrdersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ state?: string; payment_status?: string; q?: string }>;
+  searchParams: Promise<{ state?: string; payment_status?: string; q?: string; page?: string }>;
 }) {
   const token = await getAuthToken();
   if (!token) redirect("/login");
 
-  const { state, payment_status, q } = await searchParams;
+  const { state, payment_status, q, page: rawPage } = await searchParams;
+  const page = pageOf(rawPage);
 
   let data;
   try {
-    data = await getFulfilmentOrders(token, { state, payment_status, q, limit: 100 });
+    data = await getFulfilmentOrders(token, { state, payment_status, q, limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE });
   } catch {
     return (
       <div>
@@ -60,7 +62,7 @@ export default async function OrdersPage({
     <div>
       <div className="flex items-baseline justify-between">
         <h1 className="text-xl font-semibold text-gray-900">Orders</h1>
-        <p className="text-sm text-gray-500">{count} shown</p>
+        <p className="text-sm text-gray-500">{count} {state || q ? "matching" : "total"}</p>
       </div>
 
       <div className="mt-4 flex flex-wrap gap-2">
@@ -160,6 +162,7 @@ export default async function OrdersPage({
           </table>
         </div>
       )}
+      <Pagination basePath="/orders" query={{ state, payment_status, q }} page={page} pageSize={PAGE_SIZE} total={count} />
     </div>
   );
 }

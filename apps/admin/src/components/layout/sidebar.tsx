@@ -22,6 +22,7 @@ import {
   Undo2,
   Percent,
   Mail,
+  X,
 } from "lucide-react";
 
 type NavItem = { href: string; label: string; icon: typeof LayoutDashboard; countKey?: keyof NavCounts };
@@ -78,13 +79,22 @@ function Badge({ count }: { count: number }) {
   );
 }
 
-export function AdminSidebar({ counts }: { counts: NavCounts }) {
+export function AdminSidebar({ counts, open, onClose }: { counts: NavCounts; open: boolean; onClose: () => void }) {
   const pathname = usePathname();
 
   return (
-    <aside className="flex w-56 shrink-0 flex-col border-r border-gray-200 bg-white">
-      <div className="flex h-14 items-center border-b border-gray-200 px-4">
+    <>
+      {open ? <div className="fixed inset-0 z-30 bg-black/40 md:hidden" onClick={onClose} aria-hidden /> : null}
+    <aside
+      className={`fixed inset-y-0 left-0 z-40 flex w-56 shrink-0 flex-col border-r border-gray-200 bg-white transition-transform md:static md:translate-x-0 ${
+        open ? "translate-x-0" : "-translate-x-full"
+      }`}
+    >
+      <div className="flex h-14 items-center justify-between border-b border-gray-200 px-4">
         <span className="text-sm font-semibold tracking-tight text-nearblack">SKYROSTORE</span>
+        <button type="button" onClick={onClose} aria-label="Close menu" className="rounded p-1 text-gray-500 hover:bg-gray-100 md:hidden">
+          <X className="h-4 w-4" aria-hidden />
+        </button>
       </div>
       <nav className="flex-1 overflow-y-auto py-3">
         {GROUPS.map((group) => (
@@ -111,5 +121,6 @@ export function AdminSidebar({ counts }: { counts: NavCounts }) {
         ))}
       </nav>
     </aside>
+    </>
   );
 }
